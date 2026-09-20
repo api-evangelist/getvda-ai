@@ -1,0 +1,100 @@
+generated: '2026-09-19'
+method: probed
+source: https://witness.getvda.ai/.well-known/agent-card.json
+sources:
+- https://witness.getvda.ai/.well-known/agent-card.json (terms block — "Commercial terms, discoverable before you commit")
+- https://witness.getvda.ai/docs
+- https://getvda.ai/console
+- https://agents.getvda.ai/.well-known/ai-catalog.json (paymentSummary + per-entry payment)
+- https://agents.getvda.ai/llms.txt
+- https://c2md.getvda.ai/.well-known/agent-card.json (scope descriptions name the tiers)
+provider: Verified Digital Agents (VDA)
+providerId: getvda-ai
+plan_count: 6
+summary: >-
+  Pricing is published machine-readably inside the served Witness agent card (a `terms` object with tiers[],
+  billingLive false) and inside the GOSCE ai-catalog (per-entry x402 payment terms), which is why method is
+  probed. There is no /pricing page on any host (the path returns the SPA shell). Witness: Sealed free
+  (5,000 seals/month, self-serve), Anchored from EUR 50/month (5,000 seals, concierge-enabled), Enterprise on
+  request. The Witness card states billing is NOT yet live and usage is "measured_not_billed". C2MD tiers
+  (Starter / Pro / Journey / platform Tier 3) are named through OAuth scopes and Witness account tiers with no
+  prices published. The GOSCE fleet is pay-per-call: $0.025 USDC per metered tool call (health_check $0.15),
+  discovery and selftest free, no account required, never charged on failure.
+plans:
+- id: witness-sealed
+  name: Witness — Sealed
+  product: VDA Witness
+  price: 0
+  currency: EUR
+  billing_period: month
+  access: self-serve, instant, no human
+  included:
+  - {metric: seals, quota: 5000, period: month, enforcement: 'measured, surfaced on every seal, never blocked over the limit'}
+  limits:
+  - key expiry 7 days (quick-start) unless a controller key is bound
+  - not externally anchored (terminal on this tier)
+  verbatim: "Sealed is free + self-serve"
+- id: witness-anchored
+  name: Witness — Anchored
+  product: VDA Witness
+  price: 50
+  price_qualifier: from
+  currency: EUR
+  billing_period: month
+  access: contact-gated (concierge today — anchoring is enabled manually)
+  included:
+  - {metric: seals, quota: 5000, period: month}
+  features:
+  - Everything in Sealed + externally anchored (Sigstore Rekor + DigiCert + Sectigo TSAs, quorum) — "provable even against VDA"
+  - Anchored account tier unlocks C2MD generate_starter and above
+  verbatim: "from EUR 50 / month"
+- id: witness-enterprise
+  name: Witness — Enterprise
+  product: VDA Witness
+  price: null
+  currency: null
+  billing_period: null
+  access: contact us
+  included:
+  - {metric: seals, quota: volume-negotiated}
+  features: [Volume, SLA, higher-assurance tier (customer-held signing key)]
+  verbatim: "talk to us"
+- id: c2md-free
+  name: C2MD — free tier (c2md:assess)
+  product: C2MD Compliance Agent
+  price: 0
+  currency: null
+  billing_period: null
+  access: any Witness Sealed-tier key, or Google/Microsoft sign-in
+  features: [assess_agent_risk, translate_control, list_supported_frameworks, generate_evidence_readiness_report, extract_governance_inputs]
+  limits: [rate-limited per account]
+- id: c2md-starter-pro-journey
+  name: C2MD — Starter / Pro / Journey
+  product: C2MD Compliance Agent
+  price: null
+  currency: null
+  billing_period: null
+  access: Anchored-tier Witness account, or a subscription resolved via Google/Microsoft OAuth
+  features:
+  - 'Starter (c2md:generate_starter): single-jurisdiction, single-framework-stack bundle, watermarked, non-commercial licence'
+  - 'Pro (c2md:generate_pro): multi-jurisdiction, full-framework-stack bundle + DPIA/FRIA scaffolding, commercial deployment licence'
+  - 'Journey (c2md:generate_journey): full VDA-MD two-axis library for an industry — skill PLANNED, not yet callable'
+  - 'Tier 3 (Microsoft clientCredentials, by arrangement): platform-of-record integrations, terms negotiated'
+  note: No prices are published for any paid C2MD tier.
+- id: gosce-pay-per-call
+  name: GOSCE fleet — x402 pay-per-call
+  product: GOSCE agent portfolio (98 metered MCP servers)
+  price: 0.025
+  currency: USDC
+  billing_period: per tools/call
+  access: no account, no signup — a funded USDC wallet on Base (eip155:8453), or Stripe card checkout for humans
+  included:
+  - {metric: tools/list, price: free}
+  - {metric: server/discover, price: free}
+  - {metric: selftest, price: free}
+  overage:
+  - 'health.getvda.ai health_check: $0.15 (fans out to up to 50 URLs)'
+  rules:
+  - Prices are per tool and stated in the 402 PAYMENT-REQUIRED header at request time; "if this catalog and that header disagree, the header wins"
+  - Never charged for a failed call — settlement runs only after a successful result
+  - Facilitator submits the transaction and pays the gas

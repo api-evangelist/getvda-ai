@@ -1,0 +1,71 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://getvda.ai/llms.txt
+probed:
+- {url: 'https://getvda.ai/privacy', status: 200, note: SPA shell (17,108-byte index), no privacy page}
+- {url: 'https://getvda.ai/terms', status: 200, note: SPA shell}
+- {url: 'https://getvda.ai/legal/subprocessors', status: 200, note: SPA shell}
+- {url: 'https://getvda.ai/legal/dpa', status: 200, note: SPA shell}
+- {url: 'https://getvda.ai/privacy/requests', status: 200, note: SPA shell}
+- {url: 'https://getvda.ai/accessibility', status: 200, note: SPA shell}
+- {url: 'https://getvda.ai/accessibility/vpat', status: 200, note: SPA shell}
+- {url: 'https://getvda.ai/transparency', status: 200, note: SPA shell}
+- {url: 'https://getvda.ai/security/sbom', status: 200, note: SPA shell}
+- {url: 'https://getvda.ai/docs/data-residency', status: 200, note: SPA shell}
+- {url: 'https://getvda.ai/ai/transparency', status: 200, note: SPA shell}
+- {url: 'https://getvda.ai/legal/report-content', status: 200, note: SPA shell}
+- {url: 'https://witness.getvda.ai/privacy', status: 200, note: Witness SPA shell (10,147 bytes), same for /terms /legal /security /accessibility /legal/subprocessors /legal/dpa /transparency /security/sbom /ai/transparency}
+- {url: 'https://getvda.ai/.well-known/security.txt', status: 404}
+note: >-
+  Every conventional legal / regulatory path on the apex and Witness hosts returns the single-page-app shell —
+  there is no privacy policy, terms of service, DPA, subprocessor list, VPAT, SBOM or transparency report anywhere
+  on the surface, and the homepage links none. The only signals that carry SUBSTANCE are embedded in the served
+  agent cards and llms.txt documents: an in-band data-residency and LLM-data-handling statement in the C2MD card
+  metadata, an AI-transparency statement about what the generated artefacts are and are not, and the field-level
+  honest-status labelling. Everything else is absent, and absence is the measurement. The company's PRODUCT is
+  regulatory evidence (EU AI Act Article 12 reports, GDPR Article 35 DPIA scaffolds) — that is what it sells,
+  not a statement about its own posture, and it is not recorded as one.
+signals:
+  data_residency:
+    url: https://c2md.getvda.ai/.well-known/agent-card.json
+    section: metadata.vda-md:dataResidency / vda-md:llmDataHandling
+    regions: [EU-west (europe-west1)]
+    evidence:
+    - source: https://c2md.getvda.ai/.well-known/agent-card.json
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: >-
+        "vda-md:dataResidency": ["EU-west"] ... "vda-md:llmDataHandling": "Vertex AI Gemini in europe-west1. Google does
+        not use inputs to train foundation models (Vertex default). Zero-data-retention is NOT currently configured:
+        inputs/outputs may be cached up to 24h in-region and prompts may be logged for abuse monitoring under standard
+        Vertex AI terms."
+    - source: https://acp.getvda.ai/readyz
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: '{"status":"ready","region":"europe-west1", ...}'
+    note: >-
+      A published, specific residency statement (region, sub-processor model, retention caveat) carried inside the
+      machine-readable card rather than on a legal page. Scoped to C2MD; no suite-wide residency page exists.
+  ai_transparency:
+    url: https://getvda.ai/llms.txt
+    section: Honesty
+    evidence:
+    - source: https://getvda.ai/llms.txt
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: >-
+        "Generated compliance artefacts follow a lifecycle: DEMO DATA (showcase runs) -> DRAFT (a real Compliance
+        Officer is attached) -> ATTESTED (post sign-off). They are audit-preparation drafts, not a finished regulatory
+        filing until attested. VDA produces the evidence and controls that support compliance; it does not itself
+        deliver legal compliance."
+    - source: https://c2md.getvda.ai/.well-known/agent-card.json
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: >-
+        "vda-md:humanApprovalGate": "All generated bundles require compliance-officer sign-off before deployment. C2MD
+        never claims to deliver legal compliance"; "vda-md:piiPreProcessing": "Microsoft Presidio, applied selectively ..."
+    note: >-
+      A published statement of what the AI-generated outputs are (drafts), which model produces them (Vertex AI
+      Gemini), how PII is pre-processed, and the human gate before use — the substance of an AI-transparency
+      disclosure, carried in llms.txt and the card rather than on an /ai/transparency page (which is the SPA shell).

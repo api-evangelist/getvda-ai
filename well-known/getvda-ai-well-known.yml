@@ -1,0 +1,583 @@
+generated: '2026-09-19'
+method: probed
+source: live GET of the named /.well-known/ path list (plus /.well-known/did.json, /.well-known/jwks.json, /.well-known/ai-catalog.json
+  and /llms.txt, which this provider is known to serve) on every host this record knows, with a negative-control
+  path per host
+hit_count: 25
+scored_path_hits: 0
+note: 'Ten hosts probed: the apex getvda.ai (and www, which does not resolve), the five governance-block hosts named
+  in the apex card''s relatedServices (witness, c2md, acp, onboard, hitl), the GOSCE fleet''s index host agents.getvda.ai
+  and router.getvda.ai, and one representative fleet agent host. NONE of the rating''s scored discovery documents
+  is served anywhere: no security.txt (RFC 9116), no api-catalog (RFC 9727), no openid-configuration, no oauth-authorization-server
+  / oauth-protected-resource (RFC 8414 / RFC 9728 — the MCP servers on witness, c2md and router authenticate with
+  a Witness bearer key or x402 payment rather than OAuth, so there is no auth-server to describe), no ai-plugin.json,
+  no ucp/acp/aauth documents and no apis.json. Accordingly NO WellKnown and NO SecurityTxt pointer is emitted. What
+  the provider DOES publish at RFC 8615 paths is an agent-identity surface the rubric does not yet score: W3C did:web
+  DID documents on five hosts (witness, acp, onboard, hitl, agents — Ed25519 JsonWebKey2020 verification methods
+  with a rotationLog), an RFC 7517 JWKS on agents.getvda.ai that signs every fleet agent card, and a 99-entry ''AgenticResourceCatalog''
+  at agents.getvda.ai/.well-known/ai-catalog.json (specVersion 1.0, one entry per metered MCP server with x402 payment
+  terms) that the agents DID document names as its catalog service. Those are saved verbatim and indexed here with
+  document: true. The apex getvda.ai is a Google-Frontend SPA that answers 200 text/html (the 17,108-byte index
+  shell) for every EXTENSION-LESS unknown path while a path carrying a file extension 404s (the .json negative control
+  returned 404; /.well-known/getvda-ai-negative-control-9c1e4d7a without an extension returned the shell) — so its
+  openid-configuration / oauth-authorization-server / oauth-protected-resource / api-catalog 200s are the SPA shell
+  and are marked document: false; the legacy /.well-known/agent.json on that host is a real but older JSON document,
+  distinct from its agent-card.json. hitl.getvda.ai answers 401 for every path but its card, DID document, openapi.json
+  and health probes. Agent cards are indexed here for completeness and graded in a2a/getvda-ai-a2a.yml.'
+hosts:
+- host: https://getvda.ai
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 200
+    content_type: text/html; charset=UTF-8
+    bytes: 17108
+    note: SPA/catch-all HTML shell, not a document — treated as a miss
+    document: false
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    content_type: text/html; charset=UTF-8
+    bytes: 17108
+    note: SPA/catch-all HTML shell, not a document — treated as a miss
+    document: false
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    content_type: text/html; charset=UTF-8
+    bytes: 17108
+    note: SPA/catch-all HTML shell, not a document — treated as a miss
+    document: false
+  - path: /.well-known/api-catalog
+    status: 200
+    content_type: text/html; charset=UTF-8
+    bytes: 17108
+    note: SPA/catch-all HTML shell, not a document — treated as a miss
+    document: false
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json; charset=UTF-8
+    bytes: 5783
+    file: ../a2a/getvda-ai-site-agent-card.json
+    document: true
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json; charset=UTF-8
+    bytes: 5179
+    file: ../a2a/getvda-ai-site-legacy-agent-card.json
+    document: true
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/did.json
+    status: 404
+  - path: /.well-known/jwks.json
+    status: 404
+  - path: /.well-known/ai-catalog.json
+    status: 404
+  - path: /llms.txt
+    status: 200
+    content_type: text/plain; charset=UTF-8
+    bytes: 10624
+    file: ../llms/getvda-ai-llms.txt
+    document: true
+  - path: /.well-known/getvda-ai-negative-control-9c1e4d7a.json
+    status: 404
+    control: true
+  path_echo_control: 'passed for a .json control path only — an extension-less control path (/.well-known/getvda-ai-negative-control-9c1e4d7a)
+    returns the 200 SPA shell, which is why the four extension-less discovery paths on this host show 200 with document:
+    false'
+- host: https://www.getvda.ai
+  documents:
+  - path: /.well-known/security.txt
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/openid-configuration
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/oauth-authorization-server
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/oauth-protected-resource
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/api-catalog
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/ai-plugin.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/agent-card.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/agent.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/aauth-resource.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/ucp.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/acp.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/apis.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /apis.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /apis.yml
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/did.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/jwks.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/ai-catalog.json
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /llms.txt
+    status: 0
+    note: DNS does not resolve / no HTTPS listener
+  - path: /.well-known/getvda-ai-negative-control-9c1e4d7a.json
+    status: 0
+    control: true
+  path_echo_control: not applicable — host unreachable
+- host: https://witness.getvda.ai
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 38250
+    file: ../a2a/getvda-ai-agent-card.json
+    document: true
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 38250
+    file: ../a2a/getvda-ai-agent-card.json
+    document: true
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/did.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 626
+    file: getvda-ai-witness-did.json
+    document: true
+  - path: /.well-known/jwks.json
+    status: 404
+  - path: /.well-known/ai-catalog.json
+    status: 404
+  - path: /llms.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    bytes: 23138
+    file: ../llms/getvda-ai-witness-llms.txt
+    document: true
+  - path: /.well-known/getvda-ai-negative-control-9c1e4d7a.json
+    status: 404
+    control: true
+  path_echo_control: passed
+- host: https://c2md.getvda.ai
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json
+    bytes: 33802
+    file: ../a2a/getvda-ai-c2md-agent-card.json
+    document: true
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/did.json
+    status: 404
+  - path: /.well-known/jwks.json
+    status: 404
+  - path: /.well-known/ai-catalog.json
+    status: 404
+  - path: /llms.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    bytes: 3948
+    file: ../llms/getvda-ai-c2md-llms.txt
+    document: true
+  - path: /.well-known/getvda-ai-negative-control-9c1e4d7a.json
+    status: 404
+    control: true
+  path_echo_control: passed
+- host: https://acp.getvda.ai
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 4344
+    file: ../a2a/getvda-ai-acp-agent-card.json
+    document: true
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/did.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 1172
+    file: getvda-ai-acp-did.json
+    document: true
+  - path: /.well-known/jwks.json
+    status: 404
+  - path: /.well-known/ai-catalog.json
+    status: 404
+  - path: /llms.txt
+    status: 404
+  - path: /.well-known/getvda-ai-negative-control-9c1e4d7a.json
+    status: 404
+    control: true
+  path_echo_control: passed
+- host: https://onboard.getvda.ai
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json
+    bytes: 20060
+    file: ../a2a/getvda-ai-onboard-agent-card.json
+    document: true
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/did.json
+    status: 200
+    content_type: application/json
+    bytes: 861
+    file: getvda-ai-onboard-did.json
+    document: true
+  - path: /.well-known/jwks.json
+    status: 404
+  - path: /.well-known/ai-catalog.json
+    status: 404
+  - path: /llms.txt
+    status: 404
+  - path: /.well-known/getvda-ai-negative-control-9c1e4d7a.json
+    status: 404
+    control: true
+  path_echo_control: passed
+- host: https://hitl.getvda.ai
+  documents:
+  - path: /.well-known/security.txt
+    status: 401
+  - path: /.well-known/openid-configuration
+    status: 401
+  - path: /.well-known/oauth-authorization-server
+    status: 401
+  - path: /.well-known/oauth-protected-resource
+    status: 401
+  - path: /.well-known/api-catalog
+    status: 401
+  - path: /.well-known/ai-plugin.json
+    status: 401
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 20878
+    file: ../a2a/getvda-ai-hitl-agent-card.json
+    document: true
+  - path: /.well-known/agent.json
+    status: 401
+  - path: /.well-known/aauth-resource.json
+    status: 401
+  - path: /.well-known/ucp.json
+    status: 401
+  - path: /.well-known/acp.json
+    status: 401
+  - path: /.well-known/apis.json
+    status: 401
+  - path: /apis.json
+    status: 401
+  - path: /apis.yml
+    status: 401
+  - path: /.well-known/did.json
+    status: 200
+    content_type: application/json; charset=utf-8
+    bytes: 1364
+    file: getvda-ai-hitl-did.json
+    document: true
+  - path: /.well-known/jwks.json
+    status: 401
+  - path: /.well-known/ai-catalog.json
+    status: 401
+  - path: /llms.txt
+    status: 401
+  - path: /.well-known/getvda-ai-negative-control-9c1e4d7a.json
+    status: 401
+    control: true
+  path_echo_control: passed
+- host: https://agents.getvda.ai
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/did.json
+    status: 200
+    content_type: application/did+json
+    bytes: 1057
+    file: getvda-ai-agents-did.json
+    document: true
+  - path: /.well-known/jwks.json
+    status: 200
+    content_type: application/jwk-set+json
+    bytes: 235
+    file: getvda-ai-agents-jwks.json
+    document: true
+  - path: /.well-known/ai-catalog.json
+    status: 200
+    content_type: application/json
+    bytes: 190112
+    file: getvda-ai-agents-ai-catalog.json
+    document: true
+  - path: /llms.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    bytes: 21237
+    file: ../llms/getvda-ai-gosce-llms.txt
+    document: true
+  - path: /.well-known/getvda-ai-negative-control-9c1e4d7a.json
+    status: 404
+    control: true
+  path_echo_control: passed
+- host: https://router.getvda.ai
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json
+    bytes: 9551
+    file: ../a2a/getvda-ai-gosce-router-agent-card.json
+    document: true
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json
+    bytes: 9551
+    file: ../a2a/getvda-ai-gosce-router-agent-card.json
+    document: true
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/did.json
+    status: 404
+  - path: /.well-known/jwks.json
+    status: 404
+  - path: /.well-known/ai-catalog.json
+    status: 404
+  - path: /llms.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    bytes: 2174
+    file: ../llms/getvda-ai-gosce-router-llms.txt
+    document: true
+  - path: /.well-known/getvda-ai-negative-control-9c1e4d7a.json
+    status: 404
+    control: true
+  path_echo_control: passed
+- host: https://authenticated-llm-agent-cryptography.getvda.ai
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    content_type: application/json
+    bytes: 4008
+    file: ../a2a/getvda-ai-gosce-fleet-sample-agent-card.json
+    document: true
+  - path: /.well-known/agent.json
+    status: 200
+    content_type: application/json
+    bytes: 4008
+    file: ../a2a/getvda-ai-gosce-fleet-sample-agent-card.json
+    document: true
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/did.json
+    status: 404
+  - path: /.well-known/jwks.json
+    status: 404
+  - path: /.well-known/ai-catalog.json
+    status: 404
+  - path: /llms.txt
+    status: 200
+    content_type: text/plain; charset=utf-8
+    bytes: 2458
+    document: true
+    note: served but not saved (fleet host; templated per-agent llms.txt)
+  - path: /.well-known/getvda-ai-negative-control-9c1e4d7a.json
+    status: 404
+    control: true
+  path_echo_control: passed

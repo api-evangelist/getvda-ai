@@ -1,0 +1,294 @@
+# VDA Witness
+
+> The evidence layer of Verified Digital Agents (VDA). Seal governed AI-agent
+> decisions into tamper-evident, Ed25519-signed, hash-chained records, and verify
+> them OFFLINE against public infrastructure (Sigstore Rekor + RFC-3161 TSAs) with
+> zero dependency on VDA. `verify` is public (no key); `seal`/`report` need a key.
+
+## Get a key (self-serve, instant, no human in the loop)
+SEALED-tier key — signed + hash-chained + independently verifiable OFFLINE, but NOT
+externally anchored (terminal on this tier; "provable even against VDA" does NOT apply):
+  POST https://witness.getvda.ai/api/witness/test-key   {"email":"optional@example.com"}   (stable endpoint name)
+  -> { "apiKey":"wtn.<id>.<secret>", "accountId":"acct_<ULID>", "sealed":true, "anchored":false,
+       "sealedState":"not_anchored", "sealedStateReason":"anchoring_not_enabled_for_account",
+       "tier":"test", "compliance":false, "expiresInDays":7 }   // tier/compliance = DEPRECATED aliases
+Use as: Authorization: Bearer <apiKey>   (or header x-witness-key: <apiKey>)
+Also discoverable IN-BAND (no homepage): the A2A agent card's provisioning.selfServeKey
+field, and the MCP tool get_test_key — same endpoint, same caps, same Sealed-tier labels.
+Anchored-tier keys (externally committed — provable even against us) are CONCIERGE-gated,
+NOT self-serve — contact via https://witness.getvda.ai/#get-key.
+
+## Durable account + agent-provable renewal (no human, forever) — THE provisioning model
+This is THE way to provision, not an upgrade: bind a controller key you hold, then mint your
+OWN short-lived keys by renewing. API keys are short-lived by design; the account is the
+durable identity that outlives them, and there is no standing credential to leak. Concierge/
+service provisioning goes further — supply a controller and NO bootstrap key is issued at
+all; your FIRST key comes from a renewal. A returned key without a controller is a quick-start
+EXCEPTION (short-lived), and a non-expiring key is an explicit, audited EXCEPTION — not the norm.
+  1. Generate an Ed25519 keypair. Keep the private key; publish nothing.
+  2. POST https://witness.getvda.ai/api/witness/test-key  {"controllerPublicKeyJwk":{"kty":"OKP","crv":"Ed25519","x":"<base64url>"}}
+     -> a DURABLE account (no 7-day expiry) bound to your controller. (Concierge provisioning with a
+        controller issues NO key here — you go straight to step 3 for your first key.)
+  3. When the key expires (or to get your first key), renew unattended — SAME account, SAME chain:
+     a. POST https://witness.getvda.ai/api/witness/renew/challenge  {"accountId":"acct_..."}
+        -> { nonce, sign_payload:"vda.witness.renew/1|<accountId>|<nonce>" (the EXACT string to sign),
+             renew:{method:"POST", endpoint:"/api/witness/renew"} (structured routing) }
+     b. Ed25519-sign sign_payload (raw Ed25519, base64url) with your controller key
+     c. POST renew.endpoint  {"accountId":"acct_...","nonce":"...","signature":"<base64url>"}
+        -> a fresh short-TTL key bound to the same account. Prior keys stay valid until they expire (overlap).
+Already hold a legacy key? Bind a controller to that existing account instead:
+  POST https://witness.getvda.ai/api/witness/account/bind-controller  (auth: your current key) {"controllerPublicKeyJwk":{...}}
+Renewal is authorised by your controller-key signature (not a bearer token), rate-limited
+per account, and NOT subject to the anonymous-mint caps. Also via MCP: renew_challenge, renew_key.
+Seals continue at the next seq with unbroken prev-hash — a leaked short-TTL key dies fast; the account never does.
+
+## Seal a decision (needs a key)
+POST https://witness.getvda.ai/api/witness/seal
+  headers: authorization: Bearer <key>
+  body: {
+    "decision": {"agent":"Refund Agent","inputs":{"amountEur":150},"verdict":"PASS","reasoning":"<= 200"},
+    "governingRule": {"ruleId":"refund.auto","ruleText":"Agents MAY auto-approve refunds up to EUR200."},
+    "chainKey": "default",          // optional; ordering namespace AND the grouping primitive (see below)
+    "decisionId": "idempotency-key" // optional, dedupe on (account, decisionId)
+  }
+The account is derived from your credential and signed into the record; do NOT send an "account" field.
+
+## Shaped seals (needs a key) — PREFER these; they make records auditor-reconstructable
+Witness publishes its opinion about evidentiary COMPLETENESS at the protocol layer. Pick the
+skill that matches your record's basis; the generic /seal above is the compatibility escape
+(records with no record_type, reported as unstructured). Three record types:
+
+POST https://witness.getvda.ai/api/witness/seal/hitl-decision   — a HUMAN decided.
+  required: actor{id,type:human,role?}, decision{statement,disposition?},
+            governing_clauses[{ref,text?,hash?}] (>=1), basis_captured_at (decision time),
+            evidence[{ref,hash,media_type?,captured_at?,inline?}] (>=1) OR evidence_omitted_reason
+  evidence = the system-of-record artifacts the decider SAW (external, hashed) — NOT the action
+  produced. inline embeds an artifact (<=100KB decoded); Witness verifies bytes match hash.
+
+POST https://witness.getvda.ai/api/witness/seal/agent-action    — an AGENT acted autonomously under a rule.
+  required: actor{id,type:agent|system}, action{statement,outcome?,rationale?}, governing_rule{ref,...}
+  and at least one of: evidence[...] (EXTERNAL material it saw, hashed) / parameters{...}
+  (COMPUTED arguments it was passed, self-contained, NOT hashed) — else evidence_omitted_reason.
+  one-question test: exists outside this record? -> evidence (hash it). computed/passed? -> parameters.
+  optional agent_context{cloud_run_revision?,model_name?,region?,...} — asserted, not verified.
+
+POST https://witness.getvda.ai/api/witness/seal/attestation     — assert a fact/state AS OF a time.
+  required: actor{id,type}, claim, as_of.  optional: evidence[...], governing_basis{ref,...}, context.
+  not for decisions. without governing_basis it is attested-by-the-signing-party, not verified.
+
+Witness seals the ASSERTED actor identity (and agent_context) — it does not authenticate them.
+All three also available as MCP tools (seal_hitl_decision / seal_agent_action / seal_attestation)
+and produce a standard vda.witness.record/1; the taxonomy block rides in the signed decision.inputs,
+readable via get_record and surfaced as recordType in list_records.
+
+## Admission credentials (issue / check_valid / revoke) — the credential IS a sealed record
+For issuing agents (e.g. Onboarding Agent) + enforcers (environment operators). A
+credential is a sealed attestation (attestation_type "admission_credential"); enforcers
+hold only the credential_id and verify by calling Witness. Immutable — validity is
+COMPUTED, revocation is a new superseding record.
+
+Issue (needs the issuer's key):
+  POST https://witness.getvda.ai/api/witness/credentials/issue
+  body: {subject_did, issuer_did, environment_id, scope:[...], governance_files_hash,
+         sandbox_result:{pass,score,evidence_seal_ref}, impact_delta_ref, expires_at,
+         compliance_mappings?:[{framework,article_ref,claim}]}
+  -> { credential_id, record:{...signed...}, stored:true }   (credential_id = the seal ref)
+
+check_valid (PUBLIC, no key — the single canonical validity answer):
+  GET https://witness.getvda.ai/api/witness/credentials/<credential_id>
+  -> { valid:bool, code, subject, issuer, environment, scope, expires_at,
+       revoked:bool, revoked_at?, reason_code?, issuer_verified, issuer_verification }
+  issuer_verified/issuer_verification = a DISTINCT signal from the lifecycle verdict (issuer-authenticity):
+    verified (customer-managed + signing key published in issuer_did's DID doc — provable even against Witness)
+    | key_not_in_did_doc (LOUD: claims an issuer but signed by a key not in its DID — suspicious)
+    | custodial (Witness-signed; issuer-authenticity NOT established, only integrity/anchoring)
+    | did_unresolvable (the check did not complete — not verified AND not forged). Set your own bar.
+  code = valid | revoked | expired | not_found | not_credential   (always HTTP 200 — branch on code)
+  Cache-Control: private, max-age=60 (credential found) / no-store (not_found|not_credential).
+  Witness computes validity (issued ∧ signature ∧ not-revoked-by-issuer ∧ not-expired) so
+  every enforcer is identically correct — the definition of "valid" evolves in one place.
+  TWO enforcer disciplines: (1) a credential_id is a BEARER handle — a valid credential is
+  necessary, NOT sufficient; separately challenge the presenter to prove control of "subject".
+  (2) Log every check_valid response in YOUR OWN audit trail (timestamp, credential_id,
+  response) — only your local record proves what YOU acted on and when.
+
+Revoke (needs the ISSUING account's key — only the issuer may revoke; terminal):
+  POST https://witness.getvda.ai/api/witness/credentials/<credential_id>/revoke
+  body: {reason_code:"policy_violation"|"superseded"|"compromised"|"environment_offboarded"|"other",
+         revoked_by, reason_text?}
+  -> new revocation record; verify reflects it within ~60s. Customers request revocation
+  via the issuing service (onboard.getvda.ai), which owns policy and executes here.
+
+## Revoke an API key (sealed as an event) — POST https://witness.getvda.ai/api/witness/keys/revoke
+A revoked key stops authenticating at once and the revocation is sealed as a key_revocation
+attestation on your chain. TWO authorities, distinguished by revoked_by.type (the trust level,
+not a code path):
+  CONTROLLER-AUTHORIZED (owner self-service, no operator) — prepare a key_revocation and sign
+  it with your BOUND CONTROLLER key, so the record is customer-managed (provable AGAINST Witness):
+    1. POST https://witness.getvda.ai/api/witness/prepare {skill:"revoke_api_key",
+         params:{key_id:"<keyId>", revoked_by:{type:"controller"}, reason_code:"exposed"},
+         signingPublicKeyJwk:<your controller public JWK>, signingKeyId:"controller"}
+    2. Ed25519-sign canonicalBytes with your controller PRIVATE key
+    3. POST https://witness.getvda.ai/api/witness/keys/revoke { record:{...prepared..., proof:{...}} }
+       -> Witness verifies the signer IS your bound controller and the key is yours; { revoked:true }
+  ADMIN break-glass (operator) — POST https://witness.getvda.ai/api/witness/keys/revoke {key_id} with x-witness-admin;
+  sealed CUSTODIALLY, revoked_by.type="operator".
+  reason_code = compromised | exposed | rotated | superseded | operator_action | other.
+Revocation is TOTAL: a revoked key 401s AND its account's records become unfetchable with it —
+no operator backdoor. Reflected in whoami (revoked key 401s; ≤60s sibling-cache lag only).
+
+## Customer-managed custody (customer-controlled signing) — issuer-authenticity
+By default shaped skills seal CUSTODIALLY (Witness signs). For issuer-authenticity
+provable even against Witness, seal CUSTOMER-MANAGED: the record is signed by YOUR key,
+Witness never holds it. You keep shape enforcement because Witness is the sole assembler
+(no client-side body-builder to drift). Three steps:
+  1. PREPARE (stateless): POST https://witness.getvda.ai/api/witness/prepare
+     {skill:"issue_admission_credential"|"revoke_admission_credential"|"seal_agent_action"
+       |"seal_attestation"|"seal_hitl_decision", params:{...}, signingPublicKeyJwk:{kty,crv,x}}
+     -> { record:{...unsigned...}, canonicalBytes:"<exact UTF-8 to sign>", seq, prevHash,
+          submit:{method:"POST", endpoint:"/api/witness/..."}, submitInstructions:"<prose>" }
+     NB: submit is STRUCTURED ROUTING {method,endpoint} — POST your signed record to submit.endpoint.
+     Do NOT treat submitInstructions (prose) as a path.
+  2. SIGN canonicalBytes with your record-signing PRIVATE key: raw Ed25519, base64url.
+  3. SUBMIT: POST to prepare's submit.endpoint (structured — never guess the path) with
+     { record:{...prepared..., proof:{algorithm:"Ed25519", signature:"<base64url>", created:record.issuedAt}} }
+     custody=customer-managed. Chain advanced between prepare+submit -> 409, re-prepare.
+Publish your record-signing PUBLIC key at your issuer did:web (e.g. did:web:onboard.getvda.ai
+/.well-known/did.json) so check_valid returns issuer_verified:true. States: verified /
+key_not_in_did_doc (suspicious) / custodial / did_unresolvable.
+THREE DISTINCT KEYS: account controller key (renewal) / record-signing key (custody +
+published at did:web) / did:web card-signing key. Use a dedicated record-signing key.
+Once customer-managed for real credentials, seal customer-managed for ALL seals on that
+chain (uniform issuer-authenticity). Records still hash-chain + anchor (both properties).
+
+## Group related records — chainKey IS the grouping primitive (do not build your own)
+Witness has NO bundle_id / group_id / parent_id field, and does not need one: chainKey is it.
+Every seal endpoint (generic, all three shaped seals, prepare, revoke) takes an optional
+top-level "chainKey". Records sharing one are hash-linked in seal order into a set that is
+retrievable and provable AS A SET:
+  GET  https://witness.getvda.ai/api/witness/chains/<chainKey>/proof   -> whole trail + anchor + did.json, ONE call
+  GET  https://witness.getvda.ai/api/witness/records?chainKey=<key>    -> that group only (+ chainKeys[] to discover)
+  POST https://witness.getvda.ai/api/witness/report {"chainKey":"..."} -> Article 12 evidence scoped to that group
+Give the seals of one workflow / compliance bundle / case a stable shared key, namespaced to
+you: "c2md:bundle:<id>", "acp:run:<id>". Max 128 chars [A-Za-z0-9._:-]; omitted => "default".
+
+Do NOT instead seal a manifest record that lists sibling record IDs as evidence. Evidence
+{ref,hash} means the CONTENT hash of external material; a record ID is not its content, so a
+hand-rolled manifest either carries a hash an auditor cannot reproduce or fabricates one. The
+chain link is the grouping proof — it is cryptographic, Witness-verified, and free.
+
+Chains are cheap and independent. Each (account, chainKey) anchors on its own hourly cursor,
+so a finished group anchors once and then goes quiet — it does NOT re-anchor forever like a
+single ever-growing chain. Many small chains cost LESS than one large one. Per-chain writers
+also avoid the 409 you get when a customer-managed prepare/submit races another writer on the
+same chain. Chains are account-scoped: a foreign/unknown chainKey returns 404, never a leak.
+
+CAUTION — decisionId is NOT namespaced by chainKey. Dedupe is (account, decisionId), backed
+by a UNIQUE index that does not include chain_key, so the SAME decisionId on a DIFFERENT chain
+still collides and returns the first record with deduped:true. Do not derive a decisionId from
+the chainKey alone (e.g. "manifest:<bundleId>") for a record you may ever re-seal with changed
+content — include a content hash or seq discriminator, or omit decisionId entirely.
+
+## Proof of integrity (PUBLIC, no key, no account) — start here if you are evaluating
+Do not take "provable even against VDA" on trust; it is published as a resolvable artifact:
+  GET https://witness.getvda.ai/proof              — the claim, and how to falsify it
+  GET https://witness.getvda.ai/proof/bundle.json  — a real anchored record + its chain + anchor + did.json
+One purpose-made record on a dedicated account/chain (no customer data). Verify it OFFLINE
+with the Apache-2.0 zero-dependency SDK, or skip us entirely and resolve its chain head in
+Sigstore Rekor — a public append-only log operated by the Linux Foundation, not by VDA.
+NOTE the tier boundary: the free self-serve tier is DELIBERATELY never anchored, so records
+you seal with a test key are signed and chain-verifiable but carry NO external commitment.
+Anchoring, and therefore "provable even against VDA", is a paid-tier property.
+
+## Verify a record (PUBLIC, no key) — fastest first success
+Offline SDK (recommended, no VDA call):
+  npm i vda-witness   |   pip install "vda-witness[verify]"
+  import { offlineVerify } from "vda-witness/verify";
+  const v = await offlineVerify({ record, chain, didDocument, anchor });
+  // v.state in { ANCHORED_VALID, SIGNED_PENDING, BROKEN, INSUFFICIENT_PROOF }
+Chain continuity is checkable OFFLINE (zero Witness calls) — fetch a self-contained bundle:
+  GET https://witness.getvda.ai/api/witness/records/<recordId>?proof=chain   (record + full chain + anchor + did.json)
+  GET https://witness.getvda.ai/api/witness/chains/<chainKey>/proof          (whole trail in one pass)
+Feed {record, chain, anchor, didDocument} to offlineVerify. INSUFFICIENT_PROOF = bundle was incomplete
+(missing predecessors), NOT tampering; BROKEN/chain is reserved for a genuinely altered/removed/reordered chain.
+Account-scoped (from the key); predecessor path, size linear in chain length (not a Merkle inclusion proof).
+Server verify (also public):
+  POST https://witness.getvda.ai/api/witness/verify  {"record": <record>}  -> { ok, bodyHash, signatureValid, errors }
+Verify a record's ISSUER-authenticity WITHOUT seeing the record (PUBLIC, verdict only):
+  GET https://witness.getvda.ai/api/witness/records/<recordId>/issuer
+  -> { record_id, signature_valid, issuer_verified, issuer_verification, issuer_did, signer_key }
+  For ANY record by id — returns a verdict + the issuer DID + the key it resolved against, NEVER
+  the body/decision.inputs/evidence. This is how an enforcer of a privilege-widening event (e.g. a
+  service's own genesis authority registration or baseline promotion, sealed customer-managed)
+  confirms the issuer signed it — without the account's key. Four states, same as check_valid's:
+  verified / key_not_in_did_doc (loud) / custodial (not applicable) / did_unresolvable (incomplete).
+  Also MCP tool verify_record_issuer.
+
+## Read your own records (needs a key) — operational query, NOT the report
+List (paginated summaries + your chainKeys, so you can discover your own chains):
+  GET https://witness.getvda.ai/api/witness/records?chainKey=&since=&until=&limit=50&cursor=
+  -> { account, chainKeys:[...], records:[{recordId,chainKey,seq,verdict,agent,ruleId,bodyHash,sealedAt,anchorState}], nextCursor }
+Get ONE record — the FULL signed body incl. decision.reasoning/inputs/actionProposed + proof + anchor:
+  GET https://witness.getvda.ai/api/witness/records/<recordId>  -> { record:{...full...}, chainKey, anchorState, anchor }
+Account-scoped by your key (never an accountId param); a foreign/unknown id -> 404 (no existence leak).
+This is how you read back your own reasoning. Distinct from /report (Article-12 evidence artefact).
+
+## Suite-service credential resolution — whoami (needs a key)
+For OTHER getvda.ai services (C2MD first) that accept "Authorization: Bearer wtn.<id>.<secret>"
+from their own callers and need to validate it. Witness is the SOLE source of truth for its
+own keys — siblings do NOT replicate the key store; they call whoami:
+  GET https://witness.getvda.ai/api/witness/whoami   (Authorization: Bearer wtn.<id>.<secret>)
+  -> { account_id, tier:"SEALED"|"ANCHORED", scopes:[...], compliance:bool, key_id, revoked:false, expires_at }
+  expires_at = key validity window (ISO-8601, or null = non-expiring) — authorize on VALIDITY, not just
+  presence: a revoked/expired key 401s before reaching here, but surface expires_at so you don't grant on
+  a key about to lapse. (This is the sanctioned cross-service auth path — "Contract A".)
+tier comes from the ACCOUNT (not the key). 200 is Cache-Control: private, max-age=60 (cache ~1min;
+revocations may lag by that). 401 (unknown/malformed/wrong-secret/revoked) is generic + no-store —
+no existence leak. Any valid key may ask about ITSELF only (no elevated scope; can't enumerate other
+accounts). There is NO privileged service key: a sibling acts on behalf of whichever key ITS caller
+presented. Permissively rate-limited per IP AND per account.
+
+## Pricing & usage (billing NOT yet live)
+Sealed     — FREE · 5,000 seals/month · self-serve, instant. Signed + verifiable offline, NOT anchored (terminal).
+Anchored   — from EUR 50/month · 5,000 included · externally anchored (Rekor + DigiCert + Sectigo, quorum) —
+             provable even against VDA. CONTACT to enable (concierge today; anchoring is enabled manually).
+Enterprise — talk to us (volume, SLA, higher-assurance customer-held-key tier).
+Seal usage is MEASURED + surfaced on every seal response (usage block) and via GET https://witness.getvda.ai/api/witness/usage:
+  { seals_this_period, included:5000, remaining, period_end, tier, over_limit, enforcement:"measured_not_billed" }
+Over the 5,000/month allowance it WARNS but NEVER blocks (an evidence trail is never silently dropped).
+Upgrading Sealed->Anchored preserves the SAME account id + chains (anchoringBeganSeq marks where anchoring began).
+Machine-readable terms are in the A2A card's "terms" block.
+
+## Article 12 report (needs a key) — EVIDENCE ARTEFACT, not a query
+POST https://witness.getvda.ai/api/witness/report {"chainKey":"...optional","since":"...","until":"..."} -> Article 12 evidence
+report from your trail, scopable by chain + date range. Lifecycle/integrity/disclaimer are verbatim.
+
+## MCP (zero-code connector)
+Endpoint: https://witness.getvda.ai/api/witness/mcp  (JSON-RPC 2.0)
+Tools: get_test_key (self-serve a test key; pass controllerPublicKeyJwk for a durable account),
+renew_challenge + renew_key (agent-provable, no-human key renewal),
+seal_hitl_decision + seal_agent_action + seal_attestation (shaped, auditor-reconstructable),
+issue_admission_credential + check_valid (PUBLIC) + revoke_admission_credential,
+whoami (resolve a presented key → account/tier/scopes/expiry — the sanctioned cross-service auth path),
+seal (generic/compatibility), list_records + get_record (read your own records / reasoning), verify, report.
+Auth: API key as a bearer header (no OAuth). verify + get_test_key + renew_* are keyless
+(renewal is authorised by your controller-key signature).
+Claude Desktop / Cursor / VS Code configs: https://witness.getvda.ai/docs#mcp
+
+## SDKs (Apache-2.0)
+npm: https://www.npmjs.com/package/vda-witness   (v1.0.0)
+PyPI: https://pypi.org/project/vda-witness/        (v1.0.0; sdist ships full source)
+
+## Machine-readable
+- Docs:        https://witness.getvda.ai/docs
+- OpenAPI:     https://witness.getvda.ai/openapi.json
+- A2A card:    https://witness.getvda.ai/.well-known/agent-card.json  (also /.well-known/agent.json)
+- DID:         https://witness.getvda.ai/.well-known/did.json  (did:web:witness.getvda.ai, key-1)
+
+## Honesty note
+SEALED = signed + hash-chained + independently verifiable, but NOT externally anchored —
+and on the Sealed tier that is TERMINAL (it will not become anchored). Only ANCHORED
+records (Rekor + >=1 TSA, quorum met) are provable against VDA itself ("provable even
+against us"). Two sealed states: anchoring_pending (Anchored tier, transient) vs
+not_anchored (Sealed tier, terminal — anchoring_not_enabled_for_account). Witness produces
+evidence, not a compliance certificate; attestation is a human act.

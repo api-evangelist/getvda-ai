@@ -1,0 +1,59 @@
+generated: '2026-09-19'
+method: derived
+source: openapi/getvda-ai-witness-openapi.json
+derived_from:
+- openapi/getvda-ai-witness-openapi.json
+- openapi/getvda-ai-hitl-openapi.json
+- openapi/getvda-ai-acp-openapi.json
+docs: https://witness.getvda.ai/llms.txt
+notation: >-
+  relationships use has_one / has_many / belongs_to with the field that carries the reference; direction is
+  from the entity that owns the reference. Entities come from components.schemas and from the id-shaped fields
+  the docs name (accountId acct_<ULID>, recordId, chainKey, credential_id, keyId).
+entities:
+- {name: Account, id_prefix: acct_, domain: witness, description: 'The durable identity behind every key; derived from the credential and signed into each record, never a request parameter.'}
+- {name: ApiKey, id_prefix: wtn., domain: witness, description: 'Short-lived bearer credential wtn.<keyId>.<secret>; revocation is sealed as a key_revocation event.'}
+- {name: ControllerKey, domain: witness, description: 'Ed25519 public JWK bound to an account; authorises unattended key renewal and controller-signed revocations.'}
+- {name: Chain, id_field: chainKey, domain: witness, description: 'Hash-linked, seal-ordered set of records per (account, chainKey); the grouping primitive. Anchors on its own hourly cursor.'}
+- {name: WitnessRecord, id_field: recordId, domain: witness, description: 'A sealed, Ed25519-signed record: schema, recordId, account, seq, issuedAt, signer, decision, governingRule, prevHash, proof.'}
+- {name: SealRequest, domain: witness, description: 'The generic seal input — decision + governingRule, optional chainKey and decisionId.'}
+- {name: Decision, domain: witness, description: 'agent, inputs, verdict, reasoning, actionProposed.'}
+- {name: GoverningRule, id_field: ruleId, domain: witness, description: 'ruleId, ruleText, governanceRef, governanceHash — the rule a decision was taken under.'}
+- {name: Actor, domain: witness, description: 'id, type (human | agent | system), role — the ASSERTED actor of a shaped record.'}
+- {name: EvidenceItem, domain: witness, description: 'ref + hash of external material the actor saw; optional media_type, captured_at, inline (<=100KB).'}
+- {name: Clause, domain: witness, description: 'ref, text, hash — a governing clause cited by a hitl-decision seal.'}
+- {name: AdmissionCredential, id_field: credential_id, domain: witness, description: 'A sealed attestation (attestation_type admission_credential) admitting subject_did to environment_id with scope[]; validity computed, revocation a superseding record.'}
+- {name: Anchor, domain: witness, description: 'External commitment of a chain head to Sigstore Rekor + RFC 3161 TSAs (Anchored tier only); anchorState ANCHORED_VALID | SIGNED_PENDING.'}
+- {name: DidDocument, id_prefix: 'did:web:', domain: identity, description: 'Served at /.well-known/did.json on each service host; verificationMethod[] holds the record- and card-signing keys.'}
+- {name: HitlItem, domain: hitl, description: 'A decision raised for human review — evidence content-addresses, authority requirement, outcome, asserted actor, seal record.'}
+- {name: AuthorityConfig, domain: hitl, description: 'bands (escalation ladder), label_to_band, roster (band -> actor ids), permitted_decision_classes, max_raises_per_hour, max_open_items.'}
+- {name: Baseline, domain: hitl, description: 'An accumulated grant for a caller; revocation is sealed, never deleted.'}
+- {name: BundleManifest, domain: acp, description: 'schema acp.bundle/1, version, environment, commitSha, contentHash (sha256), did, keyId, files list.'}
+- {name: BundleSignature, domain: acp, description: 'Ed25519 base64url signature over the canonical manifest bytes; keyId must equal manifest.keyId.'}
+- {name: SignedBundle, domain: acp, description: 'manifest + files + signature — the runtime projection of approved git state agents evaluate locally.'}
+relationships:
+- {from: ApiKey, to: Account, type: belongs_to, via: 'accountId'}
+- {from: ControllerKey, to: Account, type: belongs_to, via: 'controllerPublicKeyJwk (bind-controller)'}
+- {from: Account, to: Chain, type: has_many, via: 'chainKey (account-scoped)'}
+- {from: Chain, to: WitnessRecord, type: has_many, via: 'chainKey + seq'}
+- {from: WitnessRecord, to: WitnessRecord, type: belongs_to, via: 'prevHash (predecessor in the chain)'}
+- {from: WitnessRecord, to: Account, type: belongs_to, via: 'account'}
+- {from: WitnessRecord, to: Decision, type: has_one, via: 'decision'}
+- {from: WitnessRecord, to: GoverningRule, type: has_one, via: 'governingRule'}
+- {from: SealRequest, to: Decision, type: has_one, via: 'decision'}
+- {from: SealRequest, to: GoverningRule, type: has_one, via: 'governingRule'}
+- {from: WitnessRecord, to: Actor, type: has_one, via: 'actor (shaped seals)'}
+- {from: WitnessRecord, to: EvidenceItem, type: has_many, via: 'evidence[]'}
+- {from: WitnessRecord, to: Clause, type: has_many, via: 'governing_clauses[] (hitl-decision)'}
+- {from: AdmissionCredential, to: WitnessRecord, type: has_one, via: 'credential_id = the seal ref'}
+- {from: AdmissionCredential, to: Account, type: belongs_to, via: 'issuer (issuing account; only it may revoke)'}
+- {from: AdmissionCredential, to: DidDocument, type: belongs_to, via: 'issuer_did / subject_did'}
+- {from: Chain, to: Anchor, type: has_many, via: 'chain head (Anchored tier)'}
+- {from: WitnessRecord, to: DidDocument, type: belongs_to, via: 'proof.verificationMethod (customer-managed custody)'}
+- {from: HitlItem, to: AuthorityConfig, type: belongs_to, via: 'escalation label -> band'}
+- {from: HitlItem, to: WitnessRecord, type: has_one, via: 'seal record on resolution (hitl_decision)'}
+- {from: Baseline, to: HitlItem, type: belongs_to, via: 'promotion on resolve'}
+- {from: SignedBundle, to: BundleManifest, type: has_one, via: 'manifest'}
+- {from: SignedBundle, to: BundleSignature, type: has_one, via: 'signature'}
+- {from: BundleManifest, to: DidDocument, type: belongs_to, via: 'did + keyId (did:web:acp.getvda.ai#key-3)'}
+- {from: BundleManifest, to: WitnessRecord, type: has_one, via: 'activation sealed to Witness referencing commitSha'}

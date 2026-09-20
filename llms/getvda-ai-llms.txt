@@ -1,0 +1,176 @@
+# Verified Digital Agents (VDA)
+
+> Governance for AI agents that you can prove. Write the rules your agents follow —
+> versioned and reviewed like code — and seal every governed decision to a tamper-evident
+> record, so you can show what governed a decision after the fact. VDA is a composable set
+> of governance blocks: each is useful on its own, they are stronger composed, and you can
+> start with one.
+
+Governance lives in plain Markdown and git, so VDA governs best-of-breed agents from any
+provider or framework under the same rules — no lock-in, no rewrites.
+
+## The model
+
+Git holds the rules. Witness holds the events. Everything else sits between them.
+
+Full cycle — standard -> rules -> reviewed and signed in git -> ratified by a named human ->
+signed bundle -> agents verify and evaluate locally -> every decision sealed -> EU AI Act Art. 12
+evidence: https://getvda.ai/governance-cycle.html
+
+## The blocks (composable — honest status as of 2026-08)
+
+- **Witness** — Seals decisions to a tamper-evident, hash-chained record. The Anchored tier
+  commits the trail to external transparency logs (Sigstore Rekor + RFC-3161 TSAs), making it
+  provable even against VDA. Status: LIVE. Surface: signed A2A card + live MCP server.
+- **C2MD** — Turns compliance standards into governance your agents can follow, and generates
+  audit-ready documentation. Status: LIVE. Surface: signed A2A card + A2A skills (no MCP surface).
+- **ACP (Agent Control Plane)** — Governance lives in version control; changes are authored with
+  a Compliance Guard, adversarially tested, and signed before agents get them; authority is read
+  from git (CODEOWNERS + branch protection). Status: LIVE — federated human-approval identity
+  (customer IdP) is STAGED, not live: approvals are recorded but identity is not yet federated.
+  Surface: signed A2A card + REST (MCP planned, not live).
+- **Onboarding** — Admits agents into a governed environment and issues verifiable credentials.
+  Status: LIVE — deeper evaluation phases rolling out (a credential attests intake + issuance,
+  NOT a completed multi-phase evaluation). Surface: signed A2A card + A2A skills; admission tools
+  are exposed over the Witness MCP (no MCP endpoint of its own).
+- **HITL (Human in the loop)** — Your rules set what an agent does on its own and what comes to a
+  person; anything beyond the limits is surfaced for a human decision, and the decision is sealed to
+  Witness under customer-managed custody. Domain-blind by construction: an item is a decision, some
+  evidence, and an authority requirement. Status: LIVE as a standalone block at hitl.getvda.ai, and
+  in production via the hospitality flagship. Surface: signed A2A card + MCP/REST (9 skills —
+  raise, list, get and resolve items; baseline matching; authority config). Calls authenticate with
+  a Witness Bearer (Contract A). ACP composes with it: a governance change that needs ratification
+  is raised to HITL, resolved by an authorised human, sealed, and ACP's activation gate is fed by
+  that sealed resolution.
+
+## Block detail pages
+
+- Witness: https://getvda.ai/blocks/witness.html
+- ACP: https://getvda.ai/blocks/acp.html
+- HITL: https://getvda.ai/blocks/hitl.html
+- Onboarding: https://getvda.ai/blocks/onboarding.html
+- C2MD: see the capability pages below
+
+## C2MD capabilities (what it does, with generated examples)
+
+Each page explains one capability and links a worked example on synthetic data (Northwind Bank,
+a fictional bank running a credit-decision agent). All examples are labelled DEMO DATA.
+
+- Assess agent risk — EU AI Act and GDPR in one pass: Annex III classification, provider-vs-deployer
+  role, lawful basis, special-category inference flags, DPIA/FRIA triggers.
+  https://getvda.ai/c2md/assess-agent-risk.html
+  Example: https://getvda.ai/samples/northwind-agent-risk.html
+- Translate a compliance control — one NIST SP 800-53 / ISO 42001 / EU AI Act / GDPR reference into
+  agent-actionable MUST / MUST NOT / MAY rules, each keeping its clause-level citation.
+  https://getvda.ai/c2md/translate-control.html
+  Example: https://getvda.ai/samples/northwind-control-translation.html
+- Generate a governance bundle — AGENTS.md (identity + RACI), SOP.md (the rules, cited), SKILL.md
+  (permitted capabilities and their conditions), in plain Markdown that git versions and the agent
+  evaluates at runtime.
+  https://getvda.ai/c2md/generate-compliance-bundle.html
+  Example: https://getvda.ai/samples/northwind-governance-bundle.html
+- Generate a DPIA / FRIA scaffold — GDPR Article 35 and EU AI Act Article 27, structured for
+  Compliance-Officer review. A scaffold, not a finished assessment.
+  https://getvda.ai/c2md/generate-dpia-fria-scaffold.html
+  Example: https://getvda.ai/samples/northwind-dpia.html
+- EU AI Act Evidence & Readiness Report — article-by-article COVERED / PARTIALLY COVERED /
+  CUSTOMER ACTION, with Article 12 evidenced from a real sealed trail. Attested mode verifies your
+  own Witness chain-proof bundle OFFLINE against did:web + Rekor/TSA, with no key shared.
+  https://getvda.ai/c2md/eu-ai-act-evidence-readiness-report.html
+  Example: https://getvda.ai/samples/northwind-eu-ai-act.html
+- Extract governance inputs (genesis-from-card) — derive data categories, autonomy level and
+  industry from an agent's own A2A card. Reviewable by a human, never self-applying; the confirmed
+  values are what ACP raises to HITL for sealed ratification.
+  https://getvda.ai/c2md/extract-governance-inputs.html
+  Example: https://getvda.ai/samples/northwind-genesis-extraction.html
+
+Not yet available: generate_journey_baseline is PLANNED and currently returns -32601 (method not
+found). It has no capability page because it is not a capability yet.
+
+## If you are building on an agent harness
+
+Harnesses like LangChain DeepAgents give an agent what it needs to ACT: planning, a
+virtual filesystem, sandboxed execution, memory, sub-agents, middleware, and a
+human-in-the-loop pause. They give you capability. They do not give you accountability
+— a record of what the agent was permitted to do, who permitted it, and what it did.
+
+VDA fills three slots your harness already has:
+
+- **Middleware** — gate every tool call against signed governance, then seal the
+  outcome. Your harness has the hook; this is what goes in it. Fail-static: if
+  governance cannot be verified the action is refused, never waved through.
+- **Skills** — a harness loads skills from a directory, unversioned and unsigned. A
+  VDA-MD bundle is the same idea, held in git, reviewed as a diff, adversarially
+  tested, ratified by a named human and signed before an agent sees it.
+- **Human-in-the-loop** — a harness records that someone chose `approve`. It does not
+  record WHO, or whether they held authority. VDA seals the decision, binds it to the
+  values decided, records the asserted actor separately from the authenticated
+  account, and refuses activation if the actor lacks authority.
+
+Nothing here asks you to leave your harness. It is another way in, not a replacement.
+
+## Integrations
+
+- **LangChain DeepAgents middleware (Python)** — binds `wrap_tool_call`, so governance
+  gates ACTIONS rather than model calls: deciding to do something is not yet doing it.
+  `pip install getvda-evaluator` — published on PyPI, Apache-2.0, ZERO runtime
+  dependencies. Two implementations of the same decision are held to one conformance
+  contract, checked in CI and in the deploy gate; the contract ships inside the sdist
+  so it can be audited without cloning the monorepo.
+- **MCP** — Witness (16 tools), C2MD (11), HITL (9). Witness tool discovery and free
+  key minting need no credential.
+- **npm** — @getvda/evaluator-sdk, @getvda/test-suite, @getvda/governance-schema,
+  @getvda/bundle, @getvda/distribution, @getvda/witness, @getvda/compliance-guard.
+  All published, all framework-agnostic.
+
+## Reporting
+
+VDA turns the sealed trail into audit-ready artefacts: EU AI Act Article 12 evidence reports
+(Witness generates these from your records) and DPIA packs under GDPR Article 35 — built from the
+sealed record of a real run, not a template. Examples (demo data):
+
+- EU AI Act conformance summary: https://getvda.ai/samples/northwind-eu-ai-act.html
+- GDPR Art. 35 DPIA: https://getvda.ai/samples/northwind-dpia.html
+
+Tier note: the free self-serve Sealed tier is tamper-evident and independently verifiable offline
+but is NOT externally anchored — "provable even against VDA" applies only to the Anchored tier.
+
+## Get going (MCP / agent-first)
+
+Witness runs a live MCP server — the standard way agents connect to tools. Add it to your agent
+and drive it in plain language:
+
+- MCP server: https://witness.getvda.ai/api/witness/mcp
+- No key needed to discover tools, verify a record, or mint a free key (get_test_key).
+- Sealing writes to your account, so set that free key as the connector's token once.
+- Free Sealed tier: 5,000 seals/month, every record Ed25519-signed + hash-chained + verifiable offline.
+
+## Sibling service cards (discover the composable suite)
+
+- Witness (signed A2A card): https://witness.getvda.ai/.well-known/agent-card.json
+- Witness DID document: https://witness.getvda.ai/.well-known/did.json
+- Witness OpenAPI: https://witness.getvda.ai/openapi.json
+- C2MD (signed A2A card): https://c2md.getvda.ai/.well-known/agent-card.json
+- ACP (signed A2A card): https://acp.getvda.ai/.well-known/agent-card.json
+- Onboarding (signed A2A card): https://onboard.getvda.ai/.well-known/agent-card.json
+- HITL (signed A2A card): https://hitl.getvda.ai/.well-known/agent-card.json
+
+## Links
+
+- Homepage: https://getvda.ai/
+- Interactive demo (watch a governed run): https://getvda.ai/demo
+- Try your own governance: https://getvda.ai/try-your-own
+- Hospitality flagship console (live Apaleo): https://getvda.ai/console
+- This site's discovery card: https://getvda.ai/.well-known/agent-card.json
+
+## Honesty
+
+Generated compliance artefacts follow a lifecycle: DEMO DATA (showcase runs) -> DRAFT (a real
+Compliance Officer is attached) -> ATTESTED (post sign-off). They are audit-preparation drafts,
+not a finished regulatory filing until attested. VDA produces the evidence and controls that
+support compliance; it does not itself deliver legal compliance.
+
+## Contact
+
+To book a governance demo, use the "Book a governance demo" button on the homepage (the contact
+address is assembled in the browser to deter scraping).

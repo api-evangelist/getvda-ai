@@ -1,0 +1,310 @@
+generated: '2026-09-19'
+method: probed
+status: published
+source: https://witness.getvda.ai/api/witness/mcp
+docs: https://witness.getvda.ai/docs
+summary: 'Verified Digital Agents runs FOUR live remote MCP surfaces on its own hosts plus a 98-server metered fleet,
+  all Streamable HTTP (POST JSON-RPC 2.0) and all probed anonymously on 2026-09-19. (1) Witness at https://witness.getvda.ai/api/witness/mcp
+  — protocol 2024-11-05, serverInfo {vda-witness 1.0.0, vendor "Verified Digital Agents (VDA)"}, 16 tools with real
+  inputSchemas returned to an anonymous tools/list; discovery, `verify`, `verify_record_issuer`, `check_valid` and
+  free key minting (`get_test_key`) need no credential, sealing needs the Witness bearer key the server itself mints.
+  (2) C2MD at https://c2md.getvda.ai/mcp — protocol 2024-11-05, serverInfo {c2md-compliance-agent 1.0.0}, 11 tools;
+  initialize/tools/list/`assess_agent_risk`/`get_test_key` are anonymous, the generative tools need a Witness bearer
+  whose account tier maps to the c2md:* scopes. (3) HITL at https://hitl.getvda.ai/mcp — GATED: initialize itself
+  answers 401 {"error":"unauthorized","message":"missing bearer credential"}; its 9 tools (raise/list/get/resolve
+  items, baselines, authority config, quota) are documented with inputSchemas in the served agent card and mirror
+  the REST /v1/tools/* operations 1:1 in the OpenAPI. (4) The GOSCE Portfolio Router at https://router.getvda.ai/mcp
+  — protocol 2026-07-28, serverInfo {router 0.1.0}, 2 tools (invoke, selftest); `invoke` answered anonymously with
+  the capability index (the router''s free tier). Behind it sit 98 templated fleet servers (<agent>.getvda.ai/mcp,
+  2 tools each, invoke metered at $0.025 USDC per call via x402 v2 or a Stripe card rail, selftest free), enumerated
+  in well-known/getvda-ai-agents-ai-catalog.json. ACP declares an MCP surface as PLANNED in its agent card (mcp.status:
+  planned) and POST /mcp on acp.getvda.ai is a 404 — it is recorded here as absent, not derived. Authorship is unambiguous:
+  every serverInfo/vendor string, tool name and description is VDA-specific (seal_hitl_decision, issue_admission_credential,
+  generate_dpia_fria_scaffold) and matches no shared-platform fingerprint.'
+deployment:
+  mode: remote
+  endpoint: https://witness.getvda.ai/api/witness/mcp
+  auth: none
+  verified: probed
+  note: 'Hosted HTTPS endpoints an MCP client POSTs to directly; VDA ships no stdio MCP package and documents no
+    npx/uvx install (the npm/PyPI packages are SDKs and CI tooling, not MCP servers — see packages/). `auth: none`
+    is the connection-level truth for Witness, C2MD and the router: initialize and tools/list answer with no credential
+    and no OAuth metadata is served on any host (/.well-known/oauth-authorization-server and /.well-known/oauth-protected-resource
+    404 on witness, c2md, hitl and router). Invocation is then gated per tool: Witness/C2MD write tools take `Authorization:
+    Bearer wtn.<keyId>.<secret>` (a key the Witness server mints in-band with no human), HITL requires that bearer
+    for every method including initialize, and the fleet meters `invoke` with an HTTP 402 x402 challenge. Streaming
+    transport was not exercised. GET behaviour of the endpoints (probed 2026-09-19): Witness GET /api/witness/mcp
+    -> 404 (Express, POST-only); C2MD GET /mcp -> 200 application/json (107 bytes); router GET /mcp -> 405; HITL
+    GET /mcp -> 401. A GET that is not 200 is not a dead pointer here — every one answers a POST.'
+servers:
+- id: witness
+  name: VDA Witness
+  endpoint: https://witness.getvda.ai/api/witness/mcp
+  transport: streamable-http
+  http_methods:
+  - POST
+  auth: none for discovery/verify/get_test_key; Witness bearer key (wtn.<keyId>.<secret>) for seal/read/report/whoami/revoke
+  status: live
+  openapi: openapi/getvda-ai-witness-openapi.json
+  agent_card: a2a/getvda-ai-agent-card.json
+  probe:
+    fetched: '2026-09-19'
+    initialize:
+      http_status: 200
+      protocol_version: '2024-11-05'
+      server_info:
+        name: vda-witness
+        version: 1.0.0
+        vendor: Verified Digital Agents (VDA)
+      capabilities:
+        tools: {}
+      file: mcp/getvda-ai-witness-mcp-initialize.json
+    tools_list:
+      http_status: 200
+      content_type: application/json; charset=utf-8
+      tool_count: 16
+      file: mcp/getvda-ai-witness-mcp-tools.json
+  tools:
+  - name: get_test_key
+    auth: none
+    description: Self-issue a SEALED-tier Witness API key in-band (free; 5
+    000 seals/month; optionally bind an Ed25519 controller JWK for a durable account): null
+  - name: renew_challenge
+    auth: none
+    description: Agent-provable renewal step 1 — one-time nonce for an accountId
+  - name: renew_key
+    auth: none (controller-key signature)
+    description: Renewal step 2 — prove control of the account
+    receive a fresh short-TTL key: null
+  - name: seal
+    auth: bearer
+    description: General-purpose seal of a governed decision (compatibility; prefer a shaped seal)
+  - name: seal_hitl_decision
+    auth: bearer
+    description: Seal a human-in-the-loop decision with evidentiary basis
+  - name: seal_agent_action
+    auth: bearer
+    description: Seal an autonomous agent action under a governing rule
+  - name: seal_attestation
+    auth: bearer
+    description: Seal a fact/state as of a time
+  - name: issue_admission_credential
+    auth: bearer
+    description: Issue an agent admission credential (a sealed attestation)
+  - name: check_valid
+    auth: none
+    description: Is an admission credential currently valid (PUBLIC)
+  - name: revoke_admission_credential
+    auth: bearer (issuing account only)
+    description: Revoke an admission credential
+  - name: verify
+    auth: none
+    description: Independently verify a record or chain (Ed25519 signature + hash chain)
+  - name: report
+    auth: bearer
+    description: EU AI Act Article 12 evidence report from the sealed trail
+  - name: list_records
+    auth: bearer
+    description: Paginated summaries of the account's own records
+  - name: get_record
+    auth: bearer
+    description: Full signed body of one record + verification + anchor state
+  - name: whoami
+    auth: bearer
+    description: Resolve the presented key to account
+    tier: null
+    scopes: null
+    expiry (Contract A cross-service auth): null
+  - name: verify_record_issuer
+    auth: none
+    description: Issuer-authenticity verdict for a record id (never the body)
+- id: c2md
+  name: C2MD Compliance Agent
+  endpoint: https://c2md.getvda.ai/mcp
+  transport: streamable-http
+  http_methods:
+  - POST
+  auth: none for initialize/tools/list/assess_agent_risk/get_test_key; Witness bearer key for generative tools (account
+    tier maps to c2md:* scopes)
+  status: live
+  agent_card: a2a/getvda-ai-c2md-agent-card.json
+  a2a_endpoint: https://c2md.getvda.ai/a2a
+  probe:
+    fetched: '2026-09-19'
+    initialize:
+      http_status: 200
+      protocol_version: '2024-11-05'
+      server_info:
+        name: c2md-compliance-agent
+        version: 1.0.0
+      capabilities:
+        tools:
+          listChanged: false
+      instructions: C2MD generates EU AI Act / GDPR / NIST / ISO 42001 governance artifacts for AI agents. Discovery
+        and `assess_agent_risk` are free and need no key. Everything else needs a getvda.ai suite key — call `get_test_key`
+        to find out how to get one free. Generated artifacts are DRAFTS requiring compliance-officer sign-off; C2MD
+        does not deliver legal compliance.
+      file: mcp/getvda-ai-c2md-mcp-initialize.json
+    tools_list:
+      http_status: 200
+      content_type: application/json
+      tool_count: 11
+      file: mcp/getvda-ai-c2md-mcp-tools.json
+  tools:
+  - name: assess_agent_risk
+    auth: none
+    description: Cross-framework (EU AI Act + GDPR) risk assessment of an agent description; diagnostic only
+  - name: extract_governance_inputs
+    auth: none
+    description: Derive reviewable governance inputs from an agent's own A2A card (genesis-from-card)
+  - name: generate_admission_attestation
+    auth: bearer
+    description: Compliance attestation for an admission credential from its Witness chain
+  - name: generate_compliance_bundle
+    auth: bearer (c2md:generate_starter / generate_pro)
+    description: AGENTS.md + SOP.md + SKILL.md governance bundle; long-running (task descriptor)
+  - name: generate_dpia_fria_scaffold
+    auth: bearer (c2md:generate_pro)
+    description: GDPR Art. 35 DPIA / EU AI Act Art. 27 FRIA scaffold
+  - name: generate_evidence_readiness_report
+    auth: none in demo mode; bearer or an offline Witness proof bundle otherwise
+    description: EU AI Act article-by-article evidence and readiness report
+  - name: generate_journey_baseline
+    auth: bearer (c2md:generate_journey)
+    description: PLANNED — currently returns JSON-RPC -32601 method not found
+  - name: list_supported_frameworks
+    auth: none
+    description: Supported frameworks
+    jurisdictions and version anchors: null
+  - name: translate_control
+    auth: none
+    description: One NIST/ISO/EU AI Act/GDPR control reference into MUST/MUST NOT/MAY rules
+  - name: get_task
+    auth: bearer
+    description: Poll a long-running task by id
+  - name: get_test_key
+    auth: none
+    description: Explains how to obtain a free suite key (minted by Witness
+    not C2MD): null
+- id: hitl
+  name: HITL — human decisions on agent actions
+  endpoint: https://hitl.getvda.ai/mcp
+  transport: streamable-http
+  http_methods:
+  - POST
+  auth: Witness bearer key (Contract A) required for EVERY method, initialize included
+  status: live (gated)
+  openapi: openapi/getvda-ai-hitl-openapi.json
+  agent_card: a2a/getvda-ai-hitl-agent-card.json
+  probe:
+    fetched: '2026-09-19'
+    initialize:
+      http_status: 401
+      content_type: application/json; charset=utf-8
+      body: '{"error":"unauthorized","message":"missing bearer credential"}'
+    tools_list:
+      http_status: 401
+      body: '{"error":"unauthorized","message":"missing bearer credential"}'
+    note: The live schema is auth-gated. The 9 tool names and inputSchemas below are taken from the served, signed
+      agent card (skills[].inputSchema) and the OpenAPI, which document POST /mcp as "initialize | tools/list |
+      tools/call" and expose each tool as POST /v1/tools/<name>; they are not a live tools/list capture.
+  tools:
+  - name: raise_hitl_item
+    rest: raise_hitl_item
+    description: Raise a decision for human review
+  - name: list_hitl_items
+    rest: list_hitl_items
+    description: List decision items (summaries carry no evidence)
+  - name: get_hitl_item
+    rest: get_hitl_item
+    description: Get one decision item
+  - name: resolve_hitl_item
+    rest: resolve_hitl_item
+    description: Record a human decision (sealed customer-managed to Witness)
+  - name: list_baselines
+    rest: list_baselines
+    description: List active baselines for a caller
+  - name: revoke_baseline
+    rest: revoke_baseline
+    description: Revoke a baseline (never a delete; sealed)
+  - name: match_baseline
+    rest: match_baseline
+    description: Parity check for baseline containment
+  - name: register_authority_config
+    rest: register_authority_config
+    description: Register an activated authority config
+  - name: get_raise_quota
+    rest: get_raise_quota
+    description: Remaining raises this hour
+    open-item headroom: null
+    permitted decision classes: null
+- id: gosce-router
+  name: GOSCE Portfolio Router
+  endpoint: https://router.getvda.ai/mcp
+  transport: streamable-http
+  http_methods:
+  - POST
+  auth: none; fleet `invoke` calls are metered with x402 v2 (HTTP 402 PAYMENT-REQUIRED, USDC on Base eip155:8453,
+    or Stripe card via nvm:card-delegation)
+  status: live
+  openapi: openapi/getvda-ai-gosce-router-openapi.json
+  agent_card: a2a/getvda-ai-gosce-router-agent-card.json
+  probe:
+    fetched: '2026-09-19'
+    initialize:
+      http_status: 200
+      protocol_version: '2026-07-28'
+      server_info:
+        name: router
+        version: 0.1.0
+      capabilities:
+        tools:
+          listChanged: false
+      file: mcp/getvda-ai-gosce-router-mcp-initialize.json
+    tools_list:
+      http_status: 200
+      content_type: application/json
+      tool_count: 2
+      file: mcp/getvda-ai-gosce-router-mcp-tools.json
+    tools_call_invoke:
+      http_status: 200
+      note: An anonymous tools/call of `invoke` with input "{}" returned the capability→agents index rather than
+        a 402; the router treats its own routing answer as free.
+  tools:
+  - name: invoke
+    description: Route an orchestrator to a verified fleet agent by capability
+    with example output from the router's own selftest probes: null
+  - name: selftest
+    description: FREE — run the agent's real capability on canned input and return a graded result plus a trust
+      manifest
+  fleet:
+    count: 98
+    endpoint_pattern: https://<agent>.getvda.ai/mcp
+    catalog: well-known/getvda-ai-agents-ai-catalog.json
+    index: https://agents.getvda.ai/agents
+    per_server_tools:
+    - invoke
+    - selftest
+    free:
+    - tools/list
+    - server/discover
+    - selftest
+    price: $0.025 USDC per metered tools/call (health.getvda.ai health_check $0.15); not charged on failure
+    sample_probe:
+      endpoint: https://authenticated-llm-agent-cryptography.getvda.ai/mcp
+      tools_list_http_status: 200
+      tool_count: 2
+      server_info:
+        name: authenticated-llm-agent-cryptography
+        version: 0.1.1
+- id: acp
+  name: VDA ACP
+  endpoint: null
+  status: planned
+  probe:
+    fetched: '2026-09-19'
+    url: https://acp.getvda.ai/mcp
+    http_status: 404
+    body: '{"message":"Route POST:/mcp not found","error":"Not Found","statusCode":404}'
+  note: The ACP agent card declares mcp.status "planned" ("An MCP surface (mirroring these skills as tools) will
+    sit alongside this REST surface ... not yet live"). Nothing derived.

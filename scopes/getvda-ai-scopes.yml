@@ -1,0 +1,55 @@
+generated: '2026-09-19'
+method: searched
+source: https://c2md.getvda.ai/.well-known/agent-card.json
+docs: https://c2md.getvda.ai/llms.txt
+derived_from: a2a/getvda-ai-c2md-agent-card.json
+note: >-
+  The OAuth scopes live in the served C2MD agent card's securitySchemes, not in any OpenAPI (the C2MD OpenAPI is
+  an edge-proxy shell with no securitySchemes, so derive-oauth-scopes.py has nothing to read). The same five
+  c2md:* scopes are declared identically under google_oauth2 and microsoft_oauth2 authorizationCode flows, plus
+  one Microsoft clientCredentials scope for pre-registered service principals. The witness_bearer scheme maps a
+  Witness ACCOUNT tier to the same access ladder without OAuth: SEALED -> assess-tier skills, ANCHORED ->
+  generate_starter and above. Witness's own whoami returns scopes ["seal","read"] for a key; those are
+  account-level grants, not OAuth scopes, and are listed under witness_account_scopes.
+authorization_servers:
+- name: Google
+  authorization_url: https://accounts.google.com/o/oauth2/v2/auth
+  token_url: https://oauth2.googleapis.com/token
+  flows: [authorizationCode]
+  audience: Workspace and personal Google accounts; token validated via Google's JWKS
+- name: Microsoft Entra ID (organizations)
+  authorization_url: https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize
+  token_url: https://login.microsoftonline.com/organizations/oauth2/v2.0/token
+  flows: [authorizationCode, clientCredentials]
+  audience: work and school accounts only; personal Microsoft accounts not supported
+scopes:
+- name: c2md:assess
+  description: Risk assessment and framework translation. Free tier. Rate-limited per account.
+  tier: free
+  skills: [assess_agent_risk, translate_control, list_supported_frameworks, generate_evidence_readiness_report, extract_governance_inputs]
+- name: c2md:generate_starter
+  description: Single-jurisdiction, single-framework-stack bundle. Watermarked. Non-commercial licence.
+  tier: starter
+  skills: [generate_compliance_bundle]
+- name: c2md:generate_pro
+  description: Multi-jurisdiction, full-framework-stack bundle. Includes DPIA / FRIA scaffolding. Commercial deployment licence.
+  tier: pro
+  skills: [generate_compliance_bundle, generate_dpia_fria_scaffold]
+- name: c2md:generate_journey
+  description: Full VDA-MD two-axis library for a given industry. Journey tier subscription.
+  tier: journey
+  skills: [generate_journey_baseline]
+  note: The backing skill is PLANNED and returns -32601 today.
+- name: c2md:commercial_deploy
+  description: Commercial deployment rights for any bundle previously generated on this account.
+  tier: pro
+  skills: []
+- name: 7c89fa90-05ca-4779-8128-32c7f11f604b/.default
+  description: 'TIER 3 (by arrangement — enterprise/platform integrations, NOT self-serve): service-principal callers pre-registered to a C2MD platform-of-record account; tier and contract terms resolved server-side. Unregistered principals resolve to free-tier (assess only). Contact hello@getvda.ai.'
+  tier: enterprise
+  flow: clientCredentials (Microsoft only)
+witness_account_scopes:
+- name: seal
+  description: Returned by GET /api/witness/whoami for a valid key; grants sealing on the account's chains.
+- name: read
+  description: Returned by whoami; grants list_records / get_record / report on the account's own records.

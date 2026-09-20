@@ -1,0 +1,111 @@
+generated: '2026-09-19'
+method: derived
+source: openapi/getvda-ai-witness-openapi.json
+derived_from:
+- openapi/getvda-ai-witness-openapi.json
+- openapi/getvda-ai-hitl-openapi.json
+- openapi/getvda-ai-acp-openapi.json
+probed: true
+docs: https://witness.getvda.ai/docs
+format: json-error-object
+envelope:
+  media_type: application/json
+  fields:
+  - name: error
+    description: Short machine string ("unknown or invalid API key", "unauthorized", "no_active_bundle", "Not Found").
+  - name: message
+    description: Optional human explanation (HITL, ACP/Fastify).
+  - name: statusCode
+    description: Present only in ACP's Fastify-shaped envelope.
+  - name: detail
+    description: FastAPI shape on C2MD Edge, the GOSCE portfolio host and every fleet agent ({"detail":"Not Found"}).
+  observed:
+  - {status: 401, body: '{"error":"unknown or invalid API key"}', url: 'POST https://witness.getvda.ai/api/witness/seal (no credential)'}
+  - {status: 401, body: '{"error":"unknown or invalid API key"}', url: 'GET https://witness.getvda.ai/api/witness/usage (no credential)'}
+  - {status: 400, body: '{"error":"provide `record` or `records`"}', url: 'POST https://witness.getvda.ai/api/witness/verify (empty object)'}
+  - {status: 404, body: 'HTML "Cannot GET /.well-known/security.txt" (Express default, 163 bytes)', url: 'GET https://witness.getvda.ai/.well-known/security.txt'}
+  - {status: 401, body: '{"error":"unauthorized","message":"missing bearer credential"}', url: 'POST https://hitl.getvda.ai/mcp and GET https://hitl.getvda.ai/ (every non-public path)'}
+  - {status: 404, body: '{"message":"Route POST:/mcp not found","error":"Not Found","statusCode":404}', url: 'POST https://acp.getvda.ai/mcp'}
+  - {status: 404, body: '{"error":"no_active_bundle","environment":"default"}', url: 'GET https://acp.getvda.ai/bundles/default/active.json'}
+  - {status: 404, body: '{"detail":"Not Found"}', url: 'GET https://c2md.getvda.ai/ and https://agents.getvda.ai/.well-known/agent-card.json'}
+  - {status: 404, body: '404 Not Found (text/plain, 13 bytes)', url: 'GET https://onboard.getvda.ai/'}
+  note: >-
+    Not RFC 9457: no type URI, title, instance or application/problem+json on any host, and four different
+    envelope shapes across the suite (Express-style {error}, HITL {error,message}, Fastify {message,error,statusCode},
+    FastAPI {detail}). The JSON-RPC surfaces use JSON-RPC 2.0 error objects (C2MD documents -32601 for the planned
+    skill). Witness's check_valid endpoint deliberately answers HTTP 200 for every lifecycle state and asks the caller
+    to branch on `code` (valid | revoked | expired | not_found | not_credential) — an in-band status, not an HTTP one.
+problem_types:
+- status: 400
+  title: Malformed request
+  occurrences: 10
+  source_operations: ['POST /api/witness/test-key', 'POST /api/witness/account/bind-controller', 'POST /api/witness/seal', 'POST /api/witness/seal/*', 'POST /api/witness/verify', 'POST /api/witness/prepare', 'HITL /v1/tools/*']
+  causes:
+  - Invalid controllerPublicKeyJwk / JWK.
+  - Sent an `account` field — the account is derived from the credential and must not be supplied.
+  - verify without `record` or `records`.
+  - Shaped seal missing required actor/decision/governing_clauses/evidence (or evidence_omitted_reason).
+  remediation: Fix the body; the account is never a parameter. Shaped seals require an evidentiary basis or an explicit omission reason.
+- status: 401
+  title: Missing, invalid, expired or revoked credential
+  occurrences: 27
+  source_operations: ['every Witness key-bearing operation', 'POST /api/witness/renew', 'every HITL operation incl. POST /mcp', 'ACP pulls/{num}/decision (identity)']
+  causes:
+  - No Authorization: Bearer wtn.<keyId>.<secret> (or x-witness-key) header.
+  - Key revoked or past expires_at (Witness keys are short-lived by design; whoami 401s generically, no-store).
+  - Renewal denied — unknown account, no bound controller, or bad/expired signature.
+  remediation: Mint a Sealed-tier key (POST /api/witness/test-key, no human) or renew via challenge + controller-key signature; keep the durable account, not the key.
+- status: 402
+  title: Payment required (GOSCE fleet, x402)
+  occurrences: documented
+  source_operations: ['tools/call invoke on any <agent>.getvda.ai/mcp']
+  causes:
+  - Metered tool called without a PAYMENT-SIGNATURE header.
+  remediation: Read the base64 PAYMENT-REQUIRED header (x402 v2 PaymentRequired), sign EIP-3009 transferWithAuthorization for accepts[].amount in USDC on Base, retry with PAYMENT-SIGNATURE; settlement receipt returns in PAYMENT-RESPONSE. Failed calls are never charged. (Documented in agents.getvda.ai/llms.txt; not observed live.)
+- status: 403
+  title: Wrong account or authority
+  occurrences: 13
+  source_operations: ['POST /api/witness/credentials/{credential_id}/revoke', revoke_api_key, genesis_authority_config, 'HITL /v1/tools/*', 'ACP pulls/{num}/decision (authority)']
+  causes:
+  - Revoking a credential the presenting account did not issue.
+  - HITL genesis with an invalid controller signature (invalid_signature).
+  - ACP approver lacks git authority (CODEOWNERS + branch protection).
+  remediation: Only the issuing account may revoke; only a controller-signed genesis creates a caller; approval authority is read from git.
+- status: 404
+  title: Not found (account-scoped, no existence leak)
+  occurrences: 8
+  source_operations: ['GET /api/witness/records/{recordId}', 'GET /api/witness/chains/{chainKey}/proof', verify_record_issuer, 'POST /api/witness/credentials/{id}/revoke', revoke_api_key, 'GET /bundles/{env}/active.json', 'GET /bundles/{env}/versions/{version}', 'GET /.well-known/did.json (ACP, not provisioned)']
+  causes:
+  - A foreign or unknown record id, chainKey or key_id — Witness returns 404 rather than 403 so nothing leaks.
+  - ACP environment has no active bundle yet (observed live for "default").
+  remediation: Treat 404 as "not yours or not there"; for check_valid use the in-band `code` instead.
+- status: 409
+  title: Conflict — chain advanced, already bound, already genesised, separation of duties
+  occurrences: 14
+  source_operations: ['POST /api/witness/seal', 'POST /api/witness/account/bind-controller', genesis_authority_config, 'HITL /v1/tools/*', 'ACP pulls/{num}/decision']
+  causes:
+  - Customer-managed custody — the chain advanced between prepare and submit (seq conflict).
+  - Controller already bound (rebind needs admin); HITL caller already genesised.
+  - ACP separation of duties — the approver authored the change.
+  remediation: Re-prepare and re-sign on 409 seq conflict; use one writer per chainKey to avoid it.
+- status: 413
+  title: Payload too large
+  occurrences: 5
+  source_operations: ['POST /api/witness/seal', 'POST /api/witness/seal/hitl-decision', 'POST /api/witness/seal/agent-action', 'POST /api/witness/seal/attestation', 'POST /api/witness/prepare']
+  causes:
+  - Inline evidence over the documented 100 KB decoded limit, or an oversized record body.
+  remediation: Reference evidence by {ref, hash} instead of inlining it.
+- status: 429
+  title: Rate limited
+  occurrences: 9
+  source_operations: ['POST /api/witness/test-key (per IP)', 'POST /api/witness/renew/challenge', 'POST /api/witness/renew (per account)', 'POST /api/witness/seal and shaped seals (per-account token bucket, default 120/min)', 'GET /api/witness/whoami (per IP and per account)']
+  causes:
+  - Per-account token bucket exhausted (Witness docs — default 120/min) or anonymous-mint caps hit.
+  remediation: Back off; no Retry-After or RateLimit-* header is documented. See rate-limits/getvda-ai-rate-limits.yml.
+- status: 503
+  title: Dependency not ready / capability staged
+  occurrences: 4
+  source_operations: ['GET /readyz (HITL)', genesis_authority_config, 'GET /v1/environments/{env}/governance (ACP — git staged)', 'POST /v1/environments/{env}/versions/activate (ACP — bundle/witness staged)']
+  causes:
+  - A gating probe (witness/store/issuer identity) is not live, or the ACP capability is still staged.
+  remediation: Poll /readyz — both HITL and ACP publish live capability status in the body.

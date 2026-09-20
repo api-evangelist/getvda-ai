@@ -1,0 +1,112 @@
+generated: '2026-09-19'
+method: searched
+source: https://witness.getvda.ai/llms.txt
+derived_from:
+- openapi/getvda-ai-witness-openapi.json
+- openapi/getvda-ai-hitl-openapi.json
+- openapi/getvda-ai-acp-openapi.json
+- a2a/getvda-ai-c2md-agent-card.json
+- a2a/getvda-ai-onboard-agent-card.json
+- well-known/getvda-ai-agents-ai-catalog.json
+docs:
+- https://witness.getvda.ai/docs
+- https://witness.getvda.ai/llms.txt
+- https://c2md.getvda.ai/llms.txt
+- https://agents.getvda.ai/llms.txt
+summary:
+  types: [http, oauth2, x402-payment]
+  model: >-
+    One suite credential minted by Witness and validated everywhere else through Witness GET /whoami ("Contract A"):
+    `Authorization: Bearer wtn.<keyId>.<secret>`. Witness also accepts the same key in an `x-witness-key` header. The
+    key is short-lived by design (quick-start keys expire in 7 days) and is renewed unattended by Ed25519
+    controller-key challenge-response, so the durable identity is the account (acct_<ULID>) plus a controller key
+    the caller holds, not a standing secret. There is no OAuth authorization server on any VDA host; C2MD delegates
+    human sign-in to Google and Microsoft Entra, ACP declares an OIDC approver credential it does not yet enforce
+    (readyz: identity disabled), Onboarding uses a per-tenant bearer, and the GOSCE fleet has no authentication at
+    all — execution is gated by x402 payment.
+  observed:
+  - {request: 'POST https://witness.getvda.ai/api/witness/seal (no header)', status: 401, body: '{"error":"unknown or invalid API key"}'}
+  - {request: 'POST https://hitl.getvda.ai/mcp (no header)', status: 401, body: '{"error":"unauthorized","message":"missing bearer credential"}'}
+  - {request: 'POST https://witness.getvda.ai/api/witness/mcp tools/list (no header)', status: 200, note: discovery is anonymous}
+schemes:
+- name: witnessApiKey
+  aka: witness_bearer / bearerAuth (HITL) — the same credential under three scheme names
+  type: http
+  scheme: bearer
+  bearerFormat: wtn.<keyId>.<secret>
+  alternate_header: x-witness-key
+  issued_by: 'POST https://witness.getvda.ai/api/witness/test-key (self-serve, instant, no human) — also the MCP tool get_test_key and the card''s provisioning.selfServeKey'
+  renewal: 'POST /api/witness/renew/challenge -> Ed25519-sign sign_payload "vda.witness.renew/1|<accountId>|<nonce>" with the bound controller key -> POST /api/witness/renew; prior keys stay valid until expiry'
+  revocation: 'POST /api/witness/keys/revoke — total and itself sealed as a key_revocation event'
+  validation: 'siblings call GET /api/witness/whoami -> {account_id, tier SEALED|ANCHORED, scopes [seal, read], compliance, key_id, revoked, expires_at}; 200 is Cache-Control private max-age=60, 401 is generic + no-store'
+  used_by:
+  - witness.getvda.ai
+  - hitl.getvda.ai (every method incl. MCP initialize)
+  - acp.getvda.ai (/v1 routes)
+  - 'c2md.getvda.ai (generative tools; account tier maps to c2md:* scopes)'
+  public_exceptions:
+  - 'POST /api/witness/verify'
+  - 'GET /api/witness/credentials/{credential_id}'
+  - 'GET /api/witness/records/{recordId}/issuer'
+  - 'POST /api/witness/test-key'
+  - 'renew/challenge + renew (controller signature instead)'
+  - 'MCP initialize/tools/list on Witness and C2MD'
+  - 'ACP GET /bundles/*'
+  sources: [openapi/getvda-ai-witness-openapi.json, openapi/getvda-ai-hitl-openapi.json, openapi/getvda-ai-acp-openapi.json, a2a/getvda-ai-c2md-agent-card.json]
+- name: controllerKey
+  type: signature
+  scheme: Ed25519 challenge-response
+  description: >-
+    Not a request credential but the root of the account: an Ed25519 public JWK ({kty OKP, crv Ed25519, x}) bound at
+    mint time or via POST /api/witness/account/bind-controller. Authorises key renewal and controller-signed key
+    revocation; "there is no standing credential to leak". Distinct from the record-signing key (customer-managed
+    custody, published at the issuer's did:web) and the did:web card-signing key — the docs call out THREE keys.
+  sources: [https://witness.getvda.ai/llms.txt]
+- name: google_oauth2
+  type: oauth2
+  flows:
+    authorizationCode:
+      authorizationUrl: https://accounts.google.com/o/oauth2/v2/auth
+      tokenUrl: https://oauth2.googleapis.com/token
+      scopes: [c2md:assess, c2md:generate_starter, c2md:generate_pro, c2md:generate_journey, c2md:commercial_deploy]
+  description: Google Sign-In for Workspace and personal accounts; token validated via Google's JWKS; used for C2MD skill-tier scope assertion against subscription state.
+  used_by: [c2md.getvda.ai]
+  sources: [a2a/getvda-ai-c2md-agent-card.json]
+- name: microsoft_oauth2
+  type: oauth2
+  flows:
+    authorizationCode:
+      authorizationUrl: https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize
+      tokenUrl: https://login.microsoftonline.com/organizations/oauth2/v2.0/token
+      scopes: [c2md:assess, c2md:generate_starter, c2md:generate_pro, c2md:generate_journey, c2md:commercial_deploy]
+    clientCredentials:
+      tokenUrl: https://login.microsoftonline.com/organizations/oauth2/v2.0/token
+      scopes: ['7c89fa90-05ca-4779-8128-32c7f11f604b/.default']
+  description: Microsoft Entra ID, organisations only (personal accounts unsupported); clientCredentials is for pre-registered service principals (Tier 3, by arrangement — hello@getvda.ai).
+  used_by: [c2md.getvda.ai]
+  sources: [a2a/getvda-ai-c2md-agent-card.json]
+- name: approver_oidc
+  type: http
+  scheme: bearer
+  in: header
+  header: X-Approver-Credential
+  description: An OIDC token from the customer's IdP identifying a human approver on ACP's decision route. DECLARED but not live — GET https://acp.getvda.ai/readyz reports identity "disabled" ("set OIDC_ISSUER + OIDC_AUDIENCE to enable").
+  used_by: [acp.getvda.ai]
+  status: staged
+  sources: [a2a/getvda-ai-acp-agent-card.json, openapi/getvda-ai-acp-openapi.json]
+- name: tenantBearer
+  type: http
+  scheme: bearer
+  description: Per-tenant service-account token for the Onboarding agent's admit_agent, revoke_credential and get_admission_status skills.
+  used_by: [onboard.getvda.ai]
+  sources: [a2a/getvda-ai-onboard-agent-card.json]
+- name: x402
+  type: payment
+  scheme: x402 v2 (HTTP 402 challenge)
+  description: >-
+    The GOSCE fleet (98 servers + router) requires NO authentication; metered tools answer 402 with a base64
+    PAYMENT-REQUIRED header and are retried with a PAYMENT-SIGNATURE header — an EIP-3009 transferWithAuthorization
+    in USDC on Base (eip155:8453) or an nvm:card-delegation Stripe checkout for humans. The C2MD card notes
+    generated Copilot Studio connectors are "remote streamable-HTTP MCP servers requiring NO authentication".
+  used_by: ['*.getvda.ai fleet', router.getvda.ai]
+  sources: [well-known/getvda-ai-agents-ai-catalog.json, https://agents.getvda.ai/llms.txt]

@@ -1,0 +1,54 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
+  "id": "did:web:hitl.getvda.ai",
+  "verificationMethod": [
+    {
+      "id": "did:web:hitl.getvda.ai#key-1",
+      "type": "JsonWebKey2020",
+      "controller": "did:web:hitl.getvda.ai",
+      "publicKeyJwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "aJo4yLomOufDiJ6yvXtrZzpi_Sho1OFumlbyuINByqg"
+      },
+      "validFrom": "2026-07-19T00:00:00.000Z",
+      "validUntil": null,
+      "status": "active"
+    },
+    {
+      "id": "did:web:hitl.getvda.ai#key-2",
+      "type": "JsonWebKey2020",
+      "controller": "did:web:hitl.getvda.ai",
+      "publicKeyJwk": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "EPtSoK-y_rlfrcMkRKWBDnozxtt3XAmAblWYxWPp_BU"
+      },
+      "validFrom": "2026-07-19T00:00:00.000Z",
+      "validUntil": null,
+      "status": "active"
+    }
+  ],
+  "assertionMethod": [
+    "did:web:hitl.getvda.ai#key-2"
+  ],
+  "rotationLog": [
+    {
+      "at": "2026-07-19T00:00:00.000Z",
+      "fromKeyId": null,
+      "toKeyId": "did:web:hitl.getvda.ai#key-1",
+      "reason": "genesis",
+      "event": "genesis"
+    },
+    {
+      "at": "2026-07-19T00:00:00.000Z",
+      "fromKeyId": null,
+      "toKeyId": "did:web:hitl.getvda.ai#key-2",
+      "reason": "genesis",
+      "event": "genesis"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+generated: '2026-09-19'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: getvda.ai
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Dec 10 10:28:08 2026 GMT
+  hsts: false
+- host: witness.getvda.ai
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Nov 23 20:40:00 2026 GMT
+  hsts: false
+- host: hitl.getvda.ai
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Dec 11 16:21:55 2026 GMT
+  hsts: null
+domains:
+- domain: getvda.ai
+  dnssec: false
+  caa: []
+  spf: true
+  dmarc: true
+  dmarc_policy: none

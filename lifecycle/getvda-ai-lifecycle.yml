@@ -1,0 +1,57 @@
+generated: '2026-09-19'
+method: searched
+source: https://witness.getvda.ai/docs
+derived_from:
+- openapi/getvda-ai-witness-openapi.json
+- openapi/getvda-ai-hitl-openapi.json
+- openapi/getvda-ai-acp-openapi.json
+docs:
+- https://witness.getvda.ai/llms.txt
+- https://getvda.ai/llms.txt
+versioning:
+  scheme: 'path-versioned on HITL and ACP (/v1/...); unversioned paths on Witness (/api/witness/...); version carried in each OpenAPI info.version and each agent card'
+  current_version: 'Witness 1.0.0 (OpenAPI, card, MCP serverInfo agree); HITL 0.1.0; ACP 0.1.0; C2MD 1.0.0 (card + MCP); Onboarding 0.1.0-skeleton; GOSCE router 0.1.0; fleet agents 0.1.1'
+  spec_url: https://witness.getvda.ai/openapi.json
+  base_url: https://witness.getvda.ai
+  policy_published: false
+  note: >-
+    No versioning policy page exists on any host (/changelog, /status, /blog on getvda.ai and witness.getvda.ai all
+    return the SPA shell, not a page). What the provider does publish is unusually explicit HONEST-STATUS labelling
+    at the field level: the apex llms.txt ("honest status as of 2026-08") marks each block live / staged / planned,
+    the Witness test-key response labels `tier` and `compliance` as "DEPRECATED aliases — read sealedState", the
+    docs call POST /api/witness/test-key a "stable endpoint name", the C2MD card marks generate_journey_baseline
+    "PLANNED — NOT YET AVAILABLE" (returns -32601), the ACP card marks its MCP surface planned and federated
+    identity staged, and the Onboarding card enumerates live vs staged phases. Both HITL and ACP serve a live
+    /readyz whose body reports per-capability status with probe timestamps.
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  documented_retirements: []
+  documented_deprecations:
+  - what: Witness test-key response fields `tier` ("test") and `compliance`
+    replaced_by: sealedState / sealedStateReason
+    evidence: 'https://witness.getvda.ai/llms.txt — "tier/compliance = DEPRECATED aliases"; the served card''s provisioning.selfServeKey.returns says the same.'
+    note: A field-level deprecation announced in-band in the response contract and the card, with no date and no removal schedule.
+  note: >-
+    Zero operations carry deprecated: true across the six saved specs; no Sunset or Deprecation response header
+    is declared. No Deprecation pointer is emitted.
+status_page:
+  url: null
+  note: >-
+    status.getvda.ai does not resolve and /status on the apex and Witness hosts is the SPA shell. HITL and ACP
+    publish machine-readable readiness at GET /readyz (live probes of witness/store/genesis/issuer identity, with
+    checkedAt timestamps) and Witness's card carries a `status`-free `boundaries` block; the HITL card embeds a
+    live `status` object (ready, witness, store, genesis, issuer_identity). That is an operational health surface,
+    not a status page, so no StatusPage pointer is emitted.
+sla:
+  published: false
+  note: The Witness terms block offers "Volume, SLA, higher-assurance tier" only under Enterprise ("talk to us"); no SLA figures are published.
+key_lifecycle:
+  note: >-
+    Witness API keys are short-lived by design (self-serve Sealed keys expire in 7 days: expiresInDays 7) and are
+    renewed unattended by controller-key challenge-response; prior keys stay valid until they expire (overlap). A
+    non-expiring key is described as "an explicit, audited EXCEPTION". Revocation is total and itself sealed as a
+    key_revocation event; whoami reflects it within a ~60s cache window.

@@ -1,0 +1,4488 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "GOSCE Agent Portfolio (getvda.ai)",
+    "identifier": "did:web:agents.getvda.ai"
+  },
+  "paymentSummary": {
+    "model": "x402 per-call micropayments, two rails",
+    "agents": "the `exact` scheme on Base mainnet - any funded USDC wallet, no account, no signup, no gas",
+    "humans": "Stripe card checkout via nvm:card-delegation",
+    "discoveryIsFree": true
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:getvda.ai:agent:auth-token-mcp-service",
+      "displayName": "Auth Token MCP Service",
+      "type": "application/mcp-server+json",
+      "url": "https://auth-token-mcp-service.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Auth Token MCP Service: composes bcrypt + langchain + mcp + opentelemetry-instrumentation-fastapi + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "hash a password securely",
+        "issue and verify a JWT",
+        "add token-based authentication to my API"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:auth-token-mcp-traced-service",
+      "displayName": "Auth Token MCP Traced Service",
+      "type": "application/mcp-server+json",
+      "url": "https://auth-token-mcp-traced-service.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Auth Token MCP Traced Service: composes bcrypt + langchain + mcp + opentelemetry-sdk + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "hash a password securely",
+        "issue and verify a JWT",
+        "add token-based authentication to my API"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-llm-agent",
+      "displayName": "Authenticated LLM Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-llm-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Authenticated LLM Agent: composes bcrypt + langchain-openai + mcp + openai + python-jose \u2014 crypto, orchestration, agent-protocol, llm-client, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-llm-agent-anthropic",
+      "displayName": "Google Sign-In Claude Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-llm-agent-anthropic.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Google Sign-In Claude Agent: composes anthropic + google-auth-oauthlib + mcp \u2014 llm-client, oauth-oidc, agent-protocol via A2A + MCP.",
+      "representativeQueries": [
+        "verify a Google ID token then call a model",
+        "gate an LLM behind Google OAuth",
+        "run a completion for an OAuth-verified user"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-llm-agent-bcrypt",
+      "displayName": "Authenticated LLM Agent (Bcrypt)",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-llm-agent-bcrypt.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Authenticated LLM Agent (Bcrypt): composes bcrypt + langchain-openai + mcp + openai + opentelemetry-sdk \u2014 crypto, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-llm-agent-cryptography",
+      "displayName": "Encrypted OAuth LLM Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-llm-agent-cryptography.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Encrypted OAuth LLM Agent: composes cryptography + google-auth-oauthlib + langchain + mcp + openai + opentelemetry-exporter-otlp + opentelemetry-sdk \u2014 crypto, oauth-oidc, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "verify a Google ID token then call a model",
+        "gate an LLM behind Google OAuth",
+        "run a completion for an OAuth-verified user"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-llm-agent-google-auth-oauthlib",
+      "displayName": "OAuth LangChain OpenAI Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-llm-agent-google-auth-oauthlib.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "OAuth LangChain OpenAI Agent: composes google-auth-oauthlib + langchain + mcp + openai \u2014 oauth-oidc, orchestration, agent-protocol, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "verify a Google ID token then call a model",
+        "gate an LLM behind Google OAuth",
+        "run a completion for an OAuth-verified user"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-llm-jwt-agent",
+      "displayName": "Authenticated LLM JWT Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-llm-jwt-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Authenticated LLM JWT Agent: composes bcrypt + openai + python-jose \u2014 crypto, llm-client, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-llm-mcp-agent",
+      "displayName": "Authenticated LLM MCP Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-llm-mcp-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Authenticated LLM MCP Agent: composes google-auth-oauthlib + langchain + langchain-community + mcp + openai \u2014 oauth-oidc, orchestration, agent-protocol, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "verify a Google ID token then call a model",
+        "gate an LLM behind Google OAuth",
+        "run a completion for an OAuth-verified user"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-llm-oauth-agent",
+      "displayName": "Google OAuth Credential Service",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-llm-oauth-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Google OAuth Credential Service: composes cryptography + google-auth-oauthlib \u2014 crypto, oauth-oidc via A2A + MCP.",
+      "representativeQueries": [
+        "verify a Google ID token then call a model",
+        "gate an LLM behind Google OAuth",
+        "run a completion for an OAuth-verified user"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-llm-traced-agent",
+      "displayName": "Authenticated LLM Traced Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-llm-traced-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Authenticated LLM Traced Agent: composes cryptography + google-auth-oauthlib + langchain-openai + mcp + openai + opentelemetry-api + opentelemetry-sdk \u2014 crypto, oauth-oidc, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "verify a Google ID token then call a model",
+        "gate an LLM behind Google OAuth",
+        "run a completion for an OAuth-verified user"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-mcp-agent-aed9d5",
+      "displayName": "Authenticated MCP Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-mcp-agent-aed9d5.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Authenticated MCP Agent: composes bcrypt + langchain-core + mcp + opentelemetry-sdk + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-mcp-agent-bcrypt",
+      "displayName": "Authenticated MCP Agent (Bcrypt)",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-mcp-agent-bcrypt.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "OpenAI Login and Token Agent: composes bcrypt + mcp + openai + opentelemetry-sdk + python-jose \u2014 crypto, agent-protocol, llm-client, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-mcp-agent-bcrypt",
+      "displayName": "OpenAI Login and Token Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-mcp-agent-bcrypt.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "OpenAI Login and Token Agent: composes bcrypt + mcp + openai + opentelemetry-sdk + python-jose \u2014 crypto, agent-protocol, llm-client, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-mcp-agent-langchain-core",
+      "displayName": "LangChain Login and Token Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-mcp-agent-langchain-core.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LangChain Login and Token Agent: composes bcrypt + langchain-core + mcp + opentelemetry-sdk + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-mcp-agent-openai",
+      "displayName": "Authenticated MCP Agent (Openai)",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-mcp-agent-openai.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Authenticated MCP Agent (Langchain Core): composes bcrypt + langchain-core + mcp + openai + opentelemetry-api + opentelemetry-sdk \u2014 crypto, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-mcp-agent-opentelemetry-api",
+      "displayName": "Traced OpenAI LangChain Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-mcp-agent-opentelemetry-api.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Traced OpenAI LangChain Agent: composes bcrypt + langchain-core + mcp + openai + opentelemetry-api \u2014 crypto, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-mcp-traced-agent",
+      "displayName": "Authenticated MCP Traced Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-mcp-traced-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Authenticated MCP Traced Agent: composes bcrypt + cryptography + langchain-core + mcp + opentelemetry-sdk + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:authenticated-multi-llm-agent",
+      "displayName": "Authenticated Multi-LLM Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://authenticated-multi-llm-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Authenticated Multi-LLM Agent: composes anthropic + google-auth-oauthlib + mcp + openai \u2014 llm-client, oauth-oidc, agent-protocol via A2A + MCP.",
+      "representativeQueries": [
+        "verify a Google ID token then call a model",
+        "gate an LLM behind Google OAuth",
+        "run a completion for an OAuth-verified user"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:bcrypt-cryptography-langchain-cor-027cf2",
+      "displayName": "Encrypted LangChain Session Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://bcrypt-cryptography-langchain-cor-027cf2.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Encrypted LangChain Session Agent: composes bcrypt + cryptography + langchain-core + mcp + opentelemetry-sdk + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:bcrypt-langchain-core-mcp-25b8f1",
+      "displayName": "Secured LangChain OpenAI Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://bcrypt-langchain-core-mcp-25b8f1.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Secured LangChain OpenAI Agent: composes bcrypt + langchain-core + mcp + openai + opentelemetry-sdk \u2014 crypto, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "run an LLM call that requires authentication",
+        "gate a model completion behind a JWT",
+        "authenticate a user then ask the model a question"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:bcrypt-python-jose-1b8dd0",
+      "displayName": "Password Hashing and JWT Service",
+      "type": "application/mcp-server+json",
+      "url": "https://bcrypt-python-jose-1b8dd0.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Password Hashing and JWT Service: composes bcrypt + python-jose \u2014 crypto, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "hash a password securely",
+        "issue and verify a JWT",
+        "add token-based authentication to my API"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:bcrypt-python-jose-d0e0d0",
+      "displayName": "Bcrypt and JOSE Token Service",
+      "type": "application/mcp-server+json",
+      "url": "https://bcrypt-python-jose-d0e0d0.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Bcrypt and JOSE Token Service: composes bcrypt + python-jose \u2014 crypto, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "hash a password securely",
+        "issue and verify a JWT",
+        "add token-based authentication to my API"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:cryptography-google-auth-oauthlib-931267",
+      "displayName": "OAuth Multi-LLM Orchestrator",
+      "type": "application/mcp-server+json",
+      "url": "https://cryptography-google-auth-oauthlib-931267.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "OAuth Multi-LLM Orchestrator: composes cryptography + google-auth-oauthlib + langchain + langchain-anthropic + mcp + openai + opentelemetry-sdk \u2014 crypto, oauth-oidc, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "verify a Google ID token then call a model",
+        "gate an LLM behind Google OAuth",
+        "run a completion for an OAuth-verified user"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:cryptography-langchain-core-mcp-07d652",
+      "displayName": "Encrypted LangChain Token Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://cryptography-langchain-core-mcp-07d652.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Encrypted LangChain Token Agent: composes cryptography + langchain-core + mcp + opentelemetry-api + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:drift",
+      "displayName": "Integration Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://drift.getvda.ai/mcp",
+      "capabilities": [
+        "drift_status",
+        "drift_hash",
+        "drift_check",
+        "drift_diff",
+        "drift_probe",
+        "selftest"
+      ],
+      "description": "Tells you whether a public MCP server's tools have changed since anyone last looked. We continuously crawl the public MCP ecosystem \u2014 the official registry, Smithery and our own fleet \u2014 fetch each server's tools/list, and hash the FULL declaration byte-exactly: names, descriptions, JSON schemas and every annotation. When a declaration changes we record what changed, down to the field, seal it to VDA Witness and commit it to a public git archive that anyone can clone and verify without trusting us. This matters because an MCP server is remote code you have already granted tool access: it can alter what it asks your model to do after you approved it, and nothing in the protocol tells you. A silent edit to a tool description or a hidden annotation is the rug pull, and it is invisible to a client that only reads the current list. Coverage is published with its denominator: of ~1,555 servers discovered, only 234 are observable \u2014 roughly 74% sit behind authentication and cannot be checked by anyone without credentials. LIMIT, stated plainly: we observe DECLARATIONS, not behaviour. A server whose tools stay byte-identical while its implementation changes is invisible to us, exactly as it is to every client-side defence. If you need behavioural assurance this is not it.",
+      "representativeQueries": [
+        "use the drift observatory capability",
+        "run a drift observatory task"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "drift_check",
+          "drift_hash",
+          "drift_status",
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins",
+        "toolPricesUsd": {
+          "drift_diff": 0.02,
+          "drift_probe": 0.05
+        }
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:elasticsearch-mongodb-redis-stack-generator-el-d8f067",
+      "displayName": "Elasticsearch + MongoDB + Redis Stack Generator (Elasticsearch/Elasticsearch)",
+      "type": "application/mcp-server+json",
+      "url": "https://elasticsearch-mongodb-redis-stack-generator-el-d8f067.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Elasticsearch + MongoDB + Redis Stack Generator (Elasticsearch/Elasticsearch): composes elasticsearch/elasticsearch + mongo + redis + traefik \u2014 search, database, cache, web-server via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:elasticsearch-redis-mysql-stack-generator",
+      "displayName": "Elasticsearch + Redis + MySQL Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://elasticsearch-redis-mysql-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Elasticsearch + MySQL + Redis Stack Generator: composes elasticsearch/elasticsearch + kibana/kibana + mysql + redis \u2014 search, database, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:elasticsearch-redis-stack-generator",
+      "displayName": "Elasticsearch + Redis Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://elasticsearch-redis-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Elasticsearch + Redis Stack Generator: composes elasticsearch/elasticsearch + kibana/kibana + redis \u2014 search, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:elasticsearch-redis-stack-generator-elasticsea-588e3e",
+      "displayName": "Elasticsearch + Redis Stack Generator (Official Image)",
+      "type": "application/mcp-server+json",
+      "url": "https://elasticsearch-redis-stack-generator-elasticsea-588e3e.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Elasticsearch + Redis Stack Generator (Elasticsearch/Elasticsearch): composes elasticsearch/elasticsearch + redis \u2014 search, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:fastapi-auth-token-jwt-service",
+      "displayName": "FastAPI Auth Token JWT Service",
+      "type": "application/mcp-server+json",
+      "url": "https://fastapi-auth-token-jwt-service.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "FastAPI Auth Token JWT Service: composes authlib + bcrypt + python-jose \u2014 oauth-oidc, crypto, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "hash a password securely",
+        "issue and verify a JWT",
+        "add token-based authentication to my API"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:fastapi-auth-token-service",
+      "displayName": "FastAPI Auth Token Service",
+      "type": "application/mcp-server+json",
+      "url": "https://fastapi-auth-token-service.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "FastAPI Auth Token Service: composes bcrypt + python-jose \u2014 crypto, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "hash a password securely",
+        "issue and verify a JWT",
+        "add token-based authentication to my API"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:google-auth-oauthlib-langchain-la-c1a755",
+      "displayName": "Google OAuth LangChain Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://google-auth-oauthlib-langchain-la-c1a755.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Google OAuth LangChain Agent: composes google-auth-oauthlib + langchain + langchain-community + mcp + openai \u2014 oauth-oidc, orchestration, agent-protocol, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "verify a Google ID token then call a model",
+        "gate an LLM behind Google OAuth",
+        "run a completion for an OAuth-verified user"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:google-auth-oauthlib-langchain-la-d46b90",
+      "displayName": "Google Sign-In LangChain Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://google-auth-oauthlib-langchain-la-d46b90.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Google Sign-In LangChain Agent: composes google-auth-oauthlib + langchain + langchain-community + mcp + openai \u2014 oauth-oidc, orchestration, agent-protocol, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "verify a Google ID token then call a model",
+        "gate an LLM behind Google OAuth",
+        "run a completion for an OAuth-verified user"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:health",
+      "displayName": "Dynamic Health Monitor",
+      "type": "application/mcp-server+json",
+      "url": "https://health.getvda.ai/mcp",
+      "capabilities": [
+        "health_discover",
+        "health_check",
+        "health_history",
+        "health_exclude",
+        "selftest"
+      ],
+      "description": "Auto-discovering health monitoring. Give it ONE seed \u2014 a domain, a URL list, a docker-compose file or a public GitHub repo \u2014 and it finds every service, checks HTTP/TCP/SSL/DNS, learns each one's latency baseline, rolls dependent failures up to a single root cause, and adapts as services appear and disappear. You never edit a monitoring config.",
+      "representativeQueries": [
+        "monitor the uptime of my services",
+        "discover what to monitor from a docker-compose file",
+        "track latency baselines for my endpoints"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "health_discover",
+          "health_exclude",
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins",
+        "toolPricesUsd": {
+          "health_check": 0.15,
+          "health_history": 0.05
+        }
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:instructor-litellm-6af681",
+      "displayName": "Multi-Provider Schema Output Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://instructor-litellm-6af681.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Multi-Provider Schema Output Agent: composes instructor + litellm \u2014 structured-output, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "extract structured JSON from this text",
+        "turn a prompt and a schema into typed output",
+        "parse an unstructured description into fields"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:kafka-minio-redis-stack-generator",
+      "displayName": "Kafka + MinIO + Redis Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://kafka-minio-redis-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Kafka + MinIO + Redis Stack Generator: composes confluentinc/cp-kafka + minio/minio + redis \u2014 messaging, storage, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:kafka-redis-minio-stack-generator",
+      "displayName": "Kafka + Redis + MinIO Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://kafka-redis-minio-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Kafka + MinIO + Redis Stack Generator (Confluentinc/Cp Kafka): composes confluentinc/cp-kafka + confluentinc/cp-zookeeper + minio/minio + redis \u2014 messaging, storage, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:langchain-core-langchain-openai-l-736876",
+      "displayName": "LangSmith Traced OpenAI Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://langchain-core-langchain-openai-l-736876.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LangSmith Traced OpenAI Agent: composes langchain-core + langchain-openai + langsmith + openai \u2014 orchestration, observability, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:langchain-langchain-core-langsmit-d042fc",
+      "displayName": "LLM Observability & Orchestration Agent (Langchain)",
+      "type": "application/mcp-server+json",
+      "url": "https://langchain-langchain-core-langsmit-d042fc.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Observability & Orchestration Agent (Langchain): composes langchain + langchain-core + langsmith + openai \u2014 orchestration, observability, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-observability-orchestration",
+      "displayName": "LLM Observability & Orchestration Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-observability-orchestration.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Observability & Orchestration Agent: composes langchain-core + langsmith + openai \u2014 orchestration, observability, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-observability-orchestration-agent-langchai-c1a755",
+      "displayName": "LLM Observability & Orchestration Agent (LangChain Community)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-observability-orchestration-agent-langchai-c1a755.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Observability & Orchestration Agent (Langchain Community): composes langchain + langchain-community + langchain-core + langsmith + openai \u2014 orchestration, observability, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-2",
+      "displayName": "MCP-Native LLM Orchestration Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-2.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent 5: composes langchain-core + langchain-openai + mcp + openai \u2014 orchestration, agent-protocol, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-2-df5979",
+      "displayName": "LLM Orchestration Agent 2",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-2-df5979.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent 2: composes langchain + langchain-anthropic + langchain-openai + mcp + openai \u2014 orchestration, agent-protocol, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-cryptography",
+      "displayName": "LLM Orchestration Agent (Cryptography)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-cryptography.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Cryptography): composes cryptography + langchain-core + mcp + opentelemetry-sdk + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-d0a1a1",
+      "displayName": "LLM Orchestration Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-d0a1a1.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent: composes langchain-mcp-adapters + langchain-openai + mcp + openai \u2014 orchestration, agent-protocol, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-d2feb0",
+      "displayName": "LangSmith-Traced LLM Orchestration Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-d2feb0.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent 5: composes langchain-core + langchain-openai + langsmith + openai \u2014 orchestration, observability, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-langchain",
+      "displayName": "LLM Orchestration Agent (Langchain)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-langchain.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Langchain): composes langchain + langchain-openai + langgraph + mcp + openai \u2014 orchestration, agent-protocol, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-langchain-anthropic",
+      "displayName": "LLM Orchestration Agent (Langchain Anthropic)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-langchain-anthropic.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Langchain Anthropic): composes langchain-anthropic + langchain-community + langchain-openai + openai \u2014 orchestration, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-langchain-core",
+      "displayName": "LLM Orchestration Agent (Langchain Core)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-langchain-core.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Langchain Core): composes langchain-core + mcp + openai + opentelemetry-api + opentelemetry-sdk \u2014 orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-langchain-openai",
+      "displayName": "LLM Orchestration Agent (Langchain Openai)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-langchain-openai.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Langchain Openai): composes langchain + langchain-openai + langgraph + langsmith + openai \u2014 orchestration, observability, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-langgraph",
+      "displayName": "LLM Orchestration Agent (Langgraph)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-langgraph.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Langgraph): composes langchain-core + langgraph + mcp + openai \u2014 orchestration, agent-protocol, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-langsmith",
+      "displayName": "LLM Orchestration Agent (Langsmith)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-langsmith.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Langsmith): composes langchain + langchain-core + langchain-openai + langsmith + openai \u2014 orchestration, observability, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-mcp",
+      "displayName": "LLM Orchestration Agent (Mcp)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-mcp.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Mcp): composes cryptography + langchain-openai + mcp + openai + opentelemetry-sdk \u2014 crypto, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-openai",
+      "displayName": "LLM Orchestration Agent (Openai)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-openai.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Openai): composes langchain-anthropic + langchain-openai + openai \u2014 orchestration, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-opentelemetry-api",
+      "displayName": "LLM Orchestration Agent (Opentelemetry Api)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-opentelemetry-api.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Opentelemetry Api): composes cryptography + langchain-openai + mcp + openai + opentelemetry-api + opentelemetry-sdk \u2014 crypto, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-agent-opentelemetry-instrume-a529e4",
+      "displayName": "LLM Orchestration Agent (Opentelemetry Instrumentation Fastapi)",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-agent-opentelemetry-instrume-a529e4.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Agent (Opentelemetry Instrumentation Fastapi): composes cryptography + langchain-core + mcp + opentelemetry-instrumentation-fastapi + opentelemetry-sdk + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-jwt-agent",
+      "displayName": "LLM Orchestration JWT Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-jwt-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration JWT Agent: composes cryptography + langchain-core + mcp + opentelemetry-api + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-mcp-agent",
+      "displayName": "LLM Orchestration MCP Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-mcp-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration MCP Agent: composes cryptography + langchain + langchain-core + mcp + opentelemetry-sdk + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-observability-agent",
+      "displayName": "LLM Orchestration Observability Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-observability-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Observability Agent: composes langchain + langchain-community + langchain-core + langchain-openai + langsmith + openai \u2014 orchestration, observability, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:llm-orchestration-traced-agent",
+      "displayName": "LLM Orchestration Traced Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://llm-orchestration-traced-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "LLM Orchestration Traced Agent: composes cryptography + langchain-core + mcp + opentelemetry-api + opentelemetry-sdk + python-jose \u2014 crypto, orchestration, agent-protocol, observability, jwt via A2A + MCP.",
+      "representativeQueries": [
+        "run a prompt through a LangChain chain",
+        "orchestrate an LLM call with a system prompt",
+        "run a traced LangChain completion on Vertex AI"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:memcached-mongodb-redis-compose-generator",
+      "displayName": "Memcached + MongoDB + Redis Compose Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://memcached-mongodb-redis-compose-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Memcached + MongoDB + Redis Compose Generator: composes memcached + mongo + redis \u2014 cache, database via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose file for my stack",
+        "set up postgres and redis with health checks",
+        "scaffold a local dev environment with a database and cache"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:minio-postgres-redis-stack-generator",
+      "displayName": "MinIO + Postgres + Redis Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://minio-postgres-redis-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "MinIO + Postgres + Redis Stack Generator: composes minio/mc + minio/minio + postgres + redis \u2014 storage, database, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:mysql-redis-compose-generator",
+      "displayName": "MySQL + Redis Compose Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://mysql-redis-compose-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "MySQL + Redis Compose Generator: composes mysql + redis \u2014 database, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose file for my stack",
+        "set up postgres and redis with health checks",
+        "scaffold a local dev environment with a database and cache"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:mysql-redis-compose-generator-adminer",
+      "displayName": "MySQL + Redis Compose Generator (Adminer)",
+      "type": "application/mcp-server+json",
+      "url": "https://mysql-redis-compose-generator-adminer.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "MySQL + Redis Compose Generator (Adminer): composes adminer + mysql + redis \u2014 tooling, database, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose file for my stack",
+        "set up postgres and redis with health checks",
+        "scaffold a local dev environment with a database and cache"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:mysql-redis-compose-generator-nginx",
+      "displayName": "MySQL + Redis Compose Generator (Nginx)",
+      "type": "application/mcp-server+json",
+      "url": "https://mysql-redis-compose-generator-nginx.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "MySQL + Redis + Nginx Stack Generator: composes mysql + nginx + redis \u2014 database, web-server, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:nats-mysql-redis-stack-generator",
+      "displayName": "Nats Mysql Redis Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://nats-mysql-redis-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "NATS + MySQL + Redis Stack Generator: composes mysql + nats + prom/prometheus + redis \u2014 database, messaging, monitoring, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:nginx-redis-stack-generator",
+      "displayName": "Nginx + Redis Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://nginx-redis-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Redis + Nginx Stack Generator: composes nginx + redis \u2014 web-server, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:observable-backend-stack-generator",
+      "displayName": "Observable Backend Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://observable-backend-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Observable Backend Stack Generator: composes grafana/grafana + postgres + prom/prometheus + redis \u2014 monitoring, database, cache via A2A + MCP.",
+      "representativeQueries": [
+        "set up prometheus and grafana for my services",
+        "generate a monitoring stack with alerting",
+        "scaffold observability for a docker-compose app"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:postgres-grafana-stack-generator",
+      "displayName": "Postgres + Grafana Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://postgres-grafana-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Postgres + Grafana Stack Generator: composes grafana/grafana + grafana/loki + postgres \u2014 monitoring, database via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:postgres-kafka-prometheus-stack-generator",
+      "displayName": "Postgres + Kafka + Prometheus Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://postgres-kafka-prometheus-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Kafka + Postgres + Prometheus Stack Generator: composes confluentinc/cp-kafka + postgres + prom/prometheus \u2014 messaging, database, monitoring via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:postgres-kafka-stack-generator",
+      "displayName": "Postgres + Kafka Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://postgres-kafka-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Kafka + Postgres Stack Generator: composes confluentinc/cp-kafka + confluentinc/cp-zookeeper + postgres \u2014 messaging, database via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:postgres-minio-stack-generator",
+      "displayName": "Postgres + MinIO Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://postgres-minio-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "MinIO + Postgres Stack Generator: composes minio/minio + postgres \u2014 storage, database via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:postgres-prometheus-kafka-stack-generator",
+      "displayName": "Kafka and Postgres Monitoring Stack",
+      "type": "application/mcp-server+json",
+      "url": "https://postgres-prometheus-kafka-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Kafka and Postgres Monitoring Stack: composes confluentinc/cp-kafka + confluentinc/cp-zookeeper + postgres + prom/prometheus \u2014 messaging, database, monitoring via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:postgres-prometheus-stack-generator",
+      "displayName": "Postgres + Prometheus Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://postgres-prometheus-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Postgres + Prometheus Stack Generator: composes confluentinc/cp-zookeeper + postgres + prom/prometheus \u2014 messaging, database, monitoring via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:postgres-redis-compose-generator",
+      "displayName": "Postgres + Redis Compose Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://postgres-redis-compose-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Postgres + Redis Compose Generator: composes postgres + redis \u2014 database, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose file for my stack",
+        "set up postgres and redis with health checks",
+        "scaffold a local dev environment with a database and cache"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:rabbitmq-elasticsearch-mongodb-stack-generator",
+      "displayName": "RabbitMQ + Elasticsearch + MongoDB Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://rabbitmq-elasticsearch-mongodb-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "RabbitMQ + Elasticsearch + MongoDB Stack Generator: composes elasticsearch/elasticsearch + mongo + rabbitmq + redis \u2014 search, database, messaging, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:rabbitmq-elasticsearch-mysql-stack-generator",
+      "displayName": "RabbitMQ + Elasticsearch + MySQL Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://rabbitmq-elasticsearch-mysql-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "RabbitMQ + Elasticsearch + MySQL Stack Generator: composes elasticsearch/elasticsearch + mysql + rabbitmq + redis \u2014 search, database, messaging, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:rabbitmq-elasticsearch-postgres-stack-generato-053bcf",
+      "displayName": "RabbitMQ + Elasticsearch + Postgres Stack Generator (Elasticsearch/Elasticsearch)",
+      "type": "application/mcp-server+json",
+      "url": "https://rabbitmq-elasticsearch-postgres-stack-generato-053bcf.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "RabbitMQ + Elasticsearch + Postgres Stack Generator (Elasticsearch/Elasticsearch): composes elasticsearch/elasticsearch + postgres + rabbitmq + redis \u2014 search, database, messaging, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:rabbitmq-elasticsearch-postgres-stack-generator-mongo",
+      "displayName": "RabbitMQ + Elasticsearch + Postgres Stack Generator (Mongo)",
+      "type": "application/mcp-server+json",
+      "url": "https://rabbitmq-elasticsearch-postgres-stack-generator-mongo.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "RabbitMQ + Elasticsearch + Postgres Stack Generator (Mongo): composes elasticsearch/elasticsearch + mongo + postgres + rabbitmq \u2014 search, database, messaging via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:rabbitmq-postgres-mongodb-stack-generator",
+      "displayName": "RabbitMQ + Postgres + MongoDB Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://rabbitmq-postgres-mongodb-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "RabbitMQ + Postgres + MongoDB Stack Generator: composes mongo + postgres + rabbitmq + redis \u2014 database, messaging, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:rabbitmq-redis-stack-generator",
+      "displayName": "RabbitMQ + Redis Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://rabbitmq-redis-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "RabbitMQ + Redis Stack Generator: composes rabbitmq + redis \u2014 messaging, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:redis-minio-postgres-stack-generator",
+      "displayName": "Redis + MinIO + Postgres Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://redis-minio-postgres-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "MinIO + Postgres + Redis Stack Generator (Minio/Minio): composes minio/minio + postgres + redis \u2014 storage, database, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:redis-minio-stack-generator",
+      "displayName": "Redis + MinIO Stack Generator",
+      "type": "application/mcp-server+json",
+      "url": "https://redis-minio-stack-generator.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "MinIO + Redis Stack Generator: composes confluentinc/cp-zookeeper + minio/minio + redis \u2014 messaging, storage, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:redis-minio-stack-generator-minio-minio",
+      "displayName": "MinIO and Redis Storage Stack",
+      "type": "application/mcp-server+json",
+      "url": "https://redis-minio-stack-generator-minio-minio.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "MinIO and Redis Storage Stack: composes minio/minio + redis \u2014 storage, cache via A2A + MCP.",
+      "representativeQueries": [
+        "generate a docker-compose stack with kafka and postgres",
+        "scaffold messaging, storage and search infrastructure",
+        "give me a production-ready multi-service compose file"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:router",
+      "displayName": "GOSCE Portfolio Router",
+      "type": "application/mcp-server+json",
+      "url": "https://router.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "GOSCE Portfolio Router \u2014 the single entry point that routes orchestrators to verified GOSCE agents by capability, returning real example output from its own /selftest probes.",
+      "representativeQueries": [
+        "use the integration capability",
+        "run a integration task"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:structured-output-agent",
+      "displayName": "Structured Output MCP Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://structured-output-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Structured Output MCP Agent: composes fastmcp + instructor \u2014 agent-protocol, structured-output via A2A + MCP.",
+      "representativeQueries": [
+        "extract structured JSON from this text",
+        "turn a prompt and a schema into typed output",
+        "parse an unstructured description into fields"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:structured-output-agent-89bcb0",
+      "displayName": "Claude Schema Output Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://structured-output-agent-89bcb0.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Claude Schema Output Agent: composes anthropic + instructor \u2014 llm-client, structured-output via A2A + MCP.",
+      "representativeQueries": [
+        "extract structured JSON from this text",
+        "turn a prompt and a schema into typed output",
+        "parse an unstructured description into fields"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:structured-output-agent-c2ddcc",
+      "displayName": "Traced Structured Output Agent (Groq)",
+      "type": "application/mcp-server+json",
+      "url": "https://structured-output-agent-c2ddcc.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Structured Output Agent: composes groq + instructor + langchain-community + opentelemetry-sdk \u2014 llm-client, structured-output, orchestration, observability via A2A + MCP.",
+      "representativeQueries": [
+        "extract structured JSON from this text",
+        "turn a prompt and a schema into typed output",
+        "parse an unstructured description into fields"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:structured-output-agent-openai",
+      "displayName": "Structured Output Agent (Openai)",
+      "type": "application/mcp-server+json",
+      "url": "https://structured-output-agent-openai.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Structured Output Agent: composes instructor + openai \u2014 structured-output, llm-client via A2A + MCP.",
+      "representativeQueries": [
+        "extract structured JSON from this text",
+        "turn a prompt and a schema into typed output",
+        "parse an unstructured description into fields"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:structured-output-mcp-agent-authlib",
+      "displayName": "Structured Output MCP Agent (Authlib)",
+      "type": "application/mcp-server+json",
+      "url": "https://structured-output-mcp-agent-authlib.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Structured Output MCP Agent (Authlib): composes authlib + cryptography + instructor + langchain-core + mcp + openai + opentelemetry-api \u2014 oauth-oidc, crypto, structured-output, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "extract structured JSON from this text",
+        "turn a prompt and a schema into typed output",
+        "parse an unstructured description into fields"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:structured-output-mcp-agent-cryptography",
+      "displayName": "Structured Output MCP Agent (Cryptography)",
+      "type": "application/mcp-server+json",
+      "url": "https://structured-output-mcp-agent-cryptography.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Structured Output MCP Agent (Cryptography): composes authlib + cryptography + instructor + langchain-core + mcp + openai + opentelemetry-sdk \u2014 oauth-oidc, crypto, structured-output, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "extract structured JSON from this text",
+        "turn a prompt and a schema into typed output",
+        "parse an unstructured description into fields"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:structured-output-mcp-agent-instructor",
+      "displayName": "Structured Output MCP Agent (Instructor)",
+      "type": "application/mcp-server+json",
+      "url": "https://structured-output-mcp-agent-instructor.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Structured Output MCP Agent (Instructor): composes instructor + langchain-core + mcp + openai + opentelemetry-sdk \u2014 structured-output, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "extract structured JSON from this text",
+        "turn a prompt and a schema into typed output",
+        "parse an unstructured description into fields"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:structured-output-mcp-agent-langchain-core",
+      "displayName": "Structured Output MCP Agent (Langchain Core)",
+      "type": "application/mcp-server+json",
+      "url": "https://structured-output-mcp-agent-langchain-core.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Structured Output MCP Agent (Langchain Core): composes instructor + langchain-core + mcp + openai + opentelemetry-api \u2014 structured-output, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "extract structured JSON from this text",
+        "turn a prompt and a schema into typed output",
+        "parse an unstructured description into fields"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:structured-output-mcp-traced-agent",
+      "displayName": "Structured Output MCP Traced Agent",
+      "type": "application/mcp-server+json",
+      "url": "https://structured-output-mcp-traced-agent.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Structured Output MCP Traced Agent: composes instructor + langchain-core + mcp + openai + opentelemetry-api + opentelemetry-sdk \u2014 structured-output, orchestration, agent-protocol, llm-client, observability via A2A + MCP.",
+      "representativeQueries": [
+        "extract structured JSON from this text",
+        "turn a prompt and a schema into typed output",
+        "parse an unstructured description into fields"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:traced-llm-mcp-proxy",
+      "displayName": "Traced LLM MCP Proxy",
+      "type": "application/mcp-server+json",
+      "url": "https://traced-llm-mcp-proxy.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Traced LLM MCP Proxy: composes anthropic + mcp + opentelemetry-sdk \u2014 llm-client, agent-protocol, observability via A2A + MCP.",
+      "representativeQueries": [
+        "call Gemini and give me the OpenTelemetry trace",
+        "run a model completion with tracing spans",
+        "proxy an LLM call and return latency telemetry"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:traced-llm-proxy",
+      "displayName": "Traced LLM Proxy",
+      "type": "application/mcp-server+json",
+      "url": "https://traced-llm-proxy.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Traced LLM Proxy: composes anthropic + mcp + opentelemetry-api + opentelemetry-sdk \u2014 llm-client, agent-protocol, observability via A2A + MCP.",
+      "representativeQueries": [
+        "call Gemini and give me the OpenTelemetry trace",
+        "run a model completion with tracing spans",
+        "proxy an LLM call and return latency telemetry"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:traced-llm-proxy-anthropic",
+      "displayName": "Traced Claude Format Guard",
+      "type": "application/mcp-server+json",
+      "url": "https://traced-llm-proxy-anthropic.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Traced Claude Format Guard: composes anthropic + lm-format-enforcer + mcp + opentelemetry-api + opentelemetry-sdk \u2014 llm-client, structured-output, agent-protocol, observability via A2A + MCP.",
+      "representativeQueries": [
+        "call Gemini and give me the OpenTelemetry trace",
+        "run a model completion with tracing spans",
+        "proxy an LLM call and return latency telemetry"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    },
+    {
+      "identifier": "urn:air:getvda.ai:agent:traced-multi-llm-proxy",
+      "displayName": "Traced Multi-LLM Proxy",
+      "type": "application/mcp-server+json",
+      "url": "https://traced-multi-llm-proxy.getvda.ai/mcp",
+      "capabilities": [
+        "invoke",
+        "selftest"
+      ],
+      "description": "Traced Multi-LLM Proxy: composes anthropic + cryptography + langchain-openai + mcp + opentelemetry-api + opentelemetry-sdk \u2014 llm-client, crypto, orchestration, agent-protocol, observability via A2A + MCP.",
+      "representativeQueries": [
+        "call Gemini and give me the OpenTelemetry trace",
+        "run a model completion with tracing spans",
+        "proxy an LLM call and return latency telemetry"
+      ],
+      "payment": {
+        "x402Version": 2,
+        "free": [
+          "selftest",
+          "server/discover",
+          "tools/list"
+        ],
+        "defaultPriceUsd": 0.025,
+        "currency": "USDC",
+        "accepts": [
+          {
+            "scheme": "exact",
+            "network": "eip155:8453",
+            "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+            "payTo": "0x5aDd86003aFacF04761ad4A18b6017a353fD286c",
+            "requiresAccount": false,
+            "requiresGas": false,
+            "note": "Sign EIP-3009 transferWithAuthorization, return it base64 in the PAYMENT-SIGNATURE header, retry. The facilitator submits the transaction and pays the gas."
+          },
+          {
+            "scheme": "nvm:card-delegation",
+            "network": "stripe",
+            "requiresAccount": true,
+            "note": "Stripe card checkout, for humans."
+          }
+        ],
+        "notChargedOnFailure": true,
+        "authoritativeSource": "the PAYMENT-REQUIRED header of a 402 from this endpoint - prices are per tool and stated at request time; if this catalog and that header disagree, the header wins"
+      }
+    }
+  ]
+}

@@ -1,18 +1,249 @@
 aid: getvda-ai
-name: VDA / GOSCE
-description: 'VDA / GOSCE is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+name: Verified Digital Agents (VDA)
+description: >-
+  Verified Digital Agents (VDA, getvda.ai) sells governance for AI agents that can be proved after the fact:
+  Witness seals every governed decision into an Ed25519-signed, hash-chained record (anchored to Sigstore
+  Rekor and RFC 3161 TSAs on the paid tier) and produces EU AI Act Article 12 evidence; C2MD turns EU AI Act,
+  GDPR, NIST SP 800-53 and ISO 42001 controls into governance Markdown agents can follow; ACP versions, tests,
+  approves and signs that governance in git and serves it as signed bundles; Onboarding admits agents and
+  issues Witness-sealed admission credentials against did:web identities; HITL routes what exceeds an agent's
+  authority to a human and seals the decision. Every block publishes a signed A2A agent card,
+  Witness/C2MD/HITL run remote MCP servers, and Witness/HITL/ACP publish OpenAPI 3.1. The same operator runs
+  GOSCE, a 98-server fleet of templated, x402-metered MCP/A2A agents under *.getvda.ai — the "VDA / GOSCE"
+  author that a2aregistry.org counted as 98 agents.
+image: https://getvda.ai/favicon.svg
 url: https://raw.githubusercontent.com/api-evangelist/getvda-ai/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pipeline local-v3, 2026-09-19
+x-aliases:
+- VDA / GOSCE
+- getvda.ai
+- GOSCE
+position: Producing
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
 - Company
-apis: []
+- AI Agents
+- AI Governance
+- Compliance
+- Audit Trail
+- Agent Identity
+- A2A
+- MCP
+- x402
+- EU AI Act
+- Human In The Loop
+apis:
+- name: VDA Witness API
+  description: >-
+    Seal governed AI-agent decisions into tamper-evident, Ed25519-signed, independently-verifiable records and verify
+    them offline; issue, check and revoke agent admission credentials; self-serve key minting and agent-provable
+    renewal; EU AI Act Article 12 evidence reports. 23 operations; verify and check_valid are public, sealing needs a
+    key the API mints in-band. Also exposed as a 16-tool remote MCP server.
+  image: https://getvda.ai/favicon.svg
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Audit Trail
+  - Evidence
+  - Credentials
+  - AI Governance
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-witness-openapi.json
+  - type: OpenAPI
+    name: Provider-hosted OpenAPI 3.1
+    url: https://witness.getvda.ai/openapi.json
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    name: Provider-hosted llms.txt
+    url: https://witness.getvda.ai/llms.txt
+  - type: MCPServer
+    url: mcp/getvda-ai-mcp.yml
+  - type: MCPServer
+    name: Witness MCP endpoint (Streamable HTTP)
+    url: https://witness.getvda.ai/api/witness/mcp
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: Overlay
+    url: overlays/getvda-ai-witness-overlay.yaml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: AgentSkill
+    url: skills/getvda-ai-seal-and-verify-agent-action.md
+  - type: AgentSkill
+    url: skills/getvda-ai-issue-check-revoke-admission-credential.md
+  - type: X-DID
+    name: did:web:witness.getvda.ai
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    name: Published anchored record (Rekor + TSA)
+    url: https://witness.getvda.ai/proof
+- name: VDA HITL API
+  description: >-
+    Human decisions on agent actions: register an authority config, raise an escalated decision, read it, record the
+    human resolution (sealed to Witness under customer-managed custody), manage baselines and read quota. 17
+    operations; discovery public, every tool call requires a Witness bearer (Contract A). The 9 tools are mirrored on
+    an auth-gated remote MCP endpoint.
+  image: https://getvda.ai/favicon.svg
+  humanURL: https://getvda.ai/blocks/hitl.html
+  baseURL: https://hitl.getvda.ai
+  tags:
+  - Human In The Loop
+  - Escalation
+  - AI Governance
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-hitl-openapi.json
+  - type: OpenAPI
+    name: Provider-hosted OpenAPI 3.1
+    url: https://hitl.getvda.ai/openapi.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: MCPServer
+    name: HITL MCP endpoint (Streamable HTTP, bearer required)
+    url: https://hitl.getvda.ai/mcp
+  - type: AgentSkill
+    url: skills/getvda-ai-raise-and-resolve-hitl-decision.md
+  - type: X-DID
+    name: did:web:hitl.getvda.ai
+    url: well-known/getvda-ai-hitl-did.json
+- name: VDA ACP API
+  description: >-
+    Agent Control Plane — the governance-aware wrapper on git: load a governance set at a ref, prepare and
+    Compliance-Guard a change, run the governance CI suite, surface it for a non-engineer approver, record the
+    decision (sealed hitl_decision, merges on approve), build/sign/activate a governance bundle sealed to Witness, and
+    serve signed bundles publicly. 12 operations; MCP surface declared planned.
+  image: https://getvda.ai/favicon.svg
+  humanURL: https://getvda.ai/blocks/acp.html
+  baseURL: https://acp.getvda.ai
+  tags:
+  - Governance As Code
+  - Git
+  - AI Governance
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-acp-openapi.json
+  - type: OpenAPI
+    name: Provider-hosted OpenAPI 3.1
+    url: https://acp.getvda.ai/openapi.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: AgentSkill
+    url: skills/getvda-ai-govern-change-with-acp.md
+  - type: X-DID
+    name: did:web:acp.getvda.ai
+    url: well-known/getvda-ai-acp-did.json
+- name: C2MD Compliance Agent
+  description: >-
+    A2A (JSON-RPC at /a2a) and MCP (/mcp) agent that generates EU AI Act, GDPR, NIST SP 800-53 and ISO 42001
+    governance Markdown (AGENTS.md, SOP.md, SKILL.md, EXCEPTION.md), risk assessments, DPIA/FRIA scaffolds and
+    article-by-article evidence reports. 8 A2A skills, 11 MCP tools; assess and discovery free and keyless, generative
+    tiers via Witness account tier or Google/Microsoft OAuth scopes. The OpenAPI on this host is the FastAPI edge
+    proxy shell (9 routes), not the skill contract — the card is.
+  image: https://getvda.ai/favicon.svg
+  humanURL: https://getvda.ai/c2md/generate-compliance-bundle.html
+  baseURL: https://c2md.getvda.ai
+  tags:
+  - Compliance
+  - EU AI Act
+  - GDPR
+  - AI Governance
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-c2md-edge-openapi.json
+  - type: OpenAPI
+    name: Provider-hosted OpenAPI 3.1 (edge proxy)
+    url: https://c2md.getvda.ai/openapi.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    name: Swagger UI (edge proxy)
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    name: Provider-hosted llms.txt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: MCPServer
+    name: C2MD MCP endpoint (Streamable HTTP)
+    url: https://c2md.getvda.ai/mcp
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+- name: GOSCE Agent Portfolio and Router
+  description: >-
+    The GOSCE (GitHub Open-Source Combination Engine) fleet: 98 templated remote MCP + A2A agents at
+    <agent>.getvda.ai, each with two tools (invoke, selftest), an Ed25519-signed agent card verifiable against the
+    agents.getvda.ai JWKS, and x402 v2 pay-per-call metering ($0.025 USDC on Base or Stripe card; discovery and
+    selftest free). Indexed at agents.getvda.ai (portfolio API, did.json, jwks.json, a 99-entry ai-catalog.json) and
+    fronted by router.getvda.ai, the single entry point that routes by capability.
+  image: https://getvda.ai/favicon.svg
+  humanURL: https://agents.getvda.ai/agents
+  baseURL: https://router.getvda.ai
+  tags:
+  - AI Agents
+  - MCP
+  - A2A
+  - x402
+  - Micropayments
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-gosce-router-openapi.json
+  - type: OpenAPI
+    name: Provider-hosted router OpenAPI 3.1
+    url: https://router.getvda.ai/openapi.json
+  - type: OpenAPI
+    name: GOSCE portfolio host OpenAPI 3.1 (agents.getvda.ai)
+    url: openapi/getvda-ai-gosce-portfolio-openapi.json
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    name: Router llms.txt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: MCPServer
+    name: GOSCE router MCP endpoint (Streamable HTTP)
+    url: https://router.getvda.ai/mcp
+  - type: X-AgentCatalog
+    name: agents.getvda.ai ai-catalog.json (99 metered MCP servers)
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    name: agents.getvda.ai card-signing keys
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    name: did:web:agents.getvda.ai
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- name: VDA Onboarding Agent
+  description: >-
+    Admission authority for the suite — an A2A agent (6 skills) that runs holder-binding (DID-auth), intake and gap
+    analysis for a candidate agent and issues a Witness-sealed admission credential against did:web:onboard.getvda.ai.
+    Card version 0.1.0-skeleton; phases 4-6 staged. No OpenAPI or MCP of its own (admission tools are exposed over
+    the Witness MCP).
+  image: https://getvda.ai/favicon.svg
+  humanURL: https://getvda.ai/blocks/onboarding.html
+  baseURL: https://onboard.getvda.ai
+  tags:
+  - Agent Identity
+  - Credentials
+  - A2A
+  properties:
+  - type: Documentation
+    url: https://getvda.ai/blocks/onboarding.html
+  - type: X-DID
+    name: did:web:onboard.getvda.ai
+    url: well-known/getvda-ai-onboard-did.json
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -21,3 +252,78 @@ maintainers:
 common:
 - type: Website
   url: https://getvda.ai/
+- type: Documentation
+  url: https://getvda.ai/governance-cycle.html
+- type: GettingStarted
+  name: Get going (MCP / agent-first)
+  url: https://witness.getvda.ai/docs
+- type: GitHubOrganization
+  url: https://github.com/getvda-ai
+- type: Contact
+  name: hello@getvda.ai
+  url: mailto:hello@getvda.ai
+- type: LLMsTxt
+  url: llms/getvda-ai-llms.txt
+- type: LLMsTxt
+  name: Provider-hosted llms.txt
+  url: https://getvda.ai/llms.txt
+- type: AgentCard
+  url: a2a/getvda-ai-a2a.yml
+- type: MCPServer
+  url: mcp/getvda-ai-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/getvda-ai-tool-crosswalk.yml
+- type: Packages
+  url: packages/getvda-ai-packages.yml
+- type: SDKs
+  url: packages/getvda-ai-packages.yml
+- type: X-WellKnownProbe
+  url: well-known/getvda-ai-well-known.yml
+- type: Conformance
+  url: conformance/getvda-ai-conformance.yml
+- type: ErrorCatalog
+  url: errors/getvda-ai-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/getvda-ai-lifecycle.yml
+- type: OAuthScopes
+  url: scopes/getvda-ai-scopes.yml
+- type: Authentication
+  url: authentication/getvda-ai-authentication.yml
+- type: DomainSecurity
+  url: security/getvda-ai-domain-security.yml
+- type: Conventions
+  url: conventions/getvda-ai-conventions.yml
+- type: Idempotency
+  url: conventions/getvda-ai-conventions.yml
+- type: X-RegulatoryPosture
+  url: regulatory/getvda-ai-regulatory-posture.yml
+- type: DataResidency
+  url: regulatory/getvda-ai-regulatory-posture.yml
+- type: AITransparency
+  url: regulatory/getvda-ai-regulatory-posture.yml
+- type: Sandbox
+  url: sandbox/getvda-ai-sandbox.yml
+- type: Plans
+  url: plans/getvda-ai-plans-pricing.yml
+- type: Pricing
+  name: Witness tiers (in the served agent card terms block)
+  url: https://witness.getvda.ai/.well-known/agent-card.json
+- type: RateLimits
+  url: rate-limits/getvda-ai-rate-limits.yml
+- type: DataModel
+  url: data-model/getvda-ai-data-model.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Overlay
+  url: overlays/getvda-ai-witness-overlay.yaml
+- type: X-Robots
+  url: https://getvda.ai/robots.txt
+- type: X-Sitemap
+  url: https://getvda.ai/sitemap.xml
+- type: X-Demo
+  url: https://getvda.ai/demo
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 57
+  pass: local-v3

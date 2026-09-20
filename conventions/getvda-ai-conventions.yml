@@ -1,0 +1,132 @@
+generated: '2026-09-19'
+method: searched
+source: https://witness.getvda.ai/docs
+derived_from:
+- openapi/getvda-ai-witness-openapi.json
+- openapi/getvda-ai-hitl-openapi.json
+- openapi/getvda-ai-acp-openapi.json
+docs:
+- https://witness.getvda.ai/llms.txt
+- https://witness.getvda.ai/docs
+- https://c2md.getvda.ai/llms.txt
+- https://agents.getvda.ai/llms.txt
+base_url: https://witness.getvda.ai
+media_type: application/json
+auth:
+  style: >-
+    One suite credential — a Witness API key presented as `Authorization: Bearer wtn.<keyId>.<secret>` (Witness
+    also accepts an `x-witness-key` header) — validated by every sibling service through Witness GET /whoami
+    ("Contract A"). Keys are short-lived and self-minted (POST /api/witness/test-key, no human) and renewed by
+    Ed25519 controller-key challenge-response rather than by a standing secret. C2MD additionally accepts Google
+    and Microsoft OAuth 2.0 tokens; ACP additionally takes an OIDC approver credential in X-Approver-Credential
+    (staged); Onboarding a per-tenant bearer; the GOSCE fleet takes no credential at all and gates execution
+    with x402 payment.
+  detail: authentication/getvda-ai-authentication.yml
+idempotency:
+  supported: true
+  coverage: partial
+  mechanism: request-body key
+  header: null
+  field: decisionId
+  scope:
+  - 'POST /api/witness/seal — SealRequest.decisionId, optional, deduped on (account, decisionId)'
+  - 'POST /api/witness/seal/attestation — the seal_attestation MCP inputSchema carries decisionId'
+  retention: undocumented (a UNIQUE index on (account, decisionId) — no expiry stated)
+  description: >-
+    Witness documents "Idempotency — send decisionId; dedupe is on (account, decisionId): the same value returns the
+    existing record with deduped:true (never cross-tenant)". It is a body field, not an Idempotency-Key header, and
+    it exists on the generic seal and the attestation seal only — seal_hitl_decision and seal_agent_action carry no
+    decisionId in their schemas, and the credential issue/revoke, key revoke, HITL raise/resolve and ACP
+    activate/decision writes have no replay key at all. The docs also warn that decisionId is NOT namespaced by
+    chainKey, so the same id on a different chain collides and returns the first record. Customer-managed custody
+    has a different safety property: prepare is stateless and submit fails with 409 if the chain advanced, so a
+    stale retry cannot double-write — but a successful submit retried is a second record.
+  gaps:
+  - No idempotency key on seal_hitl_decision, seal_agent_action, credentials/issue, credentials/{id}/revoke, keys/revoke.
+  - No idempotency key on any HITL write (raise_hitl_item, resolve_hitl_item, register_authority_config) or ACP write (decision, activate).
+  - No documented safe-retry guidance for an ambiguous outcome (timeout after a successful seal).
+pagination:
+  style: cursor
+  params: [limit (1-500), cursor, chainKey, since, until]
+  response_fields: [records, nextCursor, chainKeys]
+  evidence: 'GET /api/witness/records — filters chainKey, since/until (ISO-8601), limit (1-500), cursor; HITL list_hitl_items returns summaries only (no evidence, statement or domain_ref).'
+grouping:
+  primitive: chainKey
+  description: 'chainKey is the ordering namespace AND the grouping primitive — "Witness has NO bundle_id / group_id / parent_id field". Max 128 chars [A-Za-z0-9._:-]; omitted => "default"; account-scoped (a foreign chainKey is 404).'
+request_id_tracing:
+  header: none documented
+  observed: 'x-cloud-trace-context on witness.getvda.ai responses (Google Frontend), not a documented API contract'
+versioning:
+  style: path-versioned on HITL and ACP (/v1/), unversioned on Witness (/api/witness/); see lifecycle/getvda-ai-lifecycle.yml
+error_envelope:
+  shape: '{"error": "<string>"} on Witness; {"error","message"} on HITL; Fastify {"message","error","statusCode"} on ACP; FastAPI {"detail"} on C2MD Edge and the fleet; JSON-RPC 2.0 error objects on /mcp and /a2a'
+  detail: errors/getvda-ai-problem-types.yml
+rate_limit_signaling:
+  status: 429
+  headers: none documented
+  detail: rate-limits/getvda-ai-rate-limits.yml
+caching:
+  documented:
+  - 'GET /api/witness/whoami 200: Cache-Control: private, max-age=60; 401: no-store'
+  - 'GET /api/witness/credentials/{id}: Cache-Control: private, max-age=60 when found; no-store for not_found | not_credential'
+dry_run_mode:
+  supported: true
+  status: documented
+  mechanism: stateless prepare + free selftest/demo paths
+  surfaces:
+  - operation: 'POST /api/witness/prepare'
+    description: 'Customer-managed custody step 1 — "STATELESS": Witness assembles the shaped record and returns canonicalBytes without writing; nothing is committed until the signed record is submitted.'
+  - operation: 'POST /api/witness/verify (public)'
+    description: Verify any record or chain without a key or an account.
+  - operation: 'C2MD generate_evidence_readiness_report data_mode "demo"'
+    description: Synthetic, LLM-free, deterministic, zero external calls; output labelled SAMPLE — DEMO DATA.
+  - operation: 'GOSCE selftest (GET /selftest, MCP tool selftest)'
+    description: Runs the real capability on canned input for free.
+  detail: sandbox/getvda-ai-sandbox.yml
+reversibility:
+  grade: documented
+  docs: https://witness.getvda.ai/llms.txt
+  note: >-
+    Reversal paths exist for every revocable object — an API key, an admission credential, a HITL baseline, an ACP
+    governance version — and each is itself sealed as a new record; but the provider states NO reversal WINDOW for
+    any of them, so the grade is documented (0.4), not verified. The core write surface — sealing a record — is
+    IRREVERSIBLE BY DESIGN: a sealed record is append-only on a hash chain and "validity is COMPUTED, revocation is
+    a new superseding record", so the reversal of a seal is a superseding seal, never a delete. Nothing below asserts
+    a window the provider has not written down. Propagation latencies the docs do state ("verify reflects it within
+    ~60s") are cache lags, not reversal windows, and are not graded as windows.
+  write_surfaces:
+  - operation: 'POST /api/witness/seal and the three shaped seals'
+    action: Append a signed record to the account's chain
+    reversal: none — records are immutable; correct by sealing a superseding record on the same chainKey
+    reversal_operation: null
+    window: null
+    stated_terms: ['"Immutable — validity is COMPUTED, revocation is a new superseding record."']
+  - operation: 'POST /api/witness/credentials/issue'
+    action: Issue an agent admission credential (a sealed attestation)
+    reversal: revoke — terminal
+    reversal_operation: 'POST /api/witness/credentials/{credential_id}/revoke (MCP revoke_admission_credential); issuer account only; reason_code policy_violation | superseded | compromised | environment_offboarded | other'
+    window: null
+    stated_terms: ['"Revoke (needs the ISSUING account''s key — only the issuer may revoke; terminal) ... -> new revocation record; verify reflects it within ~60s."']
+  - operation: 'POST /api/witness/test-key / renew (key issuance)'
+    action: Mint an account API key
+    reversal: revoke — total, sealed as a key_revocation event
+    reversal_operation: 'POST /api/witness/keys/revoke (operationId revoke_api_key); reason_code compromised | exposed | rotated | superseded | operator_action | other'
+    window: null
+    stated_terms: ['"Revocation is TOTAL: a revoked key 401s AND its account''s records become unfetchable with it — no operator backdoor."']
+  - operation: 'HITL baseline promotion (via resolve_hitl_item)'
+    action: Widen a caller's decision baseline
+    reversal: revoke_baseline — never a delete
+    reversal_operation: 'POST /v1/tools/revoke_baseline (operationId revoke_baseline)'
+    window: null
+    stated_terms: ['"Revoke a baseline and seal the revocation. Never a delete — the row and its trail remain"']
+  - operation: 'ACP POST /v1/environments/{env}/versions/activate'
+    action: Activate a signed governance bundle version
+    reversal: rollback = activate the previous version
+    reversal_operation: 'POST /v1/environments/{env}/versions/activate with the prior version (documented in @getvda/distribution: "Rollback = activate the previous version")'
+    window: null
+    stated_terms: ['"Rollback = activate the previous version."']
+  - operation: 'HITL resolve_hitl_item / ACP pulls/{num}/decision'
+    action: Record a human decision (sealed, merges on approve)
+    reversal: none documented
+    reversal_operation: null
+    window: null

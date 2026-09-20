@@ -1,0 +1,73 @@
+generated: '2026-09-19'
+method: searched
+source: https://witness.getvda.ai/docs
+sources:
+- https://witness.getvda.ai/docs
+- https://witness.getvda.ai/llms.txt
+- https://c2md.getvda.ai/llms.txt
+- https://c2md.getvda.ai/.well-known/agent-card.json
+- https://hitl.getvda.ai/.well-known/agent-card.json
+provider: Verified Digital Agents (VDA)
+providerId: getvda-ai
+limit_count: 6
+summary: >-
+  Witness documents one numeric limit — a per-account token bucket, default 120 requests/minute, answering 429 —
+  plus unnumbered per-IP caps on anonymous key minting and per-account caps on renewal and whoami. C2MD's
+  anonymous MCP methods are "rate-limited per network" and its free scope "rate-limited per account", without
+  numbers. HITL's limits are caller-configured: the AuthorityConfigBody the caller registers carries
+  max_raises_per_hour and max_open_items, and get_raise_quota reads the remaining headroom back. No response
+  header (X-RateLimit-*, RateLimit-*, Retry-After) is documented or declared in any spec, and the one 401 observed
+  live carried none, so an agent has only the 429 status itself to react to.
+responseCodes:
+  throttled: 429
+  headers: []
+  note: No rate-limit or Retry-After headers documented; none observed on the live 401/400 responses probed.
+limits:
+- name: Witness per-account token bucket
+  scope: per-account
+  metric: requests-per-minute
+  limit: 120
+  window: 1 minute
+  burst: token bucket (default)
+  status: 429
+  evidence: 'https://witness.getvda.ai/docs — "Rate limit — per-account token bucket (default 120/min); 429 when exceeded."'
+- name: Witness test-key issuance
+  scope: per-IP
+  metric: requests
+  limit: undocumented number
+  status: 429
+  evidence: 'docs — "Test-key issuance is rate-limited per IP."; OpenAPI POST /api/witness/test-key declares 429 "Rate limited"'
+- name: Witness key renewal
+  scope: per-account
+  metric: requests
+  limit: undocumented number
+  status: 429
+  evidence: 'OpenAPI POST /api/witness/renew declares 429 "Per-account renewal rate limit"; llms.txt — "rate-limited per account, and NOT subject to the anonymous-mint caps"'
+- name: Witness whoami
+  scope: per-IP and per-account
+  metric: requests
+  limit: undocumented ("permissively")
+  status: 429
+  evidence: 'llms.txt — "Permissively rate-limited per IP AND per account."; 200 responses are Cache-Control: private, max-age=60'
+- name: C2MD anonymous MCP discovery and free scope
+  scope: per-network (anonymous) / per-account (c2md:assess)
+  metric: requests
+  limit: undocumented number
+  evidence: 'c2md llms.txt — "initialize / tools/list ANONYMOUS, no key. Rate-limited per network."; scope c2md:assess — "Rate-limited per account."'
+- name: HITL raise quota
+  scope: per-caller (configured by the caller's registered authority config)
+  metric: raises-per-hour and open items
+  limit: max_raises_per_hour and max_open_items (caller-set integers, minimum 1)
+  evidence: 'openapi/getvda-ai-hitl-openapi.json AuthorityConfigBody; get_raise_quota — "Remaining raises this hour, remaining open-item headroom"'
+- name: Witness Sealed-tier seal volume
+  scope: per-account
+  metric: seals-per-month
+  limit: 5000
+  enforcement: measured, never blocked ("NEVER blocked over the limit; billing is not yet live")
+  evidence: 'MCP tool get_test_key description; card terms.usage.enforcement "measured_not_billed"'
+policies:
+- name: Backoff
+  description: No Retry-After is published; back off on 429 and, for customer-managed custody, re-prepare on 409 rather than retrying the same submit.
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com

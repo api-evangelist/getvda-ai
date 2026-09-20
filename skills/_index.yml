@@ -1,0 +1,37 @@
+generated: '2026-09-19'
+method: generated
+source: >-
+  openapi/getvda-ai-witness-openapi.json, openapi/getvda-ai-hitl-openapi.json and openapi/getvda-ai-acp-openapi.json
+  (operationIds verified where the provider declares them — HITL declares them on every tool route, Witness on two,
+  ACP on none, so those routes are named by method + path), the served agent cards' skills/inputSchema blocks, and
+  the provider's llms.txt documents. VDA publishes governance SKILL.md files FOR its customers' agents (the C2MD
+  output taxonomy) but no AGENTS.md or skills for calling its own APIs (probed 2026-09-19: no skills/ or AGENTS.md in
+  the two public getvda-ai repos), so these are generated.
+skills:
+- file: getvda-ai-seal-and-verify-agent-action.md
+  name: getvda-ai-seal-and-verify-agent-action
+  method: generated
+  description: Mint a free Sealed-tier key in-band, seal an autonomous agent action under a governing rule, and verify the chain offline.
+  operations: 5
+  operation_ids: []
+  routes: ['POST /api/witness/test-key', 'POST /api/witness/seal/agent-action', 'GET /api/witness/records/{recordId}', 'GET /api/witness/chains/{chainKey}/proof', 'POST /api/witness/verify']
+- file: getvda-ai-issue-check-revoke-admission-credential.md
+  name: getvda-ai-issue-check-revoke-admission-credential
+  method: generated
+  description: Issue a sealed admission credential, verify it publicly as an enforcer with the issuer-authenticity signal, and revoke it as the issuer.
+  operations: 4
+  operation_ids: []
+  routes: ['POST /api/witness/credentials/issue', 'GET /api/witness/credentials/{credential_id}', 'GET /api/witness/records/{recordId}/issuer', 'POST /api/witness/credentials/{credential_id}/revoke']
+- file: getvda-ai-raise-and-resolve-hitl-decision.md
+  name: getvda-ai-raise-and-resolve-hitl-decision
+  method: generated
+  description: Register an authority config, raise an escalated decision for a human, and record the sealed resolution.
+  operations: 6
+  operation_ids: [register_authority_config, get_raise_quota, raise_hitl_item, get_hitl_item, resolve_hitl_item, list_hitl_items]
+- file: getvda-ai-govern-change-with-acp.md
+  name: getvda-ai-govern-change-with-acp
+  method: generated
+  description: Prepare, test, approve and activate a signed governance bundle through ACP, then distribute it to agents.
+  operations: 8
+  operation_ids: []
+  routes: ['GET /v1/environments/{env}/governance', 'POST /v1/environments/{env}/changes/prepare', 'POST /v1/environments/{env}/changes/test', 'GET /v1/environments/{env}/pulls/{num}/surface', 'POST /v1/environments/{env}/pulls/{num}/decision', 'POST /v1/environments/{env}/versions/activate', 'GET /bundles/{env}/active.json', 'GET /bundles/{env}/versions/{version}']

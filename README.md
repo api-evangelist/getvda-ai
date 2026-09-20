@@ -64,5 +64,19 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-VDA / GOSCE is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.
-- https://getvda.ai/
+Verified Digital Agents (VDA, getvda.ai) sells governance for AI agents that can be proved after the fact — a composable suite of governance blocks: **Witness** seals every governed decision into an Ed25519-signed, hash-chained record (anchored to Sigstore Rekor and RFC 3161 timestamp authorities on the paid tier) and produces EU AI Act Article 12 evidence; **C2MD** turns EU AI Act, GDPR, NIST SP 800-53 and ISO 42001 controls into governance Markdown agents can follow; **ACP** versions, tests, approves and signs that governance in git; **Onboarding** admits agents and issues Witness-sealed admission credentials against did:web identities; **HITL** routes what exceeds an agent's authority to a human and seals the decision. The same operator runs **GOSCE**, a 98-server fleet of templated, x402-metered MCP/A2A agents under `*.getvda.ai` (the "VDA / GOSCE" author on a2aregistry.org).
+
+What this profile holds (all fetched from the provider's own hosts on 2026-09-19):
+
+- `openapi/` — six verbatim OpenAPI 3.1 documents (Witness 23 ops, HITL 17, ACP 12, C2MD edge 9, GOSCE portfolio 14, GOSCE router 14)
+- `a2a/` — eight served A2A agent cards, graded against A2A 1.0.0 (five conformant, three flavored)
+- `mcp/` — four probed remote MCP servers (Witness 16 tools, C2MD 11, HITL gated, GOSCE router 2) with verbatim `tools/list` results and a tool-to-REST crosswalk
+- `well-known/` — did:web documents on five hosts, the fleet JWKS and its 99-entry agent catalog; no security.txt / api-catalog / OAuth metadata anywhere
+- `packages/` — ten first-party npm/PyPI packages with live versions and dates
+- `llms/` — five provider-published llms.txt files
+- plus authentication, scopes, conformance, errors, lifecycle, conventions (idempotency + reversibility), plans, rate limits, sandbox, regulatory posture, data model, an OpenAPI overlay and four agent skills
+
+- Website: https://getvda.ai/
+- Witness docs: https://witness.getvda.ai/docs
+- GOSCE agent index: https://agents.getvda.ai/agents
+- GitHub: https://github.com/getvda-ai

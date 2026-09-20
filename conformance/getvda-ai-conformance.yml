@@ -1,0 +1,133 @@
+generated: '2026-09-19'
+method: searched
+source: https://witness.getvda.ai/.well-known/agent-card.json
+derived_from: openapi/getvda-ai-witness-openapi.json
+docs:
+- https://witness.getvda.ai/docs
+- https://witness.getvda.ai/llms.txt
+- https://agents.getvda.ai/llms.txt
+- https://getvda.ai/llms.txt
+summary: >-
+  VDA's conformance profile is the agent-identity and agent-commerce protocol stack, not an enterprise sector
+  standard: eight A2A agent cards (five at 0.3.0 shape, graded in a2a/), four live MCP servers (protocol 2024-11-05
+  on Witness and C2MD, 2026-07-28 on the GOSCE router), JSON-RPC 2.0 on every one of them, W3C did:web DID
+  documents on five hosts with Ed25519 JsonWebKey2020 verification methods, detached EdDSA JWS (RFC 7515) card
+  signatures verifiable against an RFC 7517 JWKS, Ed25519 (RFC 8032) hash-chained records, and — on the paid
+  Anchored tier only — external anchoring to Sigstore Rekor and RFC 3161 timestamp authorities. The GOSCE fleet
+  meters execution with x402 v2 (HTTP 402 + PAYMENT-REQUIRED header, EIP-3009 transferWithAuthorization in USDC on
+  Base, CAIP-2 eip155:8453). C2MD declares OAuth 2.0 authorization-code and client-credentials flows against Google
+  and Microsoft Entra as identity providers; ACP declares an OIDC approver credential but reports identity
+  "DISABLED" on its live readyz. Nothing here is RFC 9457, no host serves RFC 9116 security.txt or RFC 9727
+  api-catalog, and no RFC 8594 Sunset/Deprecation signalling exists. The domain-standard signature for this
+  market (AI-agent governance / verifiable agent identity) is the did:web + W3C-VC-shaped admission credential
+  surface, declared in the contracts themselves.
+standards:
+- id: a2a
+  name: Agent2Agent protocol
+  version: '0.3.0'
+  conforms: true
+  evidence: >-
+    a2a/getvda-ai-a2a.yml — eight served cards; five graded conformant (Witness protocolVersion 0.2.5 with
+    preferredTransport HTTP+JSON; HITL, C2MD, router and fleet at 0.3.0 with JSONRPC and A2A urls at /a2a). C2MD's
+    llms.txt documents `skills/<name>` JSON-RPC methods and get_task polling for long-running skills.
+- id: mcp
+  name: Model Context Protocol
+  version: '2024-11-05 (Witness, C2MD); 2026-07-28 (GOSCE router and fleet)'
+  conforms: true
+  evidence: >-
+    POST https://witness.getvda.ai/api/witness/mcp initialize -> protocolVersion "2024-11-05", serverInfo
+    {vda-witness 1.0.0}; tools/list -> 16 tools with inputSchema. POST https://c2md.getvda.ai/mcp -> "2024-11-05",
+    11 tools. POST https://router.getvda.ai/mcp -> "2026-07-28", 2 tools. See mcp/getvda-ai-mcp.yml.
+- id: json-rpc-2.0
+  conforms: true
+  evidence: Every MCP and A2A endpoint answers {"jsonrpc":"2.0",...}; C2MD documents -32601 for the planned generate_journey_baseline skill.
+- id: did-web
+  name: W3C Decentralized Identifiers (did:web method)
+  conforms: true
+  domain_standard_signature: true
+  evidence: >-
+    /.well-known/did.json served on witness, acp, onboard, hitl and agents.getvda.ai — @context https://www.w3.org/ns/did/v1
+    + https://w3id.org/security/suites/jws-2020/v1, JsonWebKey2020 Ed25519 verificationMethod[], assertionMethod[],
+    and a rotationLog (saved verbatim in well-known/). The Witness OpenAPI's check_valid response defines
+    issuer_verification states (verified / key_not_in_did_doc / custodial / did_unresolvable) resolved against the
+    issuer's did:web document, and the ACP BundleManifest schema carries `did` and `keyId` (did:web:acp.getvda.ai#key-3).
+  note: >-
+    The contract-level signature for this market: agent identity, admission credentials and card signatures all
+    resolve through did:web documents the provider serves. Admission credentials are "W3C VC"-shaped per the VDA-MD
+    whitepaper but the served credential schema was not fetched (issue needs a key), so VC conformance is not asserted.
+- id: jws-rfc7515
+  name: JSON Web Signature (detached EdDSA JWS) + JWKS (RFC 7517)
+  conforms: true
+  evidence: >-
+    GOSCE router and fleet cards carry `proof.jws` with canonicalisation rules and `proof.jwks`
+    https://agents.getvda.ai/.well-known/jwks.json (application/jwk-set+json, one EdDSA/Ed25519 key, kid
+    Y6dPf2Y2bQPF...). Witness, ACP, HITL and Onboarding cards carry Ed25519 signatures keyed to did:web #key ids.
+- id: ed25519-rfc8032
+  conforms: true
+  evidence: Witness OpenAPI info.description ("Ed25519-signed, independently-verifiable records"); DID documents declare crv Ed25519; agent cards' proof.algorithm "Ed25519".
+- id: sigstore-rekor
+  name: Sigstore Rekor transparency log + RFC 3161 timestamps (external anchoring)
+  conforms: true
+  verification: partial
+  evidence: >-
+    https://witness.getvda.ai/proof publishes one anchored record with Rekor logIndex 2583358177, Rekor UUID and
+    inclusion time 2026-08-25T12:50:44Z, TSAs digicert + sectigo; bundle at /proof/bundle.json (200, 21,615 bytes).
+    Anchoring applies ONLY to the paid Anchored tier — the card's terms block and every doc say the free Sealed tier
+    is "deliberately never anchored".
+- id: x402
+  name: x402 HTTP payment protocol (v2)
+  conforms: true
+  verification: partial
+  evidence: >-
+    well-known/getvda-ai-agents-ai-catalog.json — every fleet entry declares payment.x402Version 2, accepts[] with
+    scheme "exact" on eip155:8453 (USDC 0x8335...2913, payTo 0x5aDd...286c, EIP-3009 transferWithAuthorization in a
+    PAYMENT-SIGNATURE header) and scheme "nvm:card-delegation" on Stripe; agents.getvda.ai/llms.txt documents the 402
+    + PAYMENT-REQUIRED / PAYMENT-RESPONSE headers. A metered 402 was NOT observed live (the router answered the probe
+    tools/call for free), so the challenge shape is documented, not probed.
+- id: oauth2
+  conforms: true
+  verification: declared
+  evidence: >-
+    a2a/getvda-ai-c2md-agent-card.json securitySchemes google_oauth2 (authorizationCode against accounts.google.com)
+    and microsoft_oauth2 (authorizationCode + clientCredentials against login.microsoftonline.com/organizations),
+    scopes c2md:assess … c2md:commercial_deploy. No authorization-server metadata is served on any VDA host — the
+    IdPs are Google and Microsoft. See scopes/getvda-ai-scopes.yml.
+- id: oidc
+  conforms: false
+  evidence: >-
+    ACP declares approver_oidc (an OIDC token from the customer's IdP in X-Approver-Credential) but
+    GET https://acp.getvda.ai/readyz reports capabilities.identity "disabled" — "set OIDC_ISSUER + OIDC_AUDIENCE to
+    enable"; the ACP card marks federated approval identity "staged, not live". Declared, not live.
+- id: rfc9457
+  name: Problem Details for HTTP APIs
+  conforms: false
+  evidence: Observed error bodies are {"error":"unknown or invalid API key"} (Witness), {"error":"unauthorized","message":"..."} (HITL), Fastify {"message","error","statusCode"} (ACP) and FastAPI {"detail"} (fleet). No application/problem+json anywhere. See errors/.
+- id: rfc9116
+  name: security.txt
+  conforms: false
+  evidence: /.well-known/security.txt 404 on every host (well-known/getvda-ai-well-known.yml).
+- id: rfc9727
+  name: api-catalog linkset
+  conforms: false
+  evidence: /.well-known/api-catalog 404 on every API host; the apex host returns its SPA shell.
+- id: rfc8594
+  name: Sunset / Deprecation headers
+  conforms: false
+  evidence: No Sunset or Deprecation header in any spec response; zero operations marked deprecated. See lifecycle/.
+- id: pagination
+  conforms: true
+  evidence: openapi/getvda-ai-witness-openapi.json GET /api/witness/records — limit (1-500) + cursor, response nextCursor; HITL list_hitl_items returns summaries.
+- id: idempotency
+  conforms: true
+  verification: partial
+  evidence: Witness `decisionId` dedupe on (account, decisionId) for seal / seal_attestation (docs — "Idempotency — send decisionId"); NOT a header and NOT on every write. See conventions/getvda-ai-conventions.yml idempotency.coverage partial.
+- id: eu-ai-act
+  name: EU AI Act (Regulation (EU) 2024/1689) — Article 12 record-keeping evidence
+  conforms: true
+  verification: declared
+  domain_standard_signature: false
+  evidence: >-
+    Witness POST /api/witness/report is documented as an "Article 12 EVIDENCE report"; C2MD's card metadata
+    names the source standards (EU AI Act 2024/1689, GDPR 2016/679, NIST SP 800-53 Rev 5, ISO/IEC 42001:2023, APQC
+    PCF v7.4). These are the standards VDA generates evidence FOR — a product claim, not a machine conformance of
+    the API contract, so it carries no domain_standard_signature.

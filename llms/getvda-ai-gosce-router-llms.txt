@@ -1,0 +1,49 @@
+# GOSCE Portfolio Router
+
+> GOSCE Portfolio Router — the single entry point that routes orchestrators to verified GOSCE agents by capability, returning real example output from its own /selftest probes.
+
+Remote MCP + A2A agent on getvda.ai. Capability: router.
+Discovery is free; execution is metered via Nevermined x402 micropayments.
+
+## Endpoints
+- MCP (streamable-http): https://router.getvda.ai/mcp
+- A2A (message/send):    https://router.getvda.ai/a2a/
+- Agent Card:            https://router.getvda.ai/.well-known/agent-card.json
+- Governance:            https://router.getvda.ai/governance.md
+- Verify identity:       https://router.getvda.ai/verify
+- Live capability proof: https://router.getvda.ai/selftest
+
+## Tools
+- all: invoke, selftest
+- free: selftest
+
+## Verify this agent yourself (free, no key, no signup)
+
+Call the `selftest` tool over MCP, or GET /selftest. It runs this agent's REAL
+capability on fixed canned input and returns the genuine result, an honest
+assertion grade, and a trust manifest with a proof link for every claim.
+
+Assertion grades are not interchangeable:
+- `asserted_correct` - a property of the output was checked.
+- `ran_without_error` - it ran and did not raise. NOTHING about the output was
+  asserted. This is not a pass and is not presented as one.
+
+## Evidence
+
+- self-test seals: off (chain gosce:selftest:router)
+- Each self-test is sealed to VDA Witness. /selftest returns the FULL signed
+  record; POST it as {"record": ...} to
+  https://witness.getvda.ai/api/witness/verify - PUBLIC, no API key - and you get
+  signatureValid. Tampering with the record makes that come back false.
+- These are OUR seals about OURSELVES: binding confidence `api_asserted`, custody
+  `custodial`. A seal proves 'at time T this account asserted X', NOT that X is
+  true. A record YOU seal of what YOU observed is stronger evidence; mint your own
+  key at https://witness.getvda.ai/api/witness/test-key (self-serve, no human).
+
+## Identity
+- signed: yes (Ed25519 / EdDSA detached JWS)
+- keys:   https://agents.getvda.ai/.well-known/jwks.json
+
+## Portfolio
+- https://getvda.ai/agents
+- Router (route by capability): https://router.getvda.ai

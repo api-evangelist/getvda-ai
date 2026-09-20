@@ -1,0 +1,131 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  The clientLibraries block of https://getvda.ai/.well-known/agent-card.json and the Integrations section of
+  https://getvda.ai/llms.txt (which name getvda-evaluator and the seven @getvda/* npm packages), plus the
+  "Verify a record" section of https://witness.getvda.ai/llms.txt (which names `npm i vda-witness` and
+  `pip install "vda-witness[verify]"`). Every version and publish date was read live from
+  registry.npmjs.org/<pkg> and pypi.org/pypi/<pkg>/json on 2026-09-19.
+note: >-
+  Ten first-party packages across npm and PyPI, all pointing at getvda.ai as homepage and all Apache-2.0
+  (PyPI classifiers name "Verified Digital Agents <hello@getvda.ai>" as author; the npm packages are
+  maintained by mikerawsonnz, the VDA-MD framework's author). Two release trains are visible: the vda-witness
+  SDK pair shipped 1.0.0 on 2026-07-03 within nine seconds of each other on both registries and has not
+  moved since; the seven @getvda/* ACP packages all landed as 0.1.0/0.2.0 on 2026-07-21 within two minutes of
+  each other (a single monorepo release), and getvda-evaluator — the Python evaluator with the LangChain
+  DeepAgents middleware — followed on 2026-08-24. Every package names github.com/getvda-ai/acp-agent as its
+  repository, but that repository returns 404 (private or not yet public), so the SDK source is not
+  inspectable; only vda-md-framework (CC-BY-4.0 whitepaper) and vda-os are public under the getvda-ai org.
+  The Witness API these wrap is at info.version 1.0.0 and its card was re-signed 2026-09-17, so the SDKs are
+  two and a half months behind the surface they wrap — a currency gap, not yet an abandonment signal.
+packages:
+- name: vda-witness
+  language: JavaScript/TypeScript
+  registry: npm
+  registry_url: https://www.npmjs.com/package/vda-witness
+  install: npm i vda-witness
+  version: 1.0.0
+  published: '2026-07-03'
+  official: true
+  license: Apache-2.0
+  repository: null
+  description: VDA Witness SDK — seal AI-agent decisions into tamper-evident, Ed25519-signed, independently-verifiable evidence and verify records OFFLINE (offlineVerify) against public infrastructure. Zero-dependency.
+- name: vda-witness
+  language: Python
+  registry: pypi
+  registry_url: https://pypi.org/project/vda-witness/
+  install: pip install "vda-witness[verify]"
+  version: 1.0.0
+  published: '2026-07-03'
+  official: true
+  license: Apache-2.0
+  repository: null
+  description: VDA Witness SDK for Python — seal decisions and verify records offline; the [verify] extra pulls the signature-verification dependency.
+- name: getvda-evaluator
+  language: Python
+  registry: pypi
+  registry_url: https://pypi.org/project/getvda-evaluator/
+  install: pip install getvda-evaluator
+  version: 0.1.0
+  published: '2026-08-24'
+  official: true
+  license: Apache-2.0
+  repository: https://github.com/getvda-ai/acp-agent/tree/main/packages/evaluator-py
+  description: Governance evaluation for AI agents — gate every tool call against a signed ACP governance bundle; ships a LangChain DeepAgents middleware binding wrap_tool_call. Zero runtime dependencies; the TS/Python conformance contract ships inside the sdist.
+- name: '@getvda/evaluator-sdk'
+  language: TypeScript
+  registry: npm
+  registry_url: https://www.npmjs.com/package/@getvda/evaluator-sdk
+  install: npm i @getvda/evaluator-sdk
+  version: 0.1.0
+  published: '2026-07-21'
+  official: true
+  license: Apache-2.0
+  repository: https://github.com/getvda-ai/acp-agent
+  description: The ACP evaluator SDK — fetch, verify, cache, evaluate and seal a governance bundle locally. Framework-agnostic, fail-static.
+- name: '@getvda/test-suite'
+  language: TypeScript
+  registry: npm
+  registry_url: https://www.npmjs.com/package/@getvda/test-suite
+  install: npm i @getvda/test-suite
+  version: 0.1.0
+  published: '2026-07-21'
+  official: true
+  license: Apache-2.0
+  repository: https://github.com/getvda-ai/acp-agent
+  description: ACP governance CI test suite — schema validation, Compliance Guard, adversarial scenarios, impact analysis; invocable as a GitHub Action / GitLab component / plain CLI step.
+- name: '@getvda/governance-schema'
+  language: TypeScript
+  registry: npm
+  registry_url: https://www.npmjs.com/package/@getvda/governance-schema
+  install: npm i @getvda/governance-schema
+  version: 0.2.0
+  published: '2026-07-21'
+  official: true
+  license: Apache-2.0
+  repository: https://github.com/getvda-ai/acp-agent
+  description: The shared VDA-MD governance-file schema contract (C2MD <-> ACP) — taxonomy, MUST/MUST NOT/MAY clause grammar, clause-level citations, RACI.
+- name: '@getvda/bundle'
+  language: TypeScript
+  registry: npm
+  registry_url: https://www.npmjs.com/package/@getvda/bundle
+  install: npm i @getvda/bundle
+  version: 0.1.0
+  published: '2026-07-21'
+  official: true
+  license: Apache-2.0
+  repository: https://github.com/getvda-ai/acp-agent
+  description: Signed, versioned, content-hashed governance bundle — deterministic build, Ed25519 signing (#key-3), verification against did:web:acp.getvda.ai.
+- name: '@getvda/distribution'
+  language: TypeScript
+  registry: npm
+  registry_url: https://www.npmjs.com/package/@getvda/distribution
+  install: npm i @getvda/distribution
+  version: 0.1.0
+  published: '2026-07-21'
+  official: true
+  license: Apache-2.0
+  repository: https://github.com/getvda-ai/acp-agent
+  description: Pull-based bundle distribution — publish + activate a signed bundle (activation sealed to Witness against the commit hash); rollback = activate the previous version.
+- name: '@getvda/witness'
+  language: TypeScript
+  registry: npm
+  registry_url: https://www.npmjs.com/package/@getvda/witness
+  install: npm i @getvda/witness
+  version: 0.1.0
+  published: '2026-07-21'
+  official: true
+  license: Apache-2.0
+  repository: https://github.com/getvda-ai/acp-agent
+  description: Witness sealing substrate for ACP — HTTP client for customer-managed custody (prepare -> sign -> submit) plus a no-network fake for tests.
+- name: '@getvda/compliance-guard'
+  language: TypeScript
+  registry: npm
+  registry_url: https://www.npmjs.com/package/@getvda/compliance-guard
+  install: npm i @getvda/compliance-guard
+  version: 0.1.0
+  published: '2026-07-21'
+  official: true
+  license: Apache-2.0
+  repository: https://github.com/getvda-ai/acp-agent
+  description: Provider-free rule engine over governance changes — structural diff + weakening detection; one rule-set, two entry points (inline + CI).

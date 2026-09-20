@@ -1,0 +1,846 @@
+{
+  "$comment": "C2MD Compliance Agent â€” A2A Agent Card. Host at https://c2md.getvda.ai/.well-known/agent-card.json. DNS records must be configured at Cloudflare before submitting to Google Cloud Marketplace Producer Portal.",
+  "$signing": "This committed source card is intentionally UNSIGNED (no agentCardSignature). It is signed at BUILD time by scripts/sign_agent_card.py (Ed25519, key from Google Secret Manager) and served signed at https://c2md.getvda.ai/.well-known/agent-card.json — the SERVED card is the verifiable artefact. Do not attempt to verify THIS file; it is signed-at-build, unsigned-at-rest by design.",
+  "protocolVersion": "0.3.0",
+  "name": "C2MD Compliance Agent",
+  "description": "Generates EU AI Act, GDPR, NIST SP 800-53, and ISO 42001 compliant governance Markdown for AI agents. Provide your agent's purpose, industry, jurisdictions, and data handled; receive approval-ready AGENTS.md, SOP.md, SKILL.md, and (where warranted) EXCEPTION.md with clause-level citations and a RACI header. Risk assessment and single-control translation are free. Compliance bundle generation is tiered. Powered by the VDA-MD framework.",
+  "url": "https://c2md.getvda.ai/a2a",
+  "preferredTransport": "JSONRPC",
+  "version": "1.0.0",
+  "documentationUrl": "https://c2md.getvda.ai/docs",
+  "iconUrl": "https://c2md.getvda.ai/icon.png",
+  "provider": {
+    "organization": "Value Driven AI",
+    "url": "https://getvda.ai"
+  },
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "securitySchemes": {
+    "google_oauth2": {
+      "type": "oauth2",
+      "description": "Google Sign-In for Workspace and personal Google accounts. Token validation via Google's JWKS. Used for skill-tier scope assertion against your subscription state.",
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://accounts.google.com/o/oauth2/v2/auth",
+          "tokenUrl": "https://oauth2.googleapis.com/token",
+          "scopes": {
+            "c2md:assess": "Risk assessment and framework translation. Free tier. Rate-limited per account.",
+            "c2md:generate_starter": "Single-jurisdiction, single-framework-stack bundle. Watermarked. Non-commercial licence.",
+            "c2md:generate_pro": "Multi-jurisdiction, full-framework-stack bundle. Includes DPIA / FRIA scaffolding. Commercial deployment licence.",
+            "c2md:generate_journey": "Full VDA-MD two-axis library for a given industry. Journey tier subscription.",
+            "c2md:commercial_deploy": "Commercial deployment rights for any bundle previously generated on this account."
+          }
+        }
+      }
+    },
+    "microsoft_oauth2": {
+      "type": "oauth2",
+      "description": "Microsoft Entra ID for work and school accounts (organisations only â€” personal Microsoft accounts not supported). Token validation via Microsoft's JWKS. Used for skill-tier scope assertion against your subscription state. Supports two flows: authorizationCode for human users (subscription resolved by email) and clientCredentials for machine callers (service principal resolved to a platform-of-record account; tier and contract terms determined server-side from the agreement with that platform).",
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize",
+          "tokenUrl": "https://login.microsoftonline.com/organizations/oauth2/v2.0/token",
+          "scopes": {
+            "c2md:assess": "Risk assessment and framework translation. Free tier. Rate-limited per account.",
+            "c2md:generate_starter": "Single-jurisdiction, single-framework-stack bundle. Watermarked. Non-commercial licence.",
+            "c2md:generate_pro": "Multi-jurisdiction, full-framework-stack bundle. Includes DPIA / FRIA scaffolding. Commercial deployment licence.",
+            "c2md:generate_journey": "Full VDA-MD two-axis library for a given industry. Journey tier subscription.",
+            "c2md:commercial_deploy": "Commercial deployment rights for any bundle previously generated on this account."
+          }
+        },
+        "clientCredentials": {
+          "tokenUrl": "https://login.microsoftonline.com/organizations/oauth2/v2.0/token",
+          "scopes": {
+            "7c89fa90-05ca-4779-8128-32c7f11f604b/.default": "TIER 3 (by arrangement — enterprise/platform integrations, NOT self-serve): service-principal callers pre-registered to a C2MD platform-of-record account; tier and contract terms resolved server-side from the negotiated agreement. Unregistered principals resolve to free-tier (assess only). Contact hello@getvda.ai to arrange."
+          }
+        }
+      }
+    },
+    "witness_bearer": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "wtn.<keyId>.<secret>",
+      "description": "TIER 1 (LIVE, zero setup): getvda.ai suite credential. Present 'Authorization: Bearer wtn.<keyId>.<secret>' — any valid VDA Witness API key (from witness.getvda.ai), validated by C2MD via Witness's /whoami endpoint (your secret is never stored at rest). Your Witness account tier maps to C2MD access: SEALED → assess, translate_control, list_supported_frameworks, generate_evidence_readiness_report (free tier); ANCHORED → generate_starter and above. Per-account overrides on request. You already have a key if you use Witness; no separate C2MD signup."
+    }
+  },
+  "security": [
+    {
+      "google_oauth2": [
+        "c2md:assess"
+      ]
+    },
+    {
+      "microsoft_oauth2": [
+        "c2md:assess"
+      ]
+    },
+    {
+      "witness_bearer": [
+        "c2md:assess"
+      ]
+    }
+  ],
+  "defaultInputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "text/markdown",
+    "application/zip"
+  ],
+  "skills": [
+    {
+      "id": "assess_agent_risk",
+      "name": "Assess Agent Risk",
+      "description": "Analyses an agent description across EU AI Act and GDPR simultaneously. Returns risk category (including Annex III classification where applicable), provider-vs-deployer role, lawful-basis analysis, special-category-data flags, required formal deliverables (DPIA under GDPR Article 35, FRIA under EU AI Act Article 27, conformity assessment), and an applicable-controls list across NIST SP 800-53 and ISO 42001. Diagnostic only â€” produces no governance files. Free tier. LATENCY: this is a synchronous, LLM-backed two-pass analysis â€” budget up to ~120 seconds for a response and set client timeouts accordingly (typical responses are faster). Malformed requests are rejected in milliseconds before any analysis runs. Provider-vs-deployer role is inferred when not supplied (output marks it 'inferred' with the assumption stated). This is a good-faith automated classification, NOT a legal determination — confirm with qualified counsel.",
+      "tags": [
+        "compliance",
+        "risk-assessment",
+        "eu-ai-act",
+        "gdpr",
+        "nist-800-53",
+        "iso-42001",
+        "annex-iii",
+        "dpia",
+        "fria",
+        "free-tier"
+      ],
+      "examples": [
+        "Assess risk for a CV screening agent deployed in Germany and France",
+        "Is our credit-decision chatbot classified as high-risk under EU AI Act Annex III?",
+        "What compliance obligations apply to a customer-service agent operating in EU and UK?"
+      ],
+      "inputModes": [
+        "application/json",
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "agent_description": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "jurisdictions": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "data_categories": {
+            "items": {
+              "enum": [
+                "special_category_gdpr_art9",
+                "personal_data",
+                "employment_data",
+                "financial_data",
+                "children_data",
+                "biometric",
+                "health_data",
+                "no_personal_data"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "autonomy_level": {
+            "enum": [
+              "advisory",
+              "assistive",
+              "autonomous"
+            ],
+            "type": "string"
+          },
+          "industry": {
+            "type": "string",
+            "default": null
+          },
+          "human_review_level": {
+            "enum": [
+              "individual_decisions",
+              "aggregate_only",
+              "none"
+            ],
+            "type": "string",
+            "default": null
+          },
+          "provider_or_deployer": {
+            "enum": [
+              "provider",
+              "deployer",
+              "both",
+              "inferred"
+            ],
+            "type": "string",
+            "default": null
+          }
+        },
+        "required": [
+          "agent_description",
+          "jurisdictions",
+          "data_categories",
+          "autonomy_level"
+        ]
+      }
+    },
+    {
+      "id": "translate_control",
+      "name": "Translate Compliance Control",
+      "description": "Takes a single control reference â€” NIST SP 800-53 control ID, ISO 42001 clause, EU AI Act article, or GDPR article â€” plus a target agent description, and returns agent-actionable MUST / MUST NOT / MAY rules in VDA-MD Markdown format. Designed to be composed into other agents. Free tier, rate-limited.",
+      "tags": [
+        "compliance",
+        "translation",
+        "nist",
+        "iso-42001",
+        "eu-ai-act",
+        "gdpr",
+        "composable",
+        "free-tier"
+      ],
+      "examples": [
+        "Translate NIST AC-2 for an HR onboarding agent",
+        "Convert EU AI Act Article 14 (human oversight) into agent rules",
+        "Express GDPR Article 5 (data minimisation) as MUST / MUST NOT clauses"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/markdown"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "control_reference": {
+            "properties": {
+              "framework": {
+                "type": "string"
+              },
+              "control_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "framework",
+              "control_id"
+            ],
+            "type": "object"
+          },
+          "target_agent_description": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "control_reference",
+          "target_agent_description"
+        ]
+      }
+    },
+    {
+      "id": "list_supported_frameworks",
+      "name": "List Supported Frameworks",
+      "description": "Returns the current list of compliance frameworks, jurisdictions, and version anchors supported by C2MD (e.g., NIST SP 800-53 Rev 5, ISO/IEC 42001:2023, Regulation (EU) 2024/1689, Regulation (EU) 2016/679). Useful for calling agents verifying compatibility before invoking paid skills. Free, minimal-auth.",
+      "tags": [
+        "metadata",
+        "discovery",
+        "free-tier"
+      ],
+      "examples": [
+        "What frameworks does C2MD currently support?",
+        "Is EU AI Act Annex III classification supported?",
+        "Which NIST revision is the baseline anchored to?"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "id": "generate_compliance_bundle",
+      "name": "Generate Compliance Bundle",
+      "description": "Produces a complete governance Markdown bundle for a single agent: AGENTS.md (identity, scope, RACI), SOP.md (MUST / MUST NOT / MAY clauses with clause-level framework citations), SKILL.md (permitted capabilities with conditions), and EXCEPTION.md where warranted. Includes a risk-classification rationale and an auditor-readable cross-framework synthesis. Tier-gated: Starter generates one jurisdiction / single-framework stack, watermarked, non-commercial; Pro generates multi-jurisdiction with full framework stack and commercial deployment rights. Long-running (3â€“5 minutes for Pro tier): returns a Task immediately and continues processing; poll `tasks/get` with the returned task id to retrieve the final bundle. ASYNC: returns an A2A Task immediately (state SUBMITTED) — poll tasks/get with the returned task id for the finished artifact. LLM-backed multi-pass; budget minutes for Pro. Outputs (AGENTS.md/SOP.md/SKILL.md/EXCEPTION.md) are designed for a downstream governance-runtime to enforce at invocation time; all require compliance-officer sign-off before deployment.",
+      "longRunning": true,
+      "tags": [
+        "compliance",
+        "c2md",
+        "markdown",
+        "governance",
+        "eu-ai-act",
+        "gdpr",
+        "nist",
+        "iso-42001",
+        "starter-tier",
+        "pro-tier"
+      ],
+      "examples": [
+        "Generate compliance bundle for a recruiting agent deployed in EU + UK",
+        "Produce AGENTS.md, SOP.md, SKILL.md for a credit-decision agent in Germany",
+        "C2MD bundle for a customer-service agent handling EU-resident data"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "application/zip",
+        "text/markdown"
+      ],
+      "security": [
+        {
+          "google_oauth2": [
+            "c2md:generate_starter"
+          ]
+        },
+        {
+          "google_oauth2": [
+            "c2md:generate_pro"
+          ]
+        },
+        {
+          "microsoft_oauth2": [
+            "c2md:generate_starter"
+          ]
+        },
+        {
+          "microsoft_oauth2": [
+            "c2md:generate_pro"
+          ]
+        },
+        {
+          "witness_bearer": [
+            "c2md:generate_starter"
+          ]
+        },
+        {
+          "witness_bearer": [
+            "c2md:generate_pro"
+          ]
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "agent_description": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "jurisdictions": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "data_categories": {
+            "items": {
+              "enum": [
+                "special_category_gdpr_art9",
+                "personal_data",
+                "employment_data",
+                "financial_data",
+                "children_data",
+                "biometric",
+                "health_data",
+                "no_personal_data"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "autonomy_level": {
+            "enum": [
+              "advisory",
+              "assistive",
+              "autonomous"
+            ],
+            "type": "string"
+          },
+          "industry": {
+            "type": "string",
+            "default": null
+          },
+          "human_review_level": {
+            "enum": [
+              "individual_decisions",
+              "aggregate_only",
+              "none"
+            ],
+            "type": "string",
+            "default": null
+          },
+          "provider_or_deployer": {
+            "enum": [
+              "provider",
+              "deployer",
+              "both",
+              "inferred"
+            ],
+            "type": "string",
+            "default": null
+          },
+          "tier": {
+            "default": "starter",
+            "enum": [
+              "starter",
+              "pro"
+            ],
+            "type": "string"
+          },
+          "include_vda_products": {
+            "default": false,
+            "type": "boolean"
+          },
+          "exception_hints": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "default": null
+          },
+          "declared_capabilities": {
+            "type": "array",
+            "description": "The agent's OWN named actions (e.g. from genesis-from-card's declared_capabilities, verbatim). REQUIRED for runtime-evaluable output: each becomes a named capability grant in SKILL.md's permitted_tools that a runtime evaluator gates against. If omitted, SKILL.md falls back to abstract compliance-control grants (NOT evaluable by capability name). Carry these through from the extract_governance_inputs result.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "require_named_grants": {
+            "type": "boolean",
+            "description": "Opt-in strictness: if true and declared_capabilities is empty, generation is REFUSED rather than degraded to non-runtime-evaluable control-category grants. Callers that need runtime-evaluable governance (e.g. activating a card-derived bundle) should set this AND pass declared_capabilities. Regardless of this flag, SKILL.md front matter is stamped runtime_evaluable + capability_grant_type so the evaluability of the output is always visible."
+          }
+        },
+        "required": [
+          "agent_description",
+          "jurisdictions",
+          "data_categories",
+          "autonomy_level"
+        ]
+      }
+    },
+    {
+      "id": "generate_dpia_fria_scaffold",
+      "name": "Generate DPIA / FRIA Scaffold",
+      "description": "Produces a draft Data Protection Impact Assessment (GDPR Article 35) and/or Fundamental Rights Impact Assessment (EU AI Act Article 27) scaffold, structured for compliance-officer review and approval. Requires a prior compliance bundle or an equivalent agent description. Pro tier and above. LATENCY: synchronous, LLM-backed (Pro-model, single-pass) — budget up to ~120 seconds for a response and set client timeouts accordingly.",
+      "tags": [
+        "compliance",
+        "dpia",
+        "fria",
+        "gdpr-article-35",
+        "eu-ai-act-article-27",
+        "pro-tier"
+      ],
+      "examples": [
+        "Generate DPIA scaffold for our HR screening agent",
+        "FRIA for a credit-scoring agent with Annex III classification"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json",
+        "text/markdown"
+      ],
+      "security": [
+        {
+          "google_oauth2": [
+            "c2md:generate_pro"
+          ]
+        },
+        {
+          "microsoft_oauth2": [
+            "c2md:generate_pro"
+          ]
+        },
+        {
+          "witness_bearer": [
+            "c2md:generate_pro"
+          ]
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "agent_description": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "jurisdictions": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "data_categories": {
+            "items": {
+              "enum": [
+                "special_category_gdpr_art9",
+                "personal_data",
+                "employment_data",
+                "financial_data",
+                "children_data",
+                "biometric",
+                "health_data",
+                "no_personal_data"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "autonomy_level": {
+            "enum": [
+              "advisory",
+              "assistive",
+              "autonomous"
+            ],
+            "type": "string"
+          },
+          "industry": {
+            "type": "string",
+            "default": null
+          },
+          "human_review_level": {
+            "enum": [
+              "individual_decisions",
+              "aggregate_only",
+              "none"
+            ],
+            "type": "string",
+            "default": null
+          },
+          "provider_or_deployer": {
+            "enum": [
+              "provider",
+              "deployer",
+              "both",
+              "inferred"
+            ],
+            "type": "string",
+            "default": null
+          },
+          "include_dpia": {
+            "default": true,
+            "type": "boolean"
+          },
+          "include_fria": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "agent_description",
+          "jurisdictions",
+          "data_categories",
+          "autonomy_level"
+        ]
+      }
+    },
+    {
+      "id": "generate_journey_baseline",
+      "name": "Generate Industry Journey Baseline",
+      "description": "PLANNED — NOT YET AVAILABLE. On the roadmap; calls currently return -32601 (method not found) until released. Generates the full VDA-MD two-axis governance library for a given industry: the customer-journey stage agents plus the three shared-services value streams (Source-to-Pay, Order-to-Cash, Onboarding-to-Final-Pay). Supported industries: Financial Services, HR / Workforce Tech, Hospitality. Additional verticals on request. Journey tier subscription only.",
+      "tags": [
+        "compliance",
+        "journey-mode",
+        "industry-baseline",
+        "s2p",
+        "o2c",
+        "hrpay",
+        "journey-tier"
+      ],
+      "examples": [
+        "Full HR-tech journey baseline for a European SaaS deployment",
+        "Financial services journey library for a UK-regulated neobank"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/zip",
+        "application/json"
+      ],
+      "security": [
+        {
+          "google_oauth2": [
+            "c2md:generate_journey"
+          ]
+        },
+        {
+          "microsoft_oauth2": [
+            "c2md:generate_journey"
+          ]
+        },
+        {
+          "witness_bearer": [
+            "c2md:generate_journey"
+          ]
+        }
+      ],
+      "available": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "description": "schema pending release"
+      }
+    },
+    {
+      "id": "generate_evidence_readiness_report",
+      "name": "Generate EU AI Act Evidence & Readiness Report",
+      "description": "Produces an EU AI Act Article-by-Article Evidence & Readiness Report: every relevant obligation (Annex III classification, Art. 5, 9, 10, 11, 12, 13, 14, 15, 27, 50) marked COVERED / PARTIALLY COVERED / CUSTOMER ACTION, with linked evidence where it exists and concrete, article-anchored steps where it does not. This is an evidence-and-readiness map, NOT a compliance report or a statement of compliance â€” documented is not evidenced is not compliant, and final Compliance-Officer attestation is a human act. Caller-selectable data_mode: 'demo' (default) runs on synthetic input with no external calls, output labelled SAMPLE â€” DEMO DATA; 'customer' reads the caller's real, account-isolated decision trail through VDA Witness's authorized read and evidences Article 12 live. Customer mode REQUIRES a Witness API key passed as witness_api_key â€” that Bearer key is the sole account binding (there is no account-selection parameter; account isolation is inherited from Witness), and with no/invalid key the call fails closed with no demo fall-back. 'attested' is the key-safe path: the caller supplies its OWN Witness chain-proof bundle (from GET /api/witness/chains/{chainKey}/proof â€” records + predecessor chain + anchor + didDocument) as witness_proof_bundle, plus the Art-12 witness_report, with NO key â€” a witness_api_key here is rejected loudly and never accepted, logged, or forwarded. C2MD independently verifies the evidence OFFLINE against pinned public infrastructure (did:web + Rekor/TSA, zero calls to Witness) and grades Article 12 strictly off the verified verdict (ANCHORED_VALID earns anchored/compliance-grade language; SIGNED_PENDING reads 'readiness â€” not yet anchored'); a tampered bundle is refused (never rendered) and an incomplete one returns INSUFFICIENT_PROOF. Free tier.",
+      "tags": [
+        "compliance",
+        "eu-ai-act",
+        "evidence-and-readiness",
+        "article-12",
+        "annex-iii",
+        "witness",
+        "demo-customer-attested",
+        "offline-verified",
+        "key-safe",
+        "free-tier"
+      ],
+      "examples": [
+        "Show the Article-by-Article EU AI Act readiness board for our CV screening agent (demo)",
+        "Generate the Evidence & Readiness Report from our sealed Witness trail (customer mode)",
+        "Which EU AI Act articles are covered, partial, or customer-action for our credit-decision agent?",
+        "Generate an evidence-backed EU AI Act report from my Witness chain-proof bundle without sharing my key (attested mode)"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "text/markdown",
+        "application/json"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "agent_description": {
+            "type": "string",
+            "default": null
+          },
+          "jurisdictions": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "data_categories": {
+            "items": {
+              "enum": [
+                "special_category_gdpr_art9",
+                "personal_data",
+                "employment_data",
+                "financial_data",
+                "children_data",
+                "biometric",
+                "health_data",
+                "no_personal_data"
+              ],
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array"
+          },
+          "autonomy_level": {
+            "enum": [
+              "advisory",
+              "assistive",
+              "autonomous"
+            ],
+            "type": "string"
+          },
+          "industry": {
+            "type": "string",
+            "default": null
+          },
+          "human_review_level": {
+            "enum": [
+              "individual_decisions",
+              "aggregate_only",
+              "none"
+            ],
+            "type": "string",
+            "default": null
+          },
+          "provider_or_deployer": {
+            "enum": [
+              "provider",
+              "deployer",
+              "both",
+              "inferred"
+            ],
+            "type": "string",
+            "default": null
+          },
+          "data_mode": {
+            "default": "demo",
+            "enum": [
+              "demo",
+              "customer",
+              "attested"
+            ],
+            "type": "string"
+          },
+          "witness_api_key": {
+            "type": "string",
+            "default": null
+          },
+          "witness_proof_bundle": {
+            "additionalProperties": true,
+            "type": "object",
+            "default": null
+          },
+          "witness_report": {
+            "additionalProperties": true,
+            "type": "object",
+            "default": null
+          }
+        },
+        "required": [
+          "jurisdictions",
+          "data_categories",
+          "autonomy_level"
+        ]
+      }
+    },
+    {
+      "id": "extract_governance_inputs",
+      "name": "Extract Governance Inputs (genesis-from-card)",
+      "description": "Genesis on-ramp: derive reviewable governance inputs (data_categories, autonomy_level, industry) from an agent's own A2A card — or, when enabled, from uploaded documents. The output is a REVIEWABLE classification a human approves before it drives generation. It keeps three kinds of finding distinct: what was inferred (with provenance), what was seen-but-not-confidently-mapped, and which fields a card structurally cannot carry (required_human_inputs, e.g. jurisdiction). Card mode is the free on-ramp (c2md:assess, reachable by any Witness credential); document mode requires c2md:generate_pro.",
+      "tags": [
+        "genesis",
+        "onboarding",
+        "a2a-card",
+        "governance-inputs",
+        "eu-ai-act",
+        "gdpr",
+        "iso-42001",
+        "free-tier"
+      ],
+      "examples": [
+        "Extract governance inputs from this agent's A2A card",
+        "What data categories and autonomy level does my agent card imply?"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "card": {
+            "type": "object",
+            "description": "An A2A agent card (the genesis-from-card on-ramp). Provide this OR documents."
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "A2A FileParts (PDF/docx/txt/md, up to 10). Requires c2md:generate_pro; gated until document ingest is enabled."
+          },
+          "agent_description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Required with documents; assembled deterministically from the card in card mode."
+          }
+        },
+        "oneOf": [
+          {
+            "required": [
+              "card"
+            ]
+          },
+          {
+            "required": [
+              "documents"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "vda-md:frameworkVersion": "VDA-MD v4.1",
+    "vda-md:sourceStandards": {
+      "nist": "SP 800-53 Rev 5",
+      "iso": "IEC 42001:2023",
+      "euAiAct": "Regulation (EU) 2024/1689",
+      "gdpr": "Regulation (EU) 2016/679",
+      "apqc": "PCF v7.4"
+    },
+    "vda-md:outputTaxonomy": [
+      "AGENTS.md",
+      "SOP.md",
+      "SKILL.md",
+      "EXCEPTION.md"
+    ],
+    "vda-md:dataResidency": [
+      "EU-west"
+    ],
+    "vda-md:identityProviders": [
+      "Google",
+      "Microsoft"
+    ],
+    "vda-md:piiPreProcessing": "Microsoft Presidio, applied selectively: active on translate_control and generate_dpia_fria_scaffold; bypassed on assess_agent_risk and generate_compliance_bundle, where short agent identifiers trigger entity false positives. Not a universal pre-ingestion gate.",
+    "vda-md:llmDataHandling": "Vertex AI Gemini in europe-west1. Google does not use inputs to train foundation models (Vertex default). Zero-data-retention is NOT currently configured: inputs/outputs may be cached up to 24h in-region and prompts may be logged for abuse monitoring under standard Vertex AI terms. Enabling ZDR requires disabling model caching plus a contractual abuse-monitoring opt-out via the Google Cloud account team.",
+    "vda-md:humanApprovalGate": "All generated bundles require compliance-officer sign-off before deployment. C2MD never claims to deliver legal compliance â€” it produces approval-ready governance artefacts mapped to the relevant standards.",
+    "vda-md:accessTiers": {
+      "tier1_witness_bearer": "LIVE / zero-setup — see securitySchemes.witness_bearer",
+      "tier_human_oauth": "LIVE — google_oauth2 / microsoft_oauth2 authorizationCode; subscription tier resolved by account",
+      "tier3_negotiated_platform": "By arrangement — microsoft_oauth2 clientCredentials; not self-serve",
+      "anonymous": "Not available"
+    },
+    "vda-md:errorCodes": {
+      "-32700": "Parse error — the request body is not valid JSON.",
+      "-32600": "Invalid request — missing JSON-RPC/A2A fields, OR the governance input gate rejected params (e.g. a bad data_categories enum). Params are validated in ~ms, before any LLM call.",
+      "-32601": "Unknown method, or a skill that is planned-but-not-yet-available (e.g. generate_journey_baseline).",
+      "-32602": "Invalid params structure — params is not a JSON object, or agent_description is missing/empty. Validate against the skill's inputSchema.",
+      "-32001": "Jurisdiction not in the supported registry — call skills/list_supported_frameworks for the accepted set.",
+      "-32003": "Input rejected before generation — Model Armor inbound screening blocked the input, or the model output was unparseable.",
+      "-32004": "Authentication required / credential rejected, OR an upstream dependency (the LLM, or Witness whoami for suite auth) is temporarily unavailable (HTTP 503 + Retry-After for the latter).",
+      "-32005": "Generated output rejected — Model Armor outbound screening or output schema validation failed (bundle-generation skills).",
+      "-32006": "Output-screening service temporarily unavailable — retryable (bundle-generation skills)."
+    }
+  },
+  "agentCardSignature": {
+    "algorithm": "Ed25519",
+    "keyId": "c2md-card-v2",
+    "publicKeyUrl": "https://c2md.getvda.ai/.well-known/agent-card-public-key.pem",
+    "signature": "pL4sIn_mHUUth0iWsM6g-EKgqxptMrYOjJYt6s2Ftsd-c6ayAAInLXtkoBDCIfEf-ZIM96-6McdIcDde-BVRBA"
+  }
+}

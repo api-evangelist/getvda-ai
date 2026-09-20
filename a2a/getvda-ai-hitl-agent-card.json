@@ -1,0 +1,548 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "HITL",
+  "description": "The block that owns human decisions on agent actions. Routes an escalated decision to an authorised human, records the outcome, and seals it to Witness under customer-managed custody. It is domain-blind by construction: an item is a decision, some evidence, and an authority requirement.",
+  "url": "https://hitl.getvda.ai",
+  "preferredTransport": "JSONRPC",
+  "version": "0.1.0",
+  "gitSha": "d347a708f292368e6656381ca9e2ed983260657b",
+  "provider": {
+    "organization": "getvda.ai",
+    "url": "https://getvda.ai"
+  },
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": true
+  },
+  "defaultInputModes": [
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "raise_hitl_item",
+      "name": "Raise a decision for human review",
+      "description": "Raise an item for a human to decide. HITL routes it to an authorised band using YOUR registered authority config — it never infers a band and never defaults one. Returns remaining quota so you can self-limit rather than discovering a ceiling by hitting it.",
+      "tags": [
+        "hitl",
+        "mutating"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "caller_id",
+          "decision_ref",
+          "decision_class",
+          "escalation_label",
+          "statement",
+          "basis_captured_at",
+          "governing_clauses"
+        ],
+        "properties": {
+          "caller_id": {
+            "type": "string",
+            "description": "Your registered caller id."
+          },
+          "decision_ref": {
+            "type": "string",
+            "description": "Your idempotency key. Re-raising the same decision_ref is rejected, so a retry cannot create a duplicate item."
+          },
+          "decision_class": {
+            "type": "string",
+            "description": "The kind of decision. Must be in your registered permitted_decision_classes."
+          },
+          "escalation_label": {
+            "type": "string",
+            "description": "A label from your registered authority config. HITL maps it to a band. An unknown label is an ERROR, not a default — a defaulted band is a silent decision about who may decide."
+          },
+          "statement": {
+            "type": "string",
+            "description": "What is being asked, in plain language."
+          },
+          "proposed_action": {
+            "type": "string",
+            "description": "What the agent recommends."
+          },
+          "basis_captured_at": {
+            "type": "string",
+            "description": "ISO-8601. When the DECIDING SYSTEM SAW ITS EVIDENCE — not when you called HITL. This is load-bearing: it is what the decider saw at recommendation time."
+          },
+          "governing_clauses": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Governing clauses in force at decision time. At least one is required. Capture `text` as well as `ref`: policies drift, and the record must show what the clause SAID when it was applied.",
+            "items": {
+              "type": "object",
+              "required": [
+                "ref"
+              ],
+              "properties": {
+                "ref": {
+                  "type": "string",
+                  "description": "Policy / SOP / rule identifier."
+                },
+                "text": {
+                  "type": "string",
+                  "description": "The clause text as it read at decision time."
+                },
+                "hash": {
+                  "type": "string",
+                  "description": "sha256:<64 hex> of the policy source version."
+                }
+              }
+            }
+          },
+          "evidence": {
+            "type": "array",
+            "description": "Content addresses ONLY — a reference and a digest. HITL has no field anywhere that can hold content, so the PII-bearing original never leaves your deployment. Supply this OR evidence_omitted_reason, never both.",
+            "items": {
+              "type": "object",
+              "required": [
+                "ref",
+                "hash"
+              ],
+              "properties": {
+                "ref": {
+                  "type": "string",
+                  "description": "URI, id, or a Witness recordId."
+                },
+                "hash": {
+                  "type": "string",
+                  "pattern": "^sha256:[0-9a-f]{64}$",
+                  "description": "sha256:<64 hex>."
+                },
+                "media_type": {
+                  "type": "string",
+                  "description": "Optional media type."
+                },
+                "descriptor": {
+                  "type": "string",
+                  "description": "Short NON-PII label, max 200 chars. A label, not a payload."
+                },
+                "captured_at": {
+                  "type": "string",
+                  "description": "ISO-8601 capture time."
+                }
+              }
+            }
+          },
+          "evidence_omitted_reason": {
+            "type": "string",
+            "description": "REQUIRED if evidence is empty. State plainly why there is none. Never synthesise a placeholder that looks like evidence — an unavailable source must be representable as unavailable, not as a plausible object."
+          },
+          "domain_ref": {
+            "type": "string",
+            "description": "A correlation handle into YOUR store, so you can re-render the rich card. Not a payload — HITL never interprets it and it must not carry PII."
+          },
+          "descriptors": {
+            "type": "object",
+            "description": "Small non-PII key/value labels for list views. Capped at 4KB."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "list_hitl_items",
+      "name": "List decision items",
+      "description": "List item summaries. Summaries deliberately carry NO evidence, statement, or domain_ref — use get_hitl_item for a single item when you need detail.",
+      "tags": [
+        "hitl",
+        "read-only"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "caller_id": {
+            "type": "string",
+            "description": "Filter to one caller."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "resolved",
+              "cancelled"
+            ]
+          },
+          "band": {
+            "type": "string",
+            "description": "Filter to an authority band."
+          },
+          "since": {
+            "type": "string",
+            "description": "ISO-8601 lower bound on created_at."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "get_hitl_item",
+      "name": "Get one decision item",
+      "description": "Full item including evidence content-addresses and, once resolved, the outcome, the asserted actor, and the seal record id. Note the resolution reports the asserted actor and the authenticated calling account separately — they are different facts.",
+      "tags": [
+        "hitl",
+        "read-only"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "item_id"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "description": "The item id."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "resolve_hitl_item",
+      "name": "Record a human decision",
+      "description": "Record the outcome of a human decision and seal it. The seal is durably queued before this returns and never blocks you — if Witness is unavailable the result reports seal.status \"pending\" and the outbox completes it. `escalate` creates the next-band item by walking your registered ladder. `baseline` requires authority to WIDEN a ceiling, which is a different thing from authority to decide the instance.",
+      "tags": [
+        "hitl",
+        "mutating"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "item_id",
+          "outcome",
+          "actor",
+          "statement",
+          "resolved_by_account"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "description": "The item id."
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "deny",
+              "escalate",
+              "baseline"
+            ],
+            "description": "One vocabulary. There are exactly four outcomes."
+          },
+          "actor": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "description": "The deciding human, AS ASSERTED BY YOUR SURFACE. HITL records this; it does not authenticate it.",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Identifier."
+              },
+              "role": {
+                "type": "string",
+                "description": "The authority under which they decided."
+              }
+            }
+          },
+          "statement": {
+            "type": "string",
+            "description": "The decision and its rationale."
+          },
+          "resolved_by_account": {
+            "type": "string",
+            "description": "The authenticated account submitting this resolution. Recorded separately from the asserted actor on purpose."
+          },
+          "baseline": {
+            "type": "object",
+            "required": [
+              "bounds",
+              "scope"
+            ],
+            "description": "Required when outcome is \"baseline\". Both bounds and scope must NAME their kind — an unbounded grant must say {\"kind\":\"unbounded\"} explicitly. A missing field never grants permission.",
+            "properties": {
+              "bounds": {
+                "type": "object",
+                "description": "One of {\"kind\":\"unbounded\"} | {\"kind\":\"numeric\",\"unit\":...,\"max\":...} | {\"kind\":\"enum\",\"values\":[...]}. Units are compared exactly and never coerced."
+              },
+              "scope": {
+                "type": "object",
+                "description": "One of {\"kind\":\"any\"} | {\"kind\":\"qualified\",\"qualifiers\":{...}}."
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "list_baselines",
+      "name": "List baselines",
+      "description": "Active baselines for a caller, with unbounded_count surfaced separately. An unbounded baseline is the widest grant a customer can make, so it is flagged explicitly rather than left to be inferred from the shape of bounds.",
+      "tags": [
+        "hitl",
+        "read-only"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "caller_id"
+        ],
+        "properties": {
+          "caller_id": {
+            "type": "string",
+            "description": "The caller id."
+          },
+          "include_revoked": {
+            "type": "boolean",
+            "description": "Include revoked baselines."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "revoke_baseline",
+      "name": "Revoke a baseline",
+      "description": "Revoke a baseline and seal the revocation. Never a delete — the row and its trail remain, because accumulated baselines are exactly what an auditor needs to review.",
+      "tags": [
+        "hitl",
+        "mutating"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "baseline_id",
+          "revoked_by",
+          "reason",
+          "caller_id"
+        ],
+        "properties": {
+          "baseline_id": {
+            "type": "string",
+            "description": "The baseline id."
+          },
+          "revoked_by": {
+            "type": "string",
+            "description": "Who revoked it."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why. Required — a revocation with no reason is not evidence."
+          },
+          "caller_id": {
+            "type": "string",
+            "description": "The caller id."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "match_baseline",
+      "name": "Check baseline containment",
+      "description": "Parity check for your local read-model. This is NOT the hot path: match locally in your own decision loop so you take no HITL latency or availability dependency. Use this to verify your projection agrees with the system of record.",
+      "tags": [
+        "hitl",
+        "read-only"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "caller_id",
+          "request"
+        ],
+        "properties": {
+          "caller_id": {
+            "type": "string",
+            "description": "The caller id."
+          },
+          "request": {
+            "type": "object",
+            "required": [
+              "decisionClass"
+            ],
+            "properties": {
+              "decisionClass": {
+                "type": "string",
+                "description": "Decision class."
+              },
+              "value": {
+                "description": "Number or string, per the bounds kind."
+              },
+              "unit": {
+                "type": "string",
+                "description": "Required for numeric bounds. A missing unit is a mismatch, never a wildcard."
+              },
+              "qualifiers": {
+                "type": "object",
+                "description": "Scope qualifiers."
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "register_authority_config",
+      "name": "Register an activated authority config",
+      "description": "Register the authority config that governance has ACTIVATED. HITL never authors governance — git is the system of record and this is a projection of it. Every non-genesis registration must carry git_commit and the activation seal, so registration can never become a route around the governance pipeline.",
+      "tags": [
+        "hitl",
+        "mutating"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "caller_id",
+          "bands",
+          "label_to_band",
+          "roster",
+          "permitted_decision_classes",
+          "max_raises_per_hour",
+          "max_open_items",
+          "git_commit",
+          "activation_seal_record_id"
+        ],
+        "properties": {
+          "caller_id": {
+            "type": "string",
+            "description": "The caller id."
+          },
+          "bands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The authority ladder, ordered narrowest first, widest last. Order IS the escalation path."
+          },
+          "label_to_band": {
+            "type": "object",
+            "description": "escalation_label -> band. Every band named must exist in the ladder."
+          },
+          "roster": {
+            "type": "object",
+            "description": "band -> [actor ids]. Bands NEST: an actor on a wider band may decide narrower items."
+          },
+          "permitted_decision_classes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The classes this caller may raise."
+          },
+          "max_raises_per_hour": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "max_open_items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "git_commit": {
+            "type": "string",
+            "description": "The commit this config was activated from."
+          },
+          "activation_seal_record_id": {
+            "type": "string",
+            "description": "The Witness attestation that activated it."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "get_raise_quota",
+      "name": "Check remaining raise quota",
+      "description": "Remaining raises this hour, remaining open-item headroom, and your permitted decision classes. Read-only — checking does not consume quota.",
+      "tags": [
+        "hitl",
+        "read-only"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "caller_id"
+        ],
+        "properties": {
+          "caller_id": {
+            "type": "string",
+            "description": "The caller id."
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  ],
+  "doesNotOwn": [
+    {
+      "concern": "deciding WHEN to escalate",
+      "owner": "the deployment",
+      "note": "The deployment evaluates its own governance and decides that a human is required. HITL is told; it does not judge."
+    },
+    {
+      "concern": "executing anything",
+      "owner": "the deployment",
+      "note": "HITL records, routes and seals. It performs no writes in any downstream system. A caller is told the outcome and does its own execution."
+    },
+    {
+      "concern": "authoring governance",
+      "owner": "git, via ACP",
+      "note": "Authority configs are registered with HITL when governance activates; git remains the system of record and HITL holds a projection. HITL has no authoring surface, so it cannot become a second writer to a concept git owns."
+    },
+    {
+      "concern": "gathering evidence",
+      "owner": "the deployment",
+      "note": "Evidence is supplied at raise time, captured when the deciding system saw it. HITL never fetches it — see the evidence_supplied_not_fetched caveat."
+    }
+  ],
+  "caveats": [
+    {
+      "id": "actor_asserted_not_authenticated",
+      "statement": "HITL records who the caller says decided; it does not authenticate the human. Session integrity is the deployment's responsibility.",
+      "detail": "Every resolution records the asserted actor and the authenticated calling account as separate fields, so the trail distinguishes who called from who is claimed to have decided. This is the same class of gap as holder-binding on agent credentials: asserted, not proven."
+    },
+    {
+      "id": "evidence_supplied_not_fetched",
+      "statement": "HITL never fetches domain evidence. It MAY resolve and verify Witness-internal refs.",
+      "detail": "Evidence is supplied by the caller at raise time and stored as content addresses only — a reference and a digest. There is no field anywhere in the store that can hold content, so the PII-bearing original never leaves the deployment and HITL's Witness account never anchors it. The one exception is narrow and substrate-internal: where an evidence ref is a Witness recordId, HITL may resolve it to verify the record exists. It never learns any domain."
+    }
+  ],
+  "custody": {
+    "model": "customer-managed",
+    "recordSigningKey": "did:web:hitl.getvda.ai#key-2",
+    "statement": "Every HITL seal is signed by HITL's own record-signing key via prepare -> sign -> submit. There is no custodial code path. This matters most for baseline promotions: a promotion is a privilege-widening governance event, and customer-managed custody with issuer_verified lets an enforcer prove HITL itself signed the promotion, not merely that Witness recorded it.",
+    "issuerVerification": "did:web resolves; issuer_verified available"
+  },
+  "status": {
+    "checkedAt": "2026-09-19T22:03:23.479Z",
+    "ready": true,
+    "witness": "live",
+    "store": "live",
+    "genesis": "live",
+    "issuer_identity": "live",
+    "note": "These statuses are the result of live probes performed at the time shown, not a reflection of configuration being present."
+  },
+  "contracts": {
+    "suiteAuthViaWhoami": {
+      "role": "consumer",
+      "statement": "HITL authenticates callers by validating a presented Witness Bearer via Witness GET /whoami. Authorization header only, never a body or query parameter.",
+      "status": "live"
+    }
+  },
+  "witnessAccountId": "acct_01KXXBQY4ZT1CXBNQJYRHR8M56",
+  "agentCardSignature": {
+    "algorithm": "Ed25519",
+    "keyId": "did:web:hitl.getvda.ai#key-1",
+    "created": "2026-09-19T22:03:23.479Z",
+    "value": "LaRCpvLf9xBBHIY4azwFq2dZS9DMUQhcx-eLZeB_WXDBO8lCtNKIMPjxqKX5Ete_vep8nUoQ5ciLr-KJHWEEBQ",
+    "verificationNote": "Ed25519 over canonicalise(card without agentCardSignature), where canonicalise is recursive key-sorted JSON. Public key at did:web:hitl.getvda.ai#key-1 in the DID document."
+  }
+}

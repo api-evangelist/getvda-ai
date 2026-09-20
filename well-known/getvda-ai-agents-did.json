@@ -1,0 +1,37 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
+  "id": "did:web:agents.getvda.ai",
+  "verificationMethod": [
+    {
+      "id": "did:web:agents.getvda.ai#Y6dPf2Y2bQPFQ6c81dgh684_GM6T3cb3nTKnlcb7E2M",
+      "type": "JsonWebKey2020",
+      "controller": "did:web:agents.getvda.ai",
+      "publicKeyJwk": {
+        "alg": "EdDSA",
+        "crv": "Ed25519",
+        "kid": "Y6dPf2Y2bQPFQ6c81dgh684_GM6T3cb3nTKnlcb7E2M",
+        "kty": "OKP",
+        "use": "sig",
+        "x": "GV_Sb9h5fUKxs4rn72a6Dt81J0Ewd6DcyfmzfdofS_U"
+      }
+    }
+  ],
+  "assertionMethod": [
+    "did:web:agents.getvda.ai#Y6dPf2Y2bQPFQ6c81dgh684_GM6T3cb3nTKnlcb7E2M"
+  ],
+  "service": [
+    {
+      "id": "did:web:agents.getvda.ai#catalog",
+      "type": "AgenticResourceCatalog",
+      "serviceEndpoint": "https://agents.getvda.ai/.well-known/ai-catalog.json"
+    },
+    {
+      "id": "did:web:agents.getvda.ai#portfolio",
+      "type": "LinkedDomains",
+      "serviceEndpoint": "https://agents.getvda.ai/agents"
+    }
+  ]
+}

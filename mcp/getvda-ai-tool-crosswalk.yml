@@ -1,0 +1,95 @@
+generated: '2026-09-19'
+method: derived
+source: mcp/getvda-ai-witness-mcp-tools.json
+derived_from:
+- mcp/getvda-ai-witness-mcp-tools.json (live tools/list, 16 tools)
+- mcp/getvda-ai-c2md-mcp-tools.json (live tools/list, 11 tools)
+- a2a/getvda-ai-hitl-agent-card.json (9 skills with inputSchema; the live HITL tools/list is auth-gated)
+- openapi/getvda-ai-witness-openapi.json
+- openapi/getvda-ai-hitl-openapi.json
+- openapi/getvda-ai-acp-openapi.json
+summary: >-
+  Three MCP surfaces are bound to three REST contracts. Witness: 16 live tools map onto 23 REST operations — every
+  tool has a backing route (the OpenAPI's own /api/witness/mcp description lists the tool names), and the tool
+  inherits that route's request body as its real inputSchema; 7 REST operations (renewal/controller plumbing,
+  usage, anchor-status, the chain proof and the MCP route itself) have no tool. The provider declares operationIds
+  on only two Witness routes, so bindings are by method + path. HITL: 9 tools map 1:1 onto 9 POST /v1/tools/<name>
+  operations with identical operationIds — the cleanest crosswalk in the catalog — with genesis, discovery and
+  health REST-only. C2MD: 11 live tools, ZERO backing REST operations — the C2MD OpenAPI is a FastAPI edge-proxy
+  shell (healthz, card, key PEM, robots and a catch-all {full_path} proxy), so every C2MD tool is mcp_only and its
+  real contract is the A2A card's skills[].inputSchema (8 skills) plus three MCP-only helpers. Confidence is high
+  where a live inputSchema and a spec request body were both read, medium where the tool is documented only in the
+  card.
+surfaces:
+  openapi:
+  - openapi/getvda-ai-witness-openapi.json (23 ops, 2 operationIds)
+  - openapi/getvda-ai-hitl-openapi.json (17 ops, 11 operationIds)
+  - openapi/getvda-ai-acp-openapi.json (12 ops, 0 operationIds; no MCP — planned)
+  - openapi/getvda-ai-c2md-edge-openapi.json (9 proxy routes; not the skill contract)
+  mcp:
+  - {url: 'https://witness.getvda.ai/api/witness/mcp', tools_list: 'live, anonymous, 16 tools'}
+  - {url: 'https://c2md.getvda.ai/mcp', tools_list: 'live, anonymous, 11 tools'}
+  - {url: 'https://hitl.getvda.ai/mcp', tools_list: 'GATED — 401 on initialize; schemas from the served card'}
+  graphql: none
+  a2a:
+  - {url: 'https://c2md.getvda.ai/a2a', skills: 8, note: the real C2MD contract}
+crosswalk:
+- {tool: get_test_key, server: witness, category: provisioning, rest: ['POST /api/witness/test-key'], binding: rest, confidence: high}
+- {tool: renew_challenge, server: witness, category: provisioning, rest: ['POST /api/witness/renew/challenge'], binding: rest, confidence: high}
+- {tool: renew_key, server: witness, category: provisioning, rest: ['POST /api/witness/renew'], binding: rest, confidence: high}
+- {tool: seal, server: witness, category: sealing, rest: ['POST /api/witness/seal'], binding: rest, confidence: high, note: 'inputSchema {decision, governingRule, chainKey, decisionId} == SealRequest'}
+- {tool: seal_hitl_decision, server: witness, category: sealing, rest: ['POST /api/witness/seal/hitl-decision'], binding: rest, confidence: high}
+- {tool: seal_agent_action, server: witness, category: sealing, rest: ['POST /api/witness/seal/agent-action'], binding: rest, confidence: high}
+- {tool: seal_attestation, server: witness, category: sealing, rest: ['POST /api/witness/seal/attestation'], binding: rest, confidence: high}
+- {tool: issue_admission_credential, server: witness, category: credentials, rest: ['POST /api/witness/credentials/issue'], binding: rest, confidence: high}
+- {tool: check_valid, server: witness, category: credentials, rest: ['GET /api/witness/credentials/{credential_id}'], binding: rest, confidence: high, note: public on both surfaces}
+- {tool: revoke_admission_credential, server: witness, category: credentials, rest: ['POST /api/witness/credentials/{credential_id}/revoke'], binding: rest, confidence: high}
+- {tool: verify, server: witness, category: verification, rest: ['POST /api/witness/verify'], binding: rest, confidence: high, note: 'inputSchema {record, records} == the REST body ("provide `record` or `records`")'}
+- {tool: verify_record_issuer, server: witness, category: verification, rest: [verify_record_issuer], binding: rest, confidence: high, note: 'operationId declared; GET /api/witness/records/{recordId}/issuer'}
+- {tool: report, server: witness, category: reporting, rest: ['POST /api/witness/report'], binding: rest, confidence: high}
+- {tool: list_records, server: witness, category: records, rest: ['GET /api/witness/records'], binding: rest, confidence: high, note: 'inputSchema {chainKey, since, until, limit, cursor} == the query parameters'}
+- {tool: get_record, server: witness, category: records, rest: ['GET /api/witness/records/{recordId}'], binding: rest, confidence: high}
+- {tool: whoami, server: witness, category: identity, rest: ['GET /api/witness/whoami'], binding: rest, confidence: high}
+- {tool: raise_hitl_item, server: hitl, category: decisions, rest: [raise_hitl_item], binding: rest, confidence: medium, note: 1:1 operationId; schema from the card (live tools/list gated)}
+- {tool: list_hitl_items, server: hitl, category: decisions, rest: [list_hitl_items], binding: rest, confidence: medium}
+- {tool: get_hitl_item, server: hitl, category: decisions, rest: [get_hitl_item], binding: rest, confidence: medium}
+- {tool: resolve_hitl_item, server: hitl, category: decisions, rest: [resolve_hitl_item], binding: rest, confidence: medium}
+- {tool: list_baselines, server: hitl, category: baselines, rest: [list_baselines], binding: rest, confidence: medium}
+- {tool: revoke_baseline, server: hitl, category: baselines, rest: [revoke_baseline], binding: rest, confidence: medium}
+- {tool: match_baseline, server: hitl, category: baselines, rest: [match_baseline], binding: rest, confidence: medium}
+- {tool: register_authority_config, server: hitl, category: authority, rest: [register_authority_config], binding: rest, confidence: medium}
+- {tool: get_raise_quota, server: hitl, category: quota, rest: [get_raise_quota], binding: rest, confidence: medium}
+mcp_only:
+- {tool: assess_agent_risk, server: c2md, reason: 'A2A skill (skills/assess_agent_risk); the C2MD OpenAPI is an edge-proxy shell with no skill routes'}
+- {tool: extract_governance_inputs, server: c2md, reason: A2A skill; no REST operation}
+- {tool: generate_admission_attestation, server: c2md, reason: 'MCP-only helper — not in the A2A card''s 8 skills and no REST operation'}
+- {tool: generate_compliance_bundle, server: c2md, reason: A2A skill (long-running, returns a task descriptor); no REST operation}
+- {tool: generate_dpia_fria_scaffold, server: c2md, reason: A2A skill; no REST operation}
+- {tool: generate_evidence_readiness_report, server: c2md, reason: A2A skill; no REST operation}
+- {tool: generate_journey_baseline, server: c2md, reason: 'A2A skill marked PLANNED — returns -32601 on both surfaces'}
+- {tool: list_supported_frameworks, server: c2md, reason: A2A skill; no REST operation}
+- {tool: translate_control, server: c2md, reason: A2A skill; no REST operation}
+- {tool: get_task, server: c2md, reason: MCP/A2A task polling helper; no REST operation}
+- {tool: get_test_key, server: c2md, reason: 'MCP-only helper that explains how to obtain a Witness key; the real mint is Witness POST /api/witness/test-key'}
+rest_only:
+- capability: witness provisioning
+  operations: ['POST /api/witness/account/bind-controller', 'POST /api/witness/prepare', 'POST /api/witness/keys/revoke (revoke_api_key)']
+- capability: witness verification
+  operations: ['GET /api/witness/chains/{chainKey}/proof']
+- capability: witness account
+  operations: ['GET /api/witness/usage', 'GET /api/witness/anchor-status', 'POST /api/witness/mcp (the MCP route itself)']
+- capability: hitl genesis, discovery and health
+  operations: [genesis_authority_config, list_tools, 'GET /openapi.json', 'GET /livez', 'GET /readyz', 'GET /.well-known/agent-card.json', 'GET /.well-known/did.json', 'POST /mcp']
+- capability: acp (no MCP surface — planned)
+  operations: ['all 12 ACP operations']
+coverage:
+  tools_named: 36
+  tools_bound: 25
+  mcp_only: 11
+  rest_ops_total: 52
+  rest_ops_with_tool: 25
+  by_server:
+    witness: {tools: 16, bound: 16, rest_ops: 23, rest_ops_with_tool: 16}
+    hitl: {tools: 9, bound: 9, rest_ops: 17, rest_ops_with_tool: 9}
+    c2md: {tools: 11, bound: 0, rest_ops: 9, rest_ops_with_tool: 0}
+    acp: {tools: 0, bound: 0, rest_ops: 12, rest_ops_with_tool: 0}

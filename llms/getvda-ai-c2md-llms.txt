@@ -1,0 +1,66 @@
+# C2MD Compliance Agent (c2md.getvda.ai)
+
+> A2A-protocol (JSON-RPC 2.0) agent that generates EU AI Act / GDPR / NIST /
+> ISO 42001 governance documentation for other AI agents. Authoritative,
+> machine-readable discovery: the signed Agent Card at
+> /.well-known/agent-card.json (Ed25519-signed; verify against
+> /.well-known/agent-card-public-key.pem). Endpoint: POST /a2a.
+
+## EU AI Act — Article-by-Article Evidence & Readiness Report
+Method: `skills/generate_evidence_readiness_report`  (scope: c2md:assess, free tier)
+Output: `text/markdown`. NOT a compliance report — documented ≠ evidenced ≠ compliant;
+final Compliance-Officer attestation is a human act.
+
+`data_mode` (caller-selectable):
+- `demo` (default) — synthetic input, LLM-free, deterministic, zero external calls.
+  Output labelled "SAMPLE — DEMO DATA".
+- `customer` — reads the caller's OWN authorized, account-isolated Witness trail.
+  Requires `witness_api_key` (the key IS the account; no account-selection param).
+- `attested` — KEY-SAFE, agent-to-agent, no human, no key. The caller supplies its
+  OWN Witness chain-proof bundle and C2MD verifies it INDEPENDENTLY, OFFLINE, against
+  pinned public infrastructure (did:web + Rekor/TSA) — zero calls to Witness.
+
+### attested flow (no key is ever accepted, logged, or forwarded)
+1. The caller fetches its own bundle: `GET https://witness.getvda.ai/api/witness/chains/{chainKey}/proof`
+2. Calls C2MD with:
+   ```json
+   {"jsonrpc":"2.0","id":"1","method":"skills/generate_evidence_readiness_report",
+    "params":{"data_mode":"attested","jurisdictions":["DE"],
+              "data_categories":["employment_data"],"autonomy_level":"autonomous",
+              "witness_proof_bundle":{ /* the /chains/{chainKey}/proof bundle */ },
+              "witness_report":{ /* the Art-12 report from POST /api/witness/report */ }}}
+   ```
+   Supplying `witness_api_key` in attested mode is REJECTED loudly.
+3. C2MD verifies → derives a description from the verified evidence → screens it →
+   assesses, and returns the per-Article board.
+
+Grading is truthful: Article 12 is graded off the VERIFIED offline verdict, never a
+caller-supplied status hint. `ANCHORED_VALID` earns anchored/compliance-grade language;
+`SIGNED_PENDING` reads "readiness — not yet anchored"; a tampered bundle is refused
+(`BROKEN`, never rendered); an incomplete bundle returns `INSUFFICIENT_PROOF`.
+
+## MCP (Model Context Protocol) — POST /mcp
+Same skills, same auth, same screening as /a2a, spoken as MCP JSON-RPC.
+
+  initialize / tools/list       ANONYMOUS, no key. Rate-limited per network.
+  tools/call get_test_key       ANONYMOUS. Explains how to get a free key.
+  tools/call assess_agent_risk  ANONYMOUS. The free diagnostic needs no key.
+  tools/call <any other skill>  Needs Authorization: Bearer wtn.<keyId>.<secret>
+
+C2MD issues NO credentials of its own — it accepts getvda.ai suite keys, so ONE key
+works across the suite and there is one revocation surface. Self-serve a free
+(Sealed-tier) key at https://witness.getvda.ai/api/witness/test-key ; it grants
+c2md:assess. Paid scopes need an Anchored-tier account.
+
+Long-running skills return a task descriptor, not a result — poll `get_task` with the
+returned id. Generated artifacts are DRAFTS requiring compliance-officer sign-off.
+
+  curl -X POST https://c2md.getvda.ai/mcp -H 'content-type: application/json'     -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+
+## Other skills (see the Agent Card for full details)
+- `skills/assess_agent_risk` — free cross-framework risk assessment (no files).
+- `skills/translate_control` — single control → agent rules.
+- `skills/list_supported_frameworks` — supported frameworks/jurisdictions.
+- `skills/generate_compliance_bundle` — governance bundle (Starter/Pro tiers).
+- `skills/generate_dpia_fria_scaffold` — DPIA/FRIA scaffolds (Pro).
+- `skills/generate_journey_baseline` — full industry library (Journey).

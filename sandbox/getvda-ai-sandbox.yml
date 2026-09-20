@@ -1,0 +1,38 @@
+generated: '2026-09-19'
+method: searched
+source: https://witness.getvda.ai/llms.txt
+docs:
+- https://witness.getvda.ai/docs
+- https://c2md.getvda.ai/llms.txt
+- https://agents.getvda.ai/llms.txt
+summary: >-
+  VDA has no separate sandbox host or test-mode key prefix; instead the free Sealed tier IS the self-serve test
+  environment, minted in-band with no human, and C2MD and the GOSCE fleet each ship a free, no-key rehearsal path.
+  Every value below is quoted from the provider's own documents; none is invented.
+witness:
+  test_key:
+    endpoint: POST https://witness.getvda.ai/api/witness/test-key
+    request_body: '{"email":"optional@example.com"}  (or {"controllerPublicKeyJwk":{"kty":"OKP","crv":"Ed25519","x":"<base64url>"}} for a durable account)'
+    returns: '{ "apiKey":"wtn.<id>.<secret>", "accountId":"acct_<ULID>", "sealed":true, "anchored":false, "sealedState":"not_anchored", "sealedStateReason":"anchoring_not_enabled_for_account", "tier":"test", "compliance":false, "expiresInDays":7 }'
+    key_prefix: wtn.
+    account_prefix: acct_
+    expiry: expiresInDays 7 for a quick-start key without a controller; durable (no 7-day expiry) when a controller JWK is bound
+    also_via: the MCP tool `get_test_key` and the card's provisioning.selfServeKey block
+    limits: 'Sealed tier: 5,000 seals/month, measured and surfaced on every seal, never blocked over the limit ("measured_not_billed"); issuance is rate-limited per IP'
+    boundary: 'Records minted with a test key are Ed25519-signed and chain-verifiable OFFLINE but NEVER externally anchored — "provable even against VDA" is a paid-tier property'
+  public_no_key_paths:
+  - POST https://witness.getvda.ai/api/witness/verify — verify any record or chain
+  - GET https://witness.getvda.ai/api/witness/credentials/{credential_id} — check_valid
+  - GET https://witness.getvda.ai/api/witness/records/{recordId}/issuer — issuer-authenticity verdict
+  - GET https://witness.getvda.ai/proof and /proof/bundle.json — one real anchored record to verify offline
+  offline_verification: 'npm i vda-witness | pip install "vda-witness[verify]" — offlineVerify({record, chain, didDocument, anchor}) -> ANCHORED_VALID | SIGNED_PENDING | BROKEN | INSUFFICIENT_PROOF'
+  prepare_is_stateless: POST /api/witness/prepare returns the unsigned record and canonicalBytes without writing anything (customer-managed custody rehearsal)
+c2md:
+  demo_mode: 'generate_evidence_readiness_report data_mode "demo" (default) — synthetic input, LLM-free, deterministic, zero external calls; output labelled "SAMPLE — DEMO DATA"'
+  free_no_key: initialize, tools/list, assess_agent_risk, get_test_key (over MCP) — "the free diagnostic needs no key"
+  samples: https://getvda.ai/samples/northwind-*.html — worked examples on synthetic Northwind Bank data, all labelled DEMO DATA
+  artifact_lifecycle: DEMO DATA -> DRAFT (a real Compliance Officer is attached) -> ATTESTED (post sign-off)
+gosce_fleet:
+  selftest: 'GET https://<agent>.getvda.ai/selftest or the MCP tool `selftest` — "FREE, no payment required. Runs this agent''s REAL capability on a fixed canned input" and returns an assertion grade (asserted_correct | ran_without_error) plus a trust manifest'
+  free_methods: [tools/list, server/discover, selftest]
+  not_charged_on_failure: true

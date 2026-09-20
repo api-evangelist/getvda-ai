@@ -1,0 +1,412 @@
+generated: '2026-09-19'
+method: probed
+source: https://witness.getvda.ai/.well-known/agent-card.json
+description: 'Verified Digital Agents serves EIGHT distinct A2A Agent Cards from its own hosts, all provider-published
+  and fetched verbatim on 2026-09-19; nothing here is generated or derived. The primary card is Witness (witness.getvda.ai),
+  the one service the provider markets as live with a live MCP server; the other seven are the sibling governance
+  blocks (HITL, C2MD, ACP, Onboarding), the apex suite discovery card on getvda.ai, and two from the GOSCE agent
+  fleet — its Portfolio Router and ONE representative of the 98 templated fleet cards the a2aregistry.org harvest
+  counted (every fleet host serves the same shape; they are enumerated in well-known/getvda-ai-agents-ai-catalog.json
+  rather than saved 98 times). Grades are measured against the A2A 1.0.0 AgentCard object: five cards are conformant,
+  three are flavored — the apex card and the Onboarding card omit protocolVersion entirely, and the ACP card has
+  no capabilities object and puts a transport name (''HTTP+JSON'') in protocolVersion. Six of the eight are cryptographically
+  signed (Ed25519 over the canonicalised card, key resolvable via did:web or the agents.getvda.ai JWKS), which is
+  a stronger provenance property than the A2A shape checks measure.'
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: witness.getvda.ai
+  legacy_path_also_served: witness.getvda.ai/.well-known/agent.json returns the identical body (38,250 bytes); getvda.ai/.well-known/agent.json
+    returns a different, older document
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  protocol_version: 0.2.5
+  preferred_transport: HTTP+JSON
+  deviations: &id001
+  - protocolVersion 0.2.5 predates the 0.3 card shape the transport enum belongs to
+  graded_cards:
+    VDA Witness: conformant
+    HITL: conformant
+    C2MD Compliance Agent: conformant
+    GOSCE Portfolio Router: conformant
+    Encrypted OAuth LLM Agent: conformant
+    VDA ACP: flavored
+    getvda Onboarding Agent: flavored
+    Verified Digital Agents (VDA): flavored
+card:
+  name: VDA Witness
+  description: Seals governed AI-agent decisions into tamper-evident, Ed25519-signed, independently-verifiable records,
+    and produces EU AI Act Article 12 evidence from the sealed trail. Part of the VDA platform.
+  url: https://witness.getvda.ai
+  version: 1.0.0
+  documentation_url: https://witness.getvda.ai/docs
+  skills: 15
+  file: getvda-ai-agent-card.json
+  signed: Ed25519 `proof` over canonicalize(card without proof); verificationMethod did:web:witness.getvda.ai#key-1,
+    resolvable at well-known/getvda-ai-witness-did.json
+  mcp_endpoint: https://witness.getvda.ai/api/witness/mcp
+  openapi_url: https://witness.getvda.ai/openapi.json
+cards:
+- file: getvda-ai-agent-card.json
+  primary: true
+  host: witness.getvda.ai
+  url: https://witness.getvda.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  name: VDA Witness
+  agent_url: https://witness.getvda.ai
+  protocol_version: 0.2.5
+  preferred_transport: HTTP+JSON
+  version: 1.0.0
+  signed: true
+  grade: conformant
+  checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+    preferred_transport_present: true
+    default_input_modes_present: true
+    default_output_modes_present: true
+  deviations: *id001
+  skills: 15
+  skill_ids:
+  - seal_hitl_decision
+  - seal_agent_action
+  - seal_attestation
+  - issue_admission_credential
+  - check_valid
+  - verify_record_issuer
+  - revoke_admission_credential
+  - revoke_api_key
+  - whoami
+  - seal
+  - read
+  - provision
+  - renew
+  - verify
+  - report
+  provider_organization: Verified Digital Agents (VDA)
+  note: Witness — the evidence layer; the one service the provider markets as LIVE with a live MCP server. Also
+    served identically at the legacy /.well-known/agent.json.
+  mcp:
+    endpoint: https://witness.getvda.ai/api/witness/mcp
+    tools:
+    - get_test_key
+    - renew_challenge
+    - renew_key
+    - seal
+    - seal_hitl_decision
+    - seal_agent_action
+    - seal_attestation
+    - issue_admission_credential
+    - check_valid
+    - revoke_admission_credential
+    - verify_record_issuer
+    - whoami
+    - list_records
+    - get_record
+    - verify
+    - report
+- file: getvda-ai-hitl-agent-card.json
+  primary: false
+  host: hitl.getvda.ai
+  url: https://hitl.getvda.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  name: HITL
+  agent_url: https://hitl.getvda.ai
+  protocol_version: 0.3.0
+  preferred_transport: JSONRPC
+  version: 0.1.0
+  signed: true
+  grade: conformant
+  checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+    preferred_transport_present: true
+    default_input_modes_present: true
+    default_output_modes_present: true
+  deviations: []
+  skills: 9
+  skill_ids:
+  - raise_hitl_item
+  - list_hitl_items
+  - get_hitl_item
+  - resolve_hitl_item
+  - list_baselines
+  - revoke_baseline
+  - match_baseline
+  - register_authority_config
+  - get_raise_quota
+  provider_organization: getvda.ai
+  note: HITL — human decisions on agent actions. The only unauthenticated paths on this host are the card, did.json,
+    openapi.json and the health probes; everything else answers 401.
+- file: getvda-ai-c2md-agent-card.json
+  primary: false
+  host: c2md.getvda.ai
+  url: https://c2md.getvda.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  name: C2MD Compliance Agent
+  agent_url: https://c2md.getvda.ai/a2a
+  protocol_version: 0.3.0
+  preferred_transport: JSONRPC
+  version: 1.0.0
+  signed: true
+  grade: conformant
+  checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+    preferred_transport_present: true
+    default_input_modes_present: true
+    default_output_modes_present: true
+  deviations: []
+  skills: 8
+  skill_ids:
+  - assess_agent_risk
+  - translate_control
+  - list_supported_frameworks
+  - generate_compliance_bundle
+  - generate_dpia_fria_scaffold
+  - generate_journey_baseline
+  - generate_evidence_readiness_report
+  - extract_governance_inputs
+  provider_organization: Value Driven AI
+  note: C2MD Compliance Agent — the served card is Ed25519-signed at build time (agentCardSignature; public key
+    at /.well-known/agent-card-public-key.pem). Its description text is double-encoded UTF-8 ("â€"" for an em dash).
+- file: getvda-ai-gosce-router-agent-card.json
+  primary: false
+  host: router.getvda.ai
+  url: https://router.getvda.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  name: GOSCE Portfolio Router
+  agent_url: https://router.getvda.ai/a2a/
+  protocol_version: 0.3.0
+  preferred_transport: JSONRPC
+  version: 0.1.0
+  signed: true
+  grade: conformant
+  checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+    preferred_transport_present: true
+    default_input_modes_present: true
+    default_output_modes_present: true
+  deviations: []
+  skills: 14
+  skill_ids:
+  - auth
+  - auth-llm
+  - compose
+  - drift-observatory
+  - health-monitor
+  - infra-stack
+  - integration
+  - langchain-llm
+  - monitoring
+  - oauth-llm
+  - router
+  - structured-output
+  - traced-gemini
+  - selftest
+  provider_organization: VDA / GOSCE
+  note: GOSCE Portfolio Router — the single A2A/MCP entry point for the 98-agent GOSCE fleet; provider.organization
+    reads "VDA / GOSCE". Detached EdDSA JWS in `proof`, keys at agents.getvda.ai/.well-known/jwks.json.
+- file: getvda-ai-gosce-fleet-sample-agent-card.json
+  primary: false
+  host: authenticated-llm-agent-cryptography.getvda.ai
+  url: https://authenticated-llm-agent-cryptography.getvda.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  name: Encrypted OAuth LLM Agent
+  agent_url: https://authenticated-llm-agent-cryptography.getvda.ai/a2a/
+  protocol_version: 0.3.0
+  preferred_transport: JSONRPC
+  version: 0.1.1
+  signed: true
+  grade: conformant
+  checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+    preferred_transport_present: true
+    default_input_modes_present: true
+    default_output_modes_present: true
+  deviations: []
+  skills: 7
+  skill_ids:
+  - crypto
+  - oauth-oidc
+  - orchestration
+  - agent-protocol
+  - llm-client
+  - observability
+  - selftest
+  provider_organization: VDA / GOSCE
+  note: 'ONE representative of the 98 templated GOSCE fleet cards (the host the a2aregistry.org harvest pointed
+    at). Every fleet host serves the same shape: JSONRPC at /a2a/, 2 MCP tools (invoke, selftest), x402-metered.
+    The other 97 are enumerated in well-known/getvda-ai-agents-ai-catalog.json and are NOT saved individually.'
+- file: getvda-ai-acp-agent-card.json
+  primary: false
+  host: acp.getvda.ai
+  url: https://acp.getvda.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  name: VDA ACP
+  agent_url: https://acp.getvda.ai
+  protocol_version: HTTP+JSON
+  preferred_transport: HTTP+JSON
+  version: 0.1.0
+  signed: true
+  grade: flavored
+  checks:
+    capabilities_is_object: false
+    protocol_version_present: true
+    skills_is_array: true
+    preferred_transport_present: true
+    default_input_modes_present: false
+    default_output_modes_present: false
+  deviations:
+  - no-capabilities
+  - protocolVersion-is-not-a-version ('HTTP+JSON')
+  skills: 7
+  skill_ids:
+  - load_governance
+  - prepare_change
+  - test_governance_change
+  - approval_surface
+  - submit_decision
+  - activate_version
+  - serve_bundle
+  provider_organization: Verified Digital Agents (VDA)
+  note: ACP (Agent Control Plane) — signed (agentCardSignature, did:web:acp.getvda.ai#key-1), REST-only; declares
+    mcp.status planned.
+  mcp:
+    status: planned
+  did: did:web:acp.getvda.ai
+- file: getvda-ai-onboard-agent-card.json
+  primary: false
+  host: onboard.getvda.ai
+  url: https://onboard.getvda.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  name: getvda Onboarding Agent
+  agent_url: https://onboard.getvda.ai
+  protocol_version: null
+  preferred_transport: null
+  version: 0.1.0-skeleton
+  signed: true
+  grade: flavored
+  checks:
+    capabilities_is_object: true
+    protocol_version_present: false
+    skills_is_array: true
+    preferred_transport_present: false
+    default_input_modes_present: true
+    default_output_modes_present: true
+  deviations:
+  - no-protocolVersion
+  skills: 6
+  skill_ids:
+  - admit_agent
+  - request_admission_challenge
+  - revoke_credential
+  - get_admission_status
+  - decide_admission_gate
+  - resume_admission
+  provider_organization: getvda.ai
+  note: Onboarding Agent — signed (signatures[] EdDSA, did:web:onboard.getvda.ai#key-1); version 0.1.0-skeleton,
+    phases 4-6 staged by the card's own phaseStatus.
+  did: did:web:onboard.getvda.ai
+- file: getvda-ai-site-agent-card.json
+  primary: false
+  host: getvda.ai
+  url: https://getvda.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  name: Verified Digital Agents (VDA)
+  agent_url: https://getvda.ai
+  protocol_version: null
+  preferred_transport: HTTP+JSON
+  version: 1.0.0
+  signed: false
+  grade: flavored
+  checks:
+    capabilities_is_object: true
+    protocol_version_present: false
+    skills_is_array: true
+    preferred_transport_present: true
+    default_input_modes_present: true
+    default_output_modes_present: true
+  deviations:
+  - no-protocolVersion
+  - preferredTransport 'HTTP+JSON' with skill-level `endpoint` strings (POST https://getvda.ai/api/...) instead
+    of an A2A JSON-RPC url; the card's own $comment says it is informational, not an A2A endpoint
+  skills: 4
+  skill_ids:
+  - generate-governed-journey
+  - run-governed-simulation
+  - generate-eu-ai-act-evidence
+  - generate-dpia
+  provider_organization: Verified Digital Agents
+  note: The apex 'discovery card' for the suite. Its own $comment says it is informational REST over HTTPS, NOT
+    a signed JSON-RPC A2A endpoint, and cross-links the five signed service cards under relatedServices. The legacy
+    /.well-known/agent.json on this host is a DIFFERENT, older document (saved as getvda-ai-site-legacy-agent-card.json)
+    with no capabilities/skills/version.
+fleet:
+  operator: GOSCE (GitHub Open-Source Combination Engine) — the same operator, publishing under 'VDA / GOSCE'
+  hosts: 98
+  catalog: well-known/getvda-ai-agents-ai-catalog.json (99 entries, 98 distinct hosts, all type application/mcp-server+json,
+    every one priced $0.025 USDC per metered call)
+  index: https://agents.getvda.ai/agents
+  router: https://router.getvda.ai
+  jwks: https://agents.getvda.ai/.well-known/jwks.json
+  registry_view: a2aregistry.org listed 98 of these as separate agents (24% of its 415 entries) under author 'VDA
+    / GOSCE'; this profile treats them as one operator's templated fleet, per the harvest note.
+  note: 'Fleet cards are templated: 7 capability skills named after the composed open-source packages plus a free
+    `selftest` skill; A2A at /a2a/, MCP at /mcp with 2 tools (invoke, selftest); execution metered by x402 v2 (USDC
+    on Base, eip155:8453) or a Stripe card rail.'
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://witness.getvda.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json; charset=utf-8
+  note: 'Verbatim bodies saved alongside this manifest for all eight cards (nine files: the apex host''s legacy
+    agent.json is a distinct document and is saved too). No field inferred. The A2A JSON-RPC endpoints themselves
+    were not invoked; the MCP endpoints on witness, c2md and router were (see mcp/getvda-ai-mcp.yml).'
+  host_probes:
+  - host: getvda.ai
+    agent-card.json: 200
+    agent.json: 200 (different, older body)
+  - host: witness.getvda.ai
+    agent-card.json: 200
+    agent.json: 200 (identical body)
+  - host: c2md.getvda.ai
+    agent-card.json: 200
+    agent.json: 404
+  - host: acp.getvda.ai
+    agent-card.json: 200
+    agent.json: 404
+  - host: onboard.getvda.ai
+    agent-card.json: 200
+    agent.json: 404
+  - host: hitl.getvda.ai
+    agent-card.json: 200
+    agent.json: 401
+  - host: router.getvda.ai
+    agent-card.json: 200
+    agent.json: 200 (identical body)
+  - host: authenticated-llm-agent-cryptography.getvda.ai
+    agent-card.json: 200
+    agent.json: 200 (identical body)
+  - host: agents.getvda.ai
+    agent-card.json: 404
+    agent.json: 404
+  - host: www.getvda.ai
+    agent-card.json: DNS does not resolve
+    agent.json: DNS does not resolve

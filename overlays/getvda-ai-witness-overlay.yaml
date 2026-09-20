@@ -1,0 +1,84 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the VDA Witness API
+  version: 2026-09-19
+  x-generated: '2026-09-19'
+  x-method: generated
+  x-source: openapi/getvda-ai-witness-openapi.json
+  x-note: >-
+    Overlay 1.0.0 document capturing API Evangelist's enhancements to the provider's spec. The original
+    openapi/getvda-ai-witness-openapi.json is verbatim and is never mutated; apply this overlay to obtain the
+    enriched view. Every fact added here is taken from the provider's own docs, llms.txt or agent card.
+extends: getvda-ai-witness-openapi.json
+actions:
+- target: $.info
+  update:
+    contact:
+      name: Verified Digital Agents (VDA)
+      url: https://getvda.ai
+      email: hello@getvda.ai
+    x-documentation: https://witness.getvda.ai/docs
+    x-llms-txt: https://witness.getvda.ai/llms.txt
+    x-agent-card: https://witness.getvda.ai/.well-known/agent-card.json
+    x-did: did:web:witness.getvda.ai
+    x-mcp-endpoint: https://witness.getvda.ai/api/witness/mcp
+    x-api-evangelist-conventions: conventions/getvda-ai-conventions.yml
+    x-api-evangelist-errors: errors/getvda-ai-problem-types.yml
+- target: $.servers[0]
+  update:
+    description: Production. The only server; region europe-west1 per sibling readyz output.
+- target: $.tags
+  update:
+  - {name: Provisioning, description: Self-serve key minting, controller binding and agent-provable renewal}
+  - {name: Sealing, description: Generic and shaped seals, customer-managed custody prepare}
+  - {name: Credentials, description: Admission credential issue / check_valid / revoke}
+  - {name: Verification, description: Public verify, issuer verdicts, chain proofs}
+  - {name: Records, description: Account-scoped reads, usage, anchor status, whoami}
+  - {name: Reporting, description: EU AI Act Article 12 evidence report}
+  - {name: MCP, description: Model Context Protocol endpoint}
+- target: $.paths['/api/witness/test-key'].post
+  update: {tags: [Provisioning], operationId: mintTestKey, x-rate-limit: per-IP, x-idempotent: false}
+- target: $.paths['/api/witness/renew/challenge'].post
+  update: {tags: [Provisioning], operationId: renewChallenge}
+- target: $.paths['/api/witness/renew'].post
+  update: {tags: [Provisioning], operationId: renewKey, x-rate-limit: per-account}
+- target: $.paths['/api/witness/account/bind-controller'].post
+  update: {tags: [Provisioning], operationId: bindController}
+- target: $.paths['/api/witness/seal'].post
+  update: {tags: [Sealing], operationId: seal, x-idempotency: 'body field decisionId, deduped on (account, decisionId), not namespaced by chainKey', x-reversible: 'no — append-only; supersede with a new record'}
+- target: $.paths['/api/witness/seal/hitl-decision'].post
+  update: {tags: [Sealing], operationId: sealHitlDecision}
+- target: $.paths['/api/witness/seal/agent-action'].post
+  update: {tags: [Sealing], operationId: sealAgentAction}
+- target: $.paths['/api/witness/seal/attestation'].post
+  update: {tags: [Sealing], operationId: sealAttestation, x-idempotency: body field decisionId}
+- target: $.paths['/api/witness/prepare'].post
+  update: {tags: [Sealing], operationId: prepareRecord, x-dry-run: 'stateless — nothing is written until the signed record is submitted to submit.endpoint'}
+- target: $.paths['/api/witness/credentials/issue'].post
+  update: {tags: [Credentials], operationId: issueAdmissionCredential, x-reversal: 'POST /api/witness/credentials/{credential_id}/revoke (terminal, issuer only)'}
+- target: $.paths['/api/witness/credentials/{credential_id}'].get
+  update: {tags: [Credentials], operationId: checkCredentialValid, security: [], x-public: true, x-note: 'Always HTTP 200 — branch on code: valid | revoked | expired | not_found | not_credential'}
+- target: $.paths['/api/witness/credentials/{credential_id}/revoke'].post
+  update: {tags: [Credentials], operationId: revokeAdmissionCredential}
+- target: $.paths['/api/witness/keys/revoke'].post
+  update: {tags: [Provisioning], x-reversal-of: mintTestKey / renewKey, x-note: 'Revocation is TOTAL and sealed as a key_revocation event'}
+- target: $.paths['/api/witness/records/{recordId}/issuer'].get
+  update: {tags: [Verification], security: [], x-public: true}
+- target: $.paths['/api/witness/verify'].post
+  update: {tags: [Verification], operationId: verifyRecord, security: [], x-public: true}
+- target: $.paths['/api/witness/records'].get
+  update: {tags: [Records], operationId: listRecords, x-pagination: 'cursor — limit 1-500, cursor, nextCursor'}
+- target: $.paths['/api/witness/records/{recordId}'].get
+  update: {tags: [Records], operationId: getRecord}
+- target: $.paths['/api/witness/chains/{chainKey}/proof'].get
+  update: {tags: [Verification], operationId: getChainProof}
+- target: $.paths['/api/witness/report'].post
+  update: {tags: [Reporting], operationId: generateArticle12Report}
+- target: $.paths['/api/witness/usage'].get
+  update: {tags: [Records], operationId: getUsage, x-note: 'Sealed tier includes 5,000 seals/month — measured, not blocked'}
+- target: $.paths['/api/witness/whoami'].get
+  update: {tags: [Records], operationId: whoami, x-cache: 'Cache-Control: private, max-age=60 on 200; no-store on 401', x-rate-limit: per-IP and per-account}
+- target: $.paths['/api/witness/anchor-status'].get
+  update: {tags: [Records], operationId: getAnchorStatus}
+- target: $.paths['/api/witness/mcp'].post
+  update: {tags: [MCP], operationId: mcp, x-mcp-protocol-version: '2024-11-05', x-mcp-tools: 16}

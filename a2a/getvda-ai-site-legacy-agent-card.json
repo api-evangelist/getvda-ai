@@ -1,0 +1,86 @@
+{
+  "$comment": "Apex discovery card for the Verified Digital Agents (VDA) suite at https://getvda.ai. VDA is a composable set of governance blocks; each service publishes its own (signed) A2A card — see 'services' below. This apex card is served by the marketing site and is intentionally UNSIGNED informational metadata, not a signed A2A/JSON-RPC endpoint. For a signed card, use the individual service cards.",
+  "name": "Verified Digital Agents (VDA)",
+  "description": "Governance for AI agents that you can prove. A composable suite: Witness seals and anchors decisions; C2MD turns compliance standards into governance agents can follow; ACP holds governance in git and reviews, tests and signs changes; Onboarding admits agents and issues verifiable credentials; human-in-the-loop surfaces what exceeds an agent's limits. Git holds the rules, Witness holds the events. Each block is useful alone; stronger composed; start with one.",
+  "url": "https://getvda.ai",
+  "documentationUrl": "https://getvda.ai/llms.txt",
+  "provider": {
+    "organization": "Verified Digital Agents",
+    "url": "https://getvda.ai"
+  },
+  "services": [
+    {
+      "name": "Witness",
+      "status": "live",
+      "role": "Seals decisions to a tamper-evident, hash-chained record; the Anchored tier commits the trail to external transparency logs (Sigstore Rekor + RFC-3161 TSAs).",
+      "surface": "signed A2A card + live MCP server",
+      "card": "https://witness.getvda.ai/.well-known/agent-card.json",
+      "did": "https://witness.getvda.ai/.well-known/did.json",
+      "mcp": "https://witness.getvda.ai/api/witness/mcp",
+      "openapi": "https://witness.getvda.ai/openapi.json"
+    },
+    {
+      "name": "C2MD",
+      "status": "live",
+      "role": "Turns compliance standards into governance agents can follow, and generates audit-ready documentation.",
+      "surface": "signed A2A card + A2A skills (no MCP surface)",
+      "card": "https://c2md.getvda.ai/.well-known/agent-card.json"
+    },
+    {
+      "name": "ACP",
+      "status": "live; federated approval identity staged, not yet live",
+      "role": "Governance lives in git; changes are authored with a Compliance Guard, adversarially tested, and signed before agents get them.",
+      "surface": "signed A2A card + REST (MCP planned, not live)",
+      "card": "https://acp.getvda.ai/.well-known/agent-card.json"
+    },
+    {
+      "name": "Onboarding",
+      "status": "live; deeper evaluation rolling out",
+      "role": "Admits agents into a governed environment and issues verifiable credentials (a credential attests intake + issuance, not a completed multi-phase evaluation).",
+      "surface": "signed A2A card + A2A skills; admission tools exposed over the Witness MCP",
+      "card": "https://onboard.getvda.ai/.well-known/agent-card.json"
+    },
+    {
+      "name": "HITL (Human in the loop)",
+      "status": "live",
+      "role": "Surfaces decisions beyond an agent's limits for a person; the decision is sealed to Witness under customer-managed custody. Domain-blind: an item is a decision, some evidence, and an authority requirement. ACP composes with it — a governance change needing ratification is raised to HITL, resolved by an authorised human, sealed, and ACP's activation gate is fed by that sealed resolution.",
+      "surface": "signed A2A card + MCP/REST (9 skills), authenticated with a Witness Bearer",
+      "card": "https://hitl.getvda.ai/.well-known/agent-card.json"
+    }
+  ],
+  "discovery": {
+    "siteCard": "https://getvda.ai/.well-known/agent-card.json",
+    "llmsTxt": "https://getvda.ai/llms.txt"
+  },
+  "clientLibraries": {
+    "$comment": "Adopt the framework from inside your own stack. These are client libraries, not services — they call the same ACP bundles, Witness account and HITL config a block-adopting user calls.",
+    "python": {
+      "package": "getvda-evaluator",
+      "install": "pip install getvda-evaluator",
+      "registry": "https://pypi.org/project/getvda-evaluator/",
+      "license": "Apache-2.0",
+      "runtimeDependencies": 0,
+      "integrations": [
+        "langchain-deepagents"
+      ],
+      "note": "Includes a LangChain DeepAgents middleware binding wrap_tool_call, so governance gates actions rather than model calls. Fails static."
+    },
+    "javascript": {
+      "packages": [
+        "@getvda/evaluator-sdk",
+        "@getvda/test-suite",
+        "@getvda/governance-schema",
+        "@getvda/bundle",
+        "@getvda/distribution",
+        "@getvda/witness",
+        "@getvda/compliance-guard"
+      ],
+      "registry": "https://www.npmjs.com/org/getvda",
+      "note": "Framework-agnostic. evaluator-sdk is the runtime enforcement artifact; test-suite is governance CI."
+    },
+    "conformance": {
+      "note": "The TypeScript and Python evaluators are held to one shared conformance contract, checked in CI and in ACP's deploy gate. Two implementations that disagree give two answers to whether an action was allowed; the contract prevents that.",
+      "shippedIn": "the getvda-evaluator sdist, so it is auditable without cloning"
+    }
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "$comment": "Discovery card for the Verified Digital Agents (VDA) suite at https://getvda.ai. Describes this site's own public HTTP/JSON skills for agent/crawler discoverability, and cross-links the individual services' signed A2A cards under 'relatedServices'. This card is informational (REST over HTTPS); it is NOT a signed JSON-RPC A2A endpoint. Each service (Witness, C2MD, ACP, Onboarding) publishes its own signed card.",
+  "name": "Verified Digital Agents (VDA)",
+  "description": "Governance for AI agents that you can prove — a composable suite. Witness seals and anchors decisions; C2MD turns compliance standards into governance agents can follow; ACP holds governance in git and reviews, tests and signs changes; Onboarding admits agents and issues verifiable credentials; human-in-the-loop surfaces what exceeds an agent's limits. Git holds the rules, Witness holds the events. Governance lives in plain Markdown, so VDA governs best-of-breed agents from any provider or framework.",
+  "url": "https://getvda.ai",
+  "documentationUrl": "https://getvda.ai/llms.txt",
+  "version": "1.0.0",
+  "preferredTransport": "HTTP+JSON",
+  "provider": {
+    "organization": "Verified Digital Agents",
+    "url": "https://getvda.ai"
+  },
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "stateTransitionHistory": true
+  },
+  "defaultInputModes": [
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "application/json",
+    "text/event-stream"
+  ],
+  "relatedServices": [
+    {
+      "name": "Witness",
+      "card": "https://witness.getvda.ai/.well-known/agent-card.json",
+      "did": "https://witness.getvda.ai/.well-known/did.json",
+      "mcp": "https://witness.getvda.ai/api/witness/mcp",
+      "openapi": "https://witness.getvda.ai/openapi.json"
+    },
+    {
+      "name": "C2MD",
+      "card": "https://c2md.getvda.ai/.well-known/agent-card.json"
+    },
+    {
+      "name": "ACP",
+      "card": "https://acp.getvda.ai/.well-known/agent-card.json"
+    },
+    {
+      "name": "Onboarding",
+      "card": "https://onboard.getvda.ai/.well-known/agent-card.json"
+    },
+    {
+      "name": "HITL",
+      "card": "https://hitl.getvda.ai/.well-known/agent-card.json",
+      "did": "https://hitl.getvda.ai/.well-known/did.json"
+    }
+  ],
+  "skills": [
+    {
+      "id": "generate-governed-journey",
+      "name": "Generate a governed journey",
+      "description": "Generate a 4-stage governed agent journey plus its C2MD governance files (AGENTS, SOP, SKILL, EXCEPTION) for a given industry.",
+      "tags": [
+        "governance",
+        "c2md",
+        "ai-agents",
+        "compliance"
+      ],
+      "endpoint": "POST https://getvda.ai/api/agents/journey/generate"
+    },
+    {
+      "id": "run-governed-simulation",
+      "name": "Run a governed simulation",
+      "description": "Run the generated agents against synthetic stage data with real §2.1 preflight and governed evaluation; streams each decision (PASS / ESCALATE / exception / SYSTEM_ERROR) sealed to the Witness audit trail.",
+      "tags": [
+        "enforcement",
+        "audit",
+        "witness",
+        "streaming"
+      ],
+      "endpoint": "POST https://getvda.ai/api/agents/scenario/run-sim"
+    },
+    {
+      "id": "generate-eu-ai-act-evidence",
+      "name": "Generate EU AI Act conformance evidence",
+      "description": "Produce an audit-ready EU AI Act conformance report from the run, with deterministic Annex III risk classification. Draft for compliance-officer sign-off (DEMO DATA / DRAFT / ATTESTED lifecycle).",
+      "tags": [
+        "eu-ai-act",
+        "compliance",
+        "evidence",
+        "risk-classification"
+      ],
+      "endpoint": "POST https://getvda.ai/api/evidence/eu-ai-act"
+    },
+    {
+      "id": "generate-dpia",
+      "name": "Generate a sample DPIA",
+      "description": "Produce a sample GDPR Article 35 Data Protection Impact Assessment from the journey governance and Witness trail. Draft for compliance-officer sign-off.",
+      "tags": [
+        "gdpr",
+        "dpia",
+        "privacy",
+        "evidence"
+      ],
+      "endpoint": "POST https://getvda.ai/api/evidence/dpia"
+    }
+  ],
+  "clientLibraries": {
+    "$comment": "Adopt the framework from inside your own stack. These are client libraries, not services — they call the same ACP bundles, Witness account and HITL config a block-adopting user calls.",
+    "python": {
+      "package": "getvda-evaluator",
+      "install": "pip install getvda-evaluator",
+      "registry": "https://pypi.org/project/getvda-evaluator/",
+      "license": "Apache-2.0",
+      "runtimeDependencies": 0,
+      "integrations": [
+        "langchain-deepagents"
+      ],
+      "note": "Includes a LangChain DeepAgents middleware binding wrap_tool_call, so governance gates actions rather than model calls. Fails static."
+    },
+    "javascript": {
+      "packages": [
+        "@getvda/evaluator-sdk",
+        "@getvda/test-suite",
+        "@getvda/governance-schema",
+        "@getvda/bundle",
+        "@getvda/distribution",
+        "@getvda/witness",
+        "@getvda/compliance-guard"
+      ],
+      "registry": "https://www.npmjs.com/org/getvda",
+      "note": "Framework-agnostic. evaluator-sdk is the runtime enforcement artifact; test-suite is governance CI."
+    },
+    "conformance": {
+      "note": "The TypeScript and Python evaluators are held to one shared conformance contract, checked in CI and in ACP's deploy gate. Two implementations that disagree give two answers to whether an action was allowed; the contract prevents that.",
+      "shippedIn": "the getvda-evaluator sdist, so it is auditable without cloning"
+    }
+  }
+}
