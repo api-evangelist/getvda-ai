@@ -36,6 +36,18 @@ tags:
 - MCP
 - x402
 - EU AI Act
+- Human-in-the-Loop
+tags_raw:
+- Company
+- AI Agents
+- AI Governance
+- Compliance
+- Audit Trail
+- Agent Identity
+- A2A
+- MCP
+- x402
+- EU AI Act
 - Human In The Loop
 apis:
 - name: VDA Witness API
@@ -98,6 +110,10 @@ apis:
   humanURL: https://getvda.ai/blocks/hitl.html
   baseURL: https://hitl.getvda.ai
   tags:
+  - Human-in-the-Loop
+  - Escalation
+  - AI Governance
+  tags_raw:
   - Human In The Loop
   - Escalation
   - AI Governance
