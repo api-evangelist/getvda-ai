@@ -1,0 +1,122 @@
+openapi: 3.2.0
+info:
+  title: HITL — human decisions on agent actions Genesis API
+  version: 0.1.0
+  description: The getvda.ai substrate that owns human decisions on agent actions. External callers (ACP, onboard-agent) register an authority config, then raise → resolve → sealed hitl_decision. Discovery is public; tool calls require Contract A (a Witness Bearer). A NEW caller is created only by controller-signed genesis; register_authority_config updates an existing caller. See docs/EXTERNAL-CALLERS.md.
+  x-git-sha: d347a708f292368e6656381ca9e2ed983260657b
+servers:
+- url: https://hitl.getvda.ai
+security:
+- bearerAuth: []
+tags:
+- name: Genesis
+paths:
+  /v1/genesis/authority-config:
+    post:
+      operationId: genesis_authority_config
+      summary: Genesis — create a caller + its first authority config
+      description: Creates a NEW caller and installs its first authority config in one step. Authenticated by the HITL CONTROLLER signature in the body (genesis_proof), NOT a Bearer — a HITL-controller operator action. Sealed as an attestation. Once per caller. Returns { caller_id, config_id, seal_record_id }. External callers do this once; thereafter they update via register_authority_config (Contract A). See docs/EXTERNAL-CALLERS.md.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - caller
+              - config
+              - genesis_proof
+              properties:
+                caller:
+                  type: object
+                  required:
+                  - witness_account_id
+                  - agent_id
+                  - display_name
+                  properties:
+                    witness_account_id:
+                      type: string
+                    agent_id:
+                      type: string
+                    display_name:
+                      type: string
+                config:
+                  $ref: '#/components/schemas/AuthorityConfigBody'
+                genesis_proof:
+                  type: object
+                  required:
+                  - algorithm
+                  - key_id
+                  - signature
+                  - created
+                  properties:
+                    algorithm:
+                      const: Ed25519
+                    key_id:
+                      type: string
+                    signature:
+                      type: string
+                      description: base64url Ed25519 over canonical {caller,config,purpose:"vda.hitl.genesis/1"}
+                    created:
+                      type: string
+                      format: date-time
+                git_commit:
+                  type: string
+                  description: Optional §8 provenance — sealed into the claim + stored on the config row.
+      responses:
+        '200':
+          description: genesised
+        '403':
+          description: invalid_signature
+        '409':
+          description: already_genesised
+        '503':
+          description: genesis_unavailable (controller key not configured)
+      tags:
+      - Genesis
+components:
+  schemas:
+    AuthorityConfigBody:
+      type: object
+      description: The routing config projected into HITL (genesis or register_authority_config).
+      required:
+      - bands
+      - label_to_band
+      - roster
+      - permitted_decision_classes
+      - max_raises_per_hour
+      - max_open_items
+      properties:
+        bands:
+          type: array
+          items:
+            type: string
+          description: Ordered ladder, narrowest→widest. Order IS the escalation path.
+        label_to_band:
+          type: object
+          additionalProperties:
+            type: string
+          description: escalation_label → band. Every band must exist in the ladder.
+        roster:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: 'band → [actor ids]. Bands NEST: a wider-band actor may decide narrower items.'
+        permitted_decision_classes:
+          type: array
+          items:
+            type: string
+        max_raises_per_hour:
+          type: integer
+          minimum: 1
+        max_open_items:
+          type: integer
+          minimum: 1
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Contract A: a Witness Bearer (wtn.<keyId>.<secret>) validated by HITL via Witness GET /whoami. Authorization header only. This authenticates the CALLING account; the human decider on a resolution is asserted separately and never authenticated by HITL.'

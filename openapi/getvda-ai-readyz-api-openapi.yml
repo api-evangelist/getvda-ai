@@ -1,0 +1,38 @@
+openapi: 3.2.0
+info:
+  title: Getvda Ai Readyz API
+  version: 0.1.0
+  x-refined-note:
+  - x-git-sha differs across the merged source definitions and was not carried
+  description: 'Operations tagged Readyz across 2 of this provider''s published API definitions: getvda-ai-acp-openapi.json, getvda-ai-hitl-openapi.json. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://acp.getvda.ai
+- url: https://hitl.getvda.ai
+tags:
+- name: Readyz
+paths:
+  /readyz:
+    get:
+      summary: Readiness + capability status
+      responses:
+        '200':
+          description: ready
+      tags:
+      - Readyz
+      operationId: getReadyz
+      x-operation-id-source: derived
+    servers:
+    - url: https://acp.getvda.ai
+components:
+  securitySchemes:
+    witness_bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: wtn.<keyId>.<secret>
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Contract A: a Witness Bearer (wtn.<keyId>.<secret>) validated by HITL via Witness GET /whoami. Authorization header only. This authenticates the CALLING account; the human decider on a resolution is asserted separately and never authenticated by HITL.'
+x-refined-from:
+- getvda-ai-acp-openapi.json
+- getvda-ai-hitl-openapi.json

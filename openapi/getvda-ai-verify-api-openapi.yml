@@ -1,0 +1,27 @@
+openapi: 3.2.0
+info:
+  title: router Verify API
+  version: 0.1.0
+tags:
+- name: Verify
+paths:
+  /verify:
+    get:
+      summary: Verify
+      description: 'FREE: how to verify this agent''s Agent Card was issued by getvda.ai.
+
+
+        The card at /.well-known/agent.json carries a detached JWS in its `proof`. The
+
+        signed bytes are the card with `proof` removed, serialised with sorted keys and no
+
+        whitespace — reproduce that exactly or the digest will differ.'
+      operationId: verify_verify_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - Verify

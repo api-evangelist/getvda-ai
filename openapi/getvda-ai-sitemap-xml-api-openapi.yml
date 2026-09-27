@@ -1,0 +1,19 @@
+openapi: 3.2.0
+info:
+  title: GOSCE Portfolio Sitemap.xml API
+  version: 0.1.0
+tags:
+- name: Sitemap.xml
+paths:
+  /sitemap.xml:
+    get:
+      summary: Sitemap
+      operationId: sitemap_sitemap_xml_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - Sitemap.xml

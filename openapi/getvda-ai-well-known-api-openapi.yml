@@ -1,0 +1,119 @@
+openapi: 3.2.0
+info:
+  title: Getvda Ai .well Known API
+  x-refined-note:
+  - x-git-sha differs across the merged source definitions and was not carried
+  version: '1.0'
+  description: 'Operations tagged .well Known across 5 of this provider''s published API definitions: getvda-ai-acp-openapi.json, getvda-ai-c2md-edge-openapi.json, getvda-ai-gosce-portfolio-openapi.json, getvda-ai-gosce-router-openapi.json, getvda-ai-hitl-openapi.json. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://acp.getvda.ai
+- url: https://hitl.getvda.ai
+tags:
+- name: .well Known
+paths:
+  /.well-known/agent-card.json:
+    get:
+      summary: A2A agent card
+      responses:
+        '200':
+          description: card
+      tags:
+      - .well Known
+      operationId: getWellKnownAgentCardJson
+      x-operation-id-source: derived
+    servers:
+    - url: https://acp.getvda.ai
+  /.well-known/did.json:
+    get:
+      summary: DID document
+      responses:
+        '200':
+          description: did
+        '404':
+          description: not provisioned
+      tags:
+      - .well Known
+      operationId: getWellKnownDidJson
+      x-operation-id-source: derived
+    servers:
+    - url: https://acp.getvda.ai
+  /.well-known/agent-card-public-key.pem:
+    get:
+      summary: Agent Card Public Key
+      operationId: agent_card_public_key__well_known_agent_card_public_key_pem_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+  /.well-known/jwks.json:
+    get:
+      summary: Jwks
+      description: 'Public keys for verifying GOSCE Agent Cards (RFC 7517).
+
+
+        Served from a STATIC file rather than derived from the private key: this service
+
+        must never have access to the signing key. `scripts/publish_jwks.py` regenerates
+
+        the file in the factory, where the key lives.'
+      operationId: jwks__well_known_jwks_json_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+  /.well-known/ai-catalog.json:
+    get:
+      summary: Ard Catalog
+      description: 'Agentic Resource Discovery manifest (ARD v1.0).
+
+
+        One file that puts the whole portfolio in front of GitHub Copilot''s Agent Finder,
+
+        Hugging Face''s Discover Tool and Google''s Agent Registry. CORS is open because
+
+        registries fetch it cross-origin, and it is entirely public information.'
+      operationId: ard_catalog__well_known_ai_catalog_json_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+  /.well-known/agent.json:
+    get:
+      summary: Agent Card
+      operationId: agent_card__well_known_agent_json_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+components:
+  securitySchemes:
+    witness_bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: wtn.<keyId>.<secret>
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Contract A: a Witness Bearer (wtn.<keyId>.<secret>) validated by HITL via Witness GET /whoami. Authorization header only. This authenticates the CALLING account; the human decider on a resolution is asserted separately and never authenticated by HITL.'
+x-refined-from:
+- getvda-ai-acp-openapi.json
+- getvda-ai-c2md-edge-openapi.json
+- getvda-ai-gosce-portfolio-openapi.json
+- getvda-ai-gosce-router-openapi.json
+- getvda-ai-hitl-openapi.json

@@ -1,0 +1,35 @@
+openapi: 3.2.0
+info:
+  title: router Copilot Studio.yaml API
+  version: 0.1.0
+tags:
+- name: Copilot Studio.yaml
+paths:
+  /copilot-studio.yaml:
+    get:
+      summary: Copilot Studio Connector
+      description: 'A ready-to-import Power Apps custom connector for Microsoft Copilot Studio.
+
+
+        Copilot Studio''s second onboarding path takes an OpenAPI file, so serving one turns
+
+        "follow five wizard steps" into "import this URL". `x-ms-agentic-protocol:
+
+        mcp-streamable-1.0` is what marks the operation as MCP streamable — the only
+
+        transport Copilot Studio still supports (SSE was dropped after August 2025).
+
+
+        No authentication is declared because none is required: discovery and `selftest` are
+
+        free, so a maker can import this and verify the agent before any payment exists.'
+      operationId: copilot_studio_connector_copilot_studio_yaml_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+      tags:
+      - Copilot Studio.yaml

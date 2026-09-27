@@ -1,0 +1,83 @@
+openapi: 3.2.0
+info:
+  title: GOSCE Portfolio API
+  version: 0.1.0
+tags:
+- name: GOSCE Portfolio
+paths:
+  /:
+    get:
+      summary: Index
+      operationId: index__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/html:
+              schema:
+                type: string
+      tags:
+      - GOSCE Portfolio
+  /{fname}.txt:
+    get:
+      summary: Text File
+      operationId: text_file__fname__txt_get
+      parameters:
+      - name: fname
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Fname
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      tags:
+      - GOSCE Portfolio
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError

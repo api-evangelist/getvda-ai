@@ -1,0 +1,42 @@
+openapi: 3.2.0
+info:
+  title: router Selftest API
+  version: 0.1.0
+tags:
+- name: Selftest
+paths:
+  /selftest:
+    get:
+      summary: Selftest
+      description: 'FREE capability proof: runs the real executor on a canned input. Cached ~45s
+
+        (so it can''t be abused as a free LLM endpoint) and never paywalled — this is how
+
+        the Portfolio Router verifies the agent and captures a real example output.'
+      operationId: selftest_selftest_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - Selftest
+    post:
+      summary: Selftest
+      description: 'FREE capability proof: runs the real executor on a canned input. Cached ~45s
+
+        (so it can''t be abused as a free LLM endpoint) and never paywalled — this is how
+
+        the Portfolio Router verifies the agent and captures a real example output.'
+      operationId: postSelftest
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - Selftest
+      x-operation-id-source: normalized
+      x-operation-id-original: selftest_selftest_get

@@ -1,0 +1,33 @@
+openapi: 3.2.0
+info:
+  title: GOSCE Portfolio Agents API
+  version: 0.1.0
+tags:
+- name: Agents
+paths:
+  /agents/:
+    get:
+      summary: Index
+      operationId: index_agents__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/html:
+              schema:
+                type: string
+      tags:
+      - Agents
+  /agents:
+    get:
+      summary: Index
+      operationId: index_agents_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/html:
+              schema:
+                type: string
+      tags:
+      - Agents

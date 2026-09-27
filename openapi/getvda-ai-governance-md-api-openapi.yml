@@ -1,0 +1,19 @@
+openapi: 3.2.0
+info:
+  title: router Governance.md API
+  version: 0.1.0
+tags:
+- name: Governance.md
+paths:
+  /governance.md:
+    get:
+      summary: Governance
+      operationId: governance_governance_md_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - Governance.md

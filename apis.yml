@@ -11,6 +11,22 @@ description: >-
   Witness/C2MD/HITL run remote MCP servers, and Witness/HITL/ACP publish OpenAPI 3.1. The same operator runs
   GOSCE, a 98-server fleet of templated, x402-metered MCP/A2A agents under *.getvda.ai — the "VDA / GOSCE"
   author that a2aregistry.org counted as 98 agents.
+deliveryModel:
+  model: saas
+  license_evidence:
+    not_product:
+    - mikerawsonnz/gosce-agents
+  open_source: unknown
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: low
+  source:
+  - openapi
+  - pricing
+  - repository-not-product
+  generated: '2026-09-25'
+  method: derived
 image: https://getvda.ai/favicon.svg
 url: https://raw.githubusercontent.com/api-evangelist/getvda-ai/refs/heads/main/apis.yml
 x-type: company
@@ -50,203 +66,12 @@ tags_raw:
 - EU AI Act
 - Human In The Loop
 apis:
-- name: VDA Witness API
-  description: >-
-    Seal governed AI-agent decisions into tamper-evident, Ed25519-signed, independently-verifiable records and verify
-    them offline; issue, check and revoke agent admission credentials; self-serve key minting and agent-provable
-    renewal; EU AI Act Article 12 evidence reports. 23 operations; verify and check_valid are public, sealing needs a
-    key the API mints in-band. Also exposed as a 16-tool remote MCP server.
-  image: https://getvda.ai/favicon.svg
-  humanURL: https://witness.getvda.ai/docs
-  baseURL: https://witness.getvda.ai
-  tags:
-  - Audit Trail
-  - Evidence
-  - Credentials
-  - AI Governance
-  properties:
-  - type: OpenAPI
-    url: openapi/getvda-ai-witness-openapi.json
-  - type: OpenAPI
-    name: Provider-hosted OpenAPI 3.1
-    url: https://witness.getvda.ai/openapi.json
-  - type: Documentation
-    url: https://witness.getvda.ai/docs
-  - type: LLMsTxt
-    url: llms/getvda-ai-witness-llms.txt
-  - type: LLMsTxt
-    name: Provider-hosted llms.txt
-    url: https://witness.getvda.ai/llms.txt
-  - type: MCPServer
-    url: mcp/getvda-ai-mcp.yml
-  - type: MCPServer
-    name: Witness MCP endpoint (Streamable HTTP)
-    url: https://witness.getvda.ai/api/witness/mcp
-  - type: ToolCrosswalk
-    url: mcp/getvda-ai-tool-crosswalk.yml
-  - type: Overlay
-    url: overlays/getvda-ai-witness-overlay.yaml
-  - type: DataModel
-    url: data-model/getvda-ai-data-model.yml
-  - type: Sandbox
-    url: sandbox/getvda-ai-sandbox.yml
-  - type: AgentSkill
-    url: skills/getvda-ai-seal-and-verify-agent-action.md
-  - type: AgentSkill
-    url: skills/getvda-ai-issue-check-revoke-admission-credential.md
-  - type: X-DID
-    name: did:web:witness.getvda.ai
-    url: well-known/getvda-ai-witness-did.json
-  - type: X-ProofOfIntegrity
-    name: Published anchored record (Rekor + TSA)
-    url: https://witness.getvda.ai/proof
-- name: VDA HITL API
-  description: >-
-    Human decisions on agent actions: register an authority config, raise an escalated decision, read it, record the
-    human resolution (sealed to Witness under customer-managed custody), manage baselines and read quota. 17
-    operations; discovery public, every tool call requires a Witness bearer (Contract A). The 9 tools are mirrored on
-    an auth-gated remote MCP endpoint.
-  image: https://getvda.ai/favicon.svg
-  humanURL: https://getvda.ai/blocks/hitl.html
-  baseURL: https://hitl.getvda.ai
-  tags:
-  - Human-in-the-Loop
-  - Escalation
-  - AI Governance
-  tags_raw:
-  - Human In The Loop
-  - Escalation
-  - AI Governance
-  properties:
-  - type: OpenAPI
-    url: openapi/getvda-ai-hitl-openapi.json
-  - type: OpenAPI
-    name: Provider-hosted OpenAPI 3.1
-    url: https://hitl.getvda.ai/openapi.json
-  - type: Documentation
-    url: https://getvda.ai/blocks/hitl.html
-  - type: MCPServer
-    name: HITL MCP endpoint (Streamable HTTP, bearer required)
-    url: https://hitl.getvda.ai/mcp
-  - type: AgentSkill
-    url: skills/getvda-ai-raise-and-resolve-hitl-decision.md
-  - type: X-DID
-    name: did:web:hitl.getvda.ai
-    url: well-known/getvda-ai-hitl-did.json
-- name: VDA ACP API
-  description: >-
-    Agent Control Plane — the governance-aware wrapper on git: load a governance set at a ref, prepare and
-    Compliance-Guard a change, run the governance CI suite, surface it for a non-engineer approver, record the
-    decision (sealed hitl_decision, merges on approve), build/sign/activate a governance bundle sealed to Witness, and
-    serve signed bundles publicly. 12 operations; MCP surface declared planned.
-  image: https://getvda.ai/favicon.svg
-  humanURL: https://getvda.ai/blocks/acp.html
-  baseURL: https://acp.getvda.ai
-  tags:
-  - Governance As Code
-  - Git
-  - AI Governance
-  properties:
-  - type: OpenAPI
-    url: openapi/getvda-ai-acp-openapi.json
-  - type: OpenAPI
-    name: Provider-hosted OpenAPI 3.1
-    url: https://acp.getvda.ai/openapi.json
-  - type: Documentation
-    url: https://getvda.ai/blocks/acp.html
-  - type: AgentSkill
-    url: skills/getvda-ai-govern-change-with-acp.md
-  - type: X-DID
-    name: did:web:acp.getvda.ai
-    url: well-known/getvda-ai-acp-did.json
-- name: C2MD Compliance Agent
-  description: >-
-    A2A (JSON-RPC at /a2a) and MCP (/mcp) agent that generates EU AI Act, GDPR, NIST SP 800-53 and ISO 42001
-    governance Markdown (AGENTS.md, SOP.md, SKILL.md, EXCEPTION.md), risk assessments, DPIA/FRIA scaffolds and
-    article-by-article evidence reports. 8 A2A skills, 11 MCP tools; assess and discovery free and keyless, generative
-    tiers via Witness account tier or Google/Microsoft OAuth scopes. The OpenAPI on this host is the FastAPI edge
-    proxy shell (9 routes), not the skill contract — the card is.
-  image: https://getvda.ai/favicon.svg
-  humanURL: https://getvda.ai/c2md/generate-compliance-bundle.html
-  baseURL: https://c2md.getvda.ai
-  tags:
-  - Compliance
-  - EU AI Act
-  - GDPR
-  - AI Governance
-  properties:
-  - type: OpenAPI
-    url: openapi/getvda-ai-c2md-edge-openapi.json
-  - type: OpenAPI
-    name: Provider-hosted OpenAPI 3.1 (edge proxy)
-    url: https://c2md.getvda.ai/openapi.json
-  - type: Documentation
-    url: https://getvda.ai/c2md/generate-compliance-bundle.html
-  - type: APIReference
-    name: Swagger UI (edge proxy)
-    url: https://c2md.getvda.ai/docs
-  - type: LLMsTxt
-    url: llms/getvda-ai-c2md-llms.txt
-  - type: LLMsTxt
-    name: Provider-hosted llms.txt
-    url: https://c2md.getvda.ai/llms.txt
-  - type: MCPServer
-    name: C2MD MCP endpoint (Streamable HTTP)
-    url: https://c2md.getvda.ai/mcp
-  - type: OAuthScopes
-    url: scopes/getvda-ai-scopes.yml
-- name: GOSCE Agent Portfolio and Router
-  description: >-
-    The GOSCE (GitHub Open-Source Combination Engine) fleet: 98 templated remote MCP + A2A agents at
-    <agent>.getvda.ai, each with two tools (invoke, selftest), an Ed25519-signed agent card verifiable against the
-    agents.getvda.ai JWKS, and x402 v2 pay-per-call metering ($0.025 USDC on Base or Stripe card; discovery and
-    selftest free). Indexed at agents.getvda.ai (portfolio API, did.json, jwks.json, a 99-entry ai-catalog.json) and
-    fronted by router.getvda.ai, the single entry point that routes by capability.
-  image: https://getvda.ai/favicon.svg
-  humanURL: https://agents.getvda.ai/agents
-  baseURL: https://router.getvda.ai
-  tags:
-  - AI Agents
-  - MCP
-  - A2A
-  - x402
-  - Micropayments
-  properties:
-  - type: OpenAPI
-    url: openapi/getvda-ai-gosce-router-openapi.json
-  - type: OpenAPI
-    name: Provider-hosted router OpenAPI 3.1
-    url: https://router.getvda.ai/openapi.json
-  - type: OpenAPI
-    name: GOSCE portfolio host OpenAPI 3.1 (agents.getvda.ai)
-    url: openapi/getvda-ai-gosce-portfolio-openapi.json
-  - type: Documentation
-    url: https://agents.getvda.ai/agents
-  - type: LLMsTxt
-    url: llms/getvda-ai-gosce-llms.txt
-  - type: LLMsTxt
-    name: Router llms.txt
-    url: llms/getvda-ai-gosce-router-llms.txt
-  - type: MCPServer
-    name: GOSCE router MCP endpoint (Streamable HTTP)
-    url: https://router.getvda.ai/mcp
-  - type: X-AgentCatalog
-    name: agents.getvda.ai ai-catalog.json (99 metered MCP servers)
-    url: well-known/getvda-ai-agents-ai-catalog.json
-  - type: X-JWKS
-    name: agents.getvda.ai card-signing keys
-    url: well-known/getvda-ai-agents-jwks.json
-  - type: X-DID
-    name: did:web:agents.getvda.ai
-    url: well-known/getvda-ai-agents-did.json
-  - type: SourceCode
-    url: https://github.com/mikerawsonnz/gosce-agents
 - name: VDA Onboarding Agent
   description: >-
-    Admission authority for the suite — an A2A agent (6 skills) that runs holder-binding (DID-auth), intake and gap
-    analysis for a candidate agent and issues a Witness-sealed admission credential against did:web:onboard.getvda.ai.
-    Card version 0.1.0-skeleton; phases 4-6 staged. No OpenAPI or MCP of its own (admission tools are exposed over
-    the Witness MCP).
+    Admission authority for the suite — an A2A agent (6 skills) that runs holder-binding (DID-auth), intake
+    and gap analysis for a candidate agent and issues a Witness-sealed admission credential against did:web:onboard.getvda.ai.
+    Card version 0.1.0-skeleton; phases 4-6 staged. No OpenAPI or MCP of its own (admission tools are
+    exposed over the Witness MCP).
   image: https://getvda.ai/favicon.svg
   humanURL: https://getvda.ai/blocks/onboarding.html
   baseURL: https://onboard.getvda.ai
@@ -260,12 +85,1541 @@ apis:
   - type: X-DID
     name: did:web:onboard.getvda.ai
     url: well-known/getvda-ai-onboard-did.json
+- aid: getvda-ai:getvda-ai-agents-api
+  name: Verified Digital Agents (VDA) Agents API
+  description: The Agents API from Verified Digital Agents (VDA) — 2 operation(s) for agents.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Agents
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-agents-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-bundles-api
+  name: Verified Digital Agents (VDA) Bundles API
+  description: The Bundles API from Verified Digital Agents (VDA) — 2 operation(s) for bundles.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Bundles
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-bundles-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-c2md-edge-api
+  name: Verified Digital Agents (VDA) C2MD Edge API
+  description: The C2MD Edge API from Verified Digital Agents (VDA) — 1 operation(s) for c2md edge.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - C2MD Edge
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-c2md-edge-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-copilot-studio-yaml-api
+  name: Verified Digital Agents (VDA) Copilot Studio.yaml API
+  description: >-
+    The Copilot Studio.yaml API from Verified Digital Agents (VDA) — 1 operation(s) for copilot studio.yaml.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Copilot Studio.yaml
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-copilot-studio-yaml-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-environments-api
+  name: Verified Digital Agents (VDA) Environments API
+  description: >-
+    The Environments API from Verified Digital Agents (VDA) — 6 operation(s) for environments.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Environments
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-environments-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-genesis-api
+  name: Verified Digital Agents (VDA) Genesis API
+  description: The Genesis API from Verified Digital Agents (VDA) — 1 operation(s) for genesis.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Genesis
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-genesis-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-gosce-portfolio-api
+  name: Verified Digital Agents (VDA) GOSCE Portfolio API
+  description: >-
+    The GOSCE Portfolio API from Verified Digital Agents (VDA) — 2 operation(s) for gosce portfolio.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - GOSCE Portfolio
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-gosce-portfolio-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-governance-md-api
+  name: Verified Digital Agents (VDA) Governance.md API
+  description: >-
+    The Governance.md API from Verified Digital Agents (VDA) — 1 operation(s) for governance.md.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Governance.md
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-governance-md-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-health-api
+  name: Verified Digital Agents (VDA) Health API
+  description: The Health API from Verified Digital Agents (VDA) — 1 operation(s) for health.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Health
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-health-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-healthz-api
+  name: Verified Digital Agents (VDA) Healthz API
+  description: The Healthz API from Verified Digital Agents (VDA) — 1 operation(s) for healthz.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Healthz
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-healthz-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-livez-api
+  name: Verified Digital Agents (VDA) Livez API
+  description: The Livez API from Verified Digital Agents (VDA) — 1 operation(s) for livez.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Livez
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-livez-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-llms-txt-api
+  name: Verified Digital Agents (VDA) Llms.txt API
+  description: The Llms.txt API from Verified Digital Agents (VDA) — 1 operation(s) for llms.txt.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Llms.txt
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-llms-txt-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-mcp-api
+  name: Verified Digital Agents (VDA) MCP API
+  description: The Mcp API from Verified Digital Agents (VDA) — 1 operation(s) for mcp.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Mcp
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-mcp-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-mcp-free-api
+  name: Verified Digital Agents (VDA) Mcp Free API
+  description: The Mcp Free API from Verified Digital Agents (VDA) — 1 operation(s) for mcp free.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Mcp Free
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-mcp-free-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-mcp-metered-api
+  name: Verified Digital Agents (VDA) Mcp Metered API
+  description: The Mcp Metered API from Verified Digital Agents (VDA) — 1 operation(s) for mcp metered.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Mcp Metered
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-mcp-metered-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-openapi-json-api
+  name: Verified Digital Agents (VDA) Openapi.json API
+  description: >-
+    The Openapi.json API from Verified Digital Agents (VDA) — 1 operation(s) for openapi.json.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Openapi.json
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-openapi-json-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-readyz-api
+  name: Verified Digital Agents (VDA) Readyz API
+  description: The Readyz API from Verified Digital Agents (VDA) — 1 operation(s) for readyz.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Readyz
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-readyz-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-robots-txt-api
+  name: Verified Digital Agents (VDA) Robots.txt API
+  description: The Robots.txt API from Verified Digital Agents (VDA) — 1 operation(s) for robots.txt.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Robots.txt
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-robots-txt-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-router-api
+  name: Verified Digital Agents (VDA) Router API
+  description: The Router API from Verified Digital Agents (VDA) — 1 operation(s) for router.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Router
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-router-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-selftest-api
+  name: Verified Digital Agents (VDA) Selftest API
+  description: The Selftest API from Verified Digital Agents (VDA) — 1 operation(s) for selftest.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Selftest
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-selftest-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-sitemap-xml-api
+  name: Verified Digital Agents (VDA) Sitemap.xml API
+  description: The Sitemap.xml API from Verified Digital Agents (VDA) — 1 operation(s) for sitemap.xml.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Sitemap.xml
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-sitemap-xml-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-solutions-api
+  name: Verified Digital Agents (VDA) Solutions API
+  description: The Solutions API from Verified Digital Agents (VDA) — 3 operation(s) for solutions.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Solutions
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-solutions-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-tools-api
+  name: Verified Digital Agents (VDA) Tools API
+  description: The Tools API from Verified Digital Agents (VDA) — 10 operation(s) for tools.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Tools
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-tools-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-verify-api
+  name: Verified Digital Agents (VDA) Verify API
+  description: The Verify API from Verified Digital Agents (VDA) — 1 operation(s) for verify.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Verify
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-verify-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-well-known-api
+  name: Verified Digital Agents (VDA) .well Known API
+  description: The .well Known API from Verified Digital Agents (VDA) — 6 operation(s) for .well known.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - .well Known
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-well-known-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
+- aid: getvda-ai:getvda-ai-witness-api
+  name: Verified Digital Agents (VDA) Witness API
+  description: The Witness API from Verified Digital Agents (VDA) — 23 operation(s) for witness.
+  humanURL: https://witness.getvda.ai/docs
+  baseURL: https://witness.getvda.ai
+  tags:
+  - Witness
+  properties:
+  - type: OpenAPI
+    url: openapi/getvda-ai-witness-api-openapi.yml
+  - type: Documentation
+    url: https://witness.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-witness-llms.txt
+  - type: LLMsTxt
+    url: https://witness.getvda.ai/llms.txt
+  - type: ToolCrosswalk
+    url: mcp/getvda-ai-tool-crosswalk.yml
+  - type: DataModel
+    url: data-model/getvda-ai-data-model.yml
+  - type: Sandbox
+    url: sandbox/getvda-ai-sandbox.yml
+  - type: X-DID
+    url: well-known/getvda-ai-witness-did.json
+  - type: X-ProofOfIntegrity
+    url: https://witness.getvda.ai/proof
+  - type: Documentation
+    url: https://getvda.ai/blocks/hitl.html
+  - type: X-DID
+    url: well-known/getvda-ai-hitl-did.json
+  - type: Documentation
+    url: https://getvda.ai/blocks/acp.html
+  - type: X-DID
+    url: well-known/getvda-ai-acp-did.json
+  - type: Documentation
+    url: https://getvda.ai/c2md/generate-compliance-bundle.html
+  - type: APIReference
+    url: https://c2md.getvda.ai/docs
+  - type: LLMsTxt
+    url: llms/getvda-ai-c2md-llms.txt
+  - type: LLMsTxt
+    url: https://c2md.getvda.ai/llms.txt
+  - type: OAuthScopes
+    url: scopes/getvda-ai-scopes.yml
+  - type: Documentation
+    url: https://agents.getvda.ai/agents
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-llms.txt
+  - type: LLMsTxt
+    url: llms/getvda-ai-gosce-router-llms.txt
+  - type: X-AgentCatalog
+    url: well-known/getvda-ai-agents-ai-catalog.json
+  - type: X-JWKS
+    url: well-known/getvda-ai-agents-jwks.json
+  - type: X-DID
+    url: well-known/getvda-ai-agents-did.json
+  - type: SourceCode
+    url: https://github.com/mikerawsonnz/gosce-agents
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: MCPServer
+  url: https://witness.getvda.ai/api/witness/mcp
+- type: AgentSkill
+  url: skills/getvda-ai-seal-and-verify-agent-action.md
+- type: AgentSkill
+  url: skills/getvda-ai-issue-check-revoke-admission-credential.md
+- type: MCPServer
+  url: https://hitl.getvda.ai/mcp
+- type: AgentSkill
+  url: skills/getvda-ai-raise-and-resolve-hitl-decision.md
+- type: AgentSkill
+  url: skills/getvda-ai-govern-change-with-acp.md
+- type: MCPServer
+  url: https://c2md.getvda.ai/mcp
+- type: MCPServer
+  url: https://router.getvda.ai/mcp
 - type: Website
   url: https://getvda.ai/
 - type: Documentation
@@ -343,3 +1697,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 57
   pass: local-v3
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://witness.getvda.ai/.well-known/agent-card.json"
+  grade: "conformant"
+  protocol_version: "0.2.5"
+  control: 404

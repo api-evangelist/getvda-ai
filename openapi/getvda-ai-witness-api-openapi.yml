@@ -1,0 +1,1442 @@
+openapi: 3.2.0
+info:
+  title: VDA Witness API
+  version: 1.0.0
+  description: Seal governed AI-agent decisions into tamper-evident, Ed25519-signed, independently-verifiable records, and verify them OFFLINE against public infrastructure (Sigstore Rekor + RFC-3161 TSAs).
+  license:
+    name: Apache-2.0
+servers:
+- url: https://witness.getvda.ai
+tags:
+- name: Witness
+paths:
+  /api/witness/test-key:
+    post:
+      summary: 'Self-serve: mint an instant SEALED-tier API key (no human in the loop)'
+      description: 'Issues a SEALED-tier key: records are signed + hash-chained + independently verifiable OFFLINE, but NOT externally anchored (terminal on this tier — ''provable even against VDA'' does not apply). Rate-limited per IP. The Anchored tier (externally committed) is concierge-provisioned, not self-serve.'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Optional, for follow-up only
+                controllerPublicKeyJwk:
+                  type: object
+                  description: Optional Ed25519 public JWK {kty:'OKP',crv:'Ed25519',x}. Bind it to claim a DURABLE, self-renewable account (no 7-day expiry) and receive a short-TTL key.
+      responses:
+        '200':
+          description: Key issued once
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  apiKey:
+                    type: string
+                  accountId:
+                    type: string
+                  sealed:
+                    const: true
+                  anchored:
+                    const: false
+                  sealedState:
+                    const: not_anchored
+                  sealedStateReason:
+                    const: anchoring_not_enabled_for_account
+                  tierLabel:
+                    const: Sealed
+                  tier:
+                    const: test
+                    deprecated: true
+                  compliance:
+                    const: false
+                    deprecated: true
+                  durable:
+                    type: boolean
+                  controllerBound:
+                    type: boolean
+                  keyExpiresAt:
+                    type: string
+                  upgrade:
+                    type: object
+                  note:
+                    type: string
+        '400':
+          description: Invalid controllerPublicKeyJwk
+        '429':
+          description: Rate limited
+      tags:
+      - Witness
+      operationId: postApiWitnessTestKey
+      x-operation-id-source: derived
+  /api/witness/renew/challenge:
+    post:
+      summary: 'Agent-provable renewal, step 1: get a one-time challenge nonce'
+      description: Always returns a fresh nonce (no account-existence leak). Only an account bound to a controller key can complete step 2. Rate-limited per IP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - accountId
+              properties:
+                accountId:
+                  type: string
+      responses:
+        '200':
+          description: Challenge
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nonce:
+                    type: string
+                  expiresInSec:
+                    type: integer
+                  sign_payload:
+                    type: string
+                    description: the EXACT UTF-8 string to Ed25519-sign (substituted, not a template)
+                  renew:
+                    type: object
+                    properties:
+                      method:
+                        type: string
+                        const: POST
+                      endpoint:
+                        type: string
+                  sign_instructions:
+                    type: string
+                    description: human-readable prose only
+        '429':
+          description: Rate limited
+      tags:
+      - Witness
+      operationId: postApiWitnessRenewChallenge
+      x-operation-id-source: derived
+  /api/witness/renew:
+    post:
+      summary: 'Agent-provable renewal, step 2: prove control → fresh short-TTL key'
+      description: Ed25519-sign `vda.witness.renew/1||` with your controller key. On success, a NEW short-TTL key bound to the SAME account is issued (prior keys stay valid until they expire — overlap). No human, no bearer token. Uniform 401 on any failure.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - accountId
+              - nonce
+              - signature
+              properties:
+                accountId:
+                  type: string
+                nonce:
+                  type: string
+                signature:
+                  type: string
+                  description: base64url Ed25519 signature
+      responses:
+        '200':
+          description: Fresh key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  apiKey:
+                    type: string
+                  accountId:
+                    type: string
+                  keyId:
+                    type: string
+                  keyExpiresAt:
+                    type: string
+                  keyTtlSec:
+                    type: integer
+        '401':
+          description: Renewal denied (unknown account, no bound controller, or bad/expired signature)
+        '429':
+          description: Per-account renewal rate limit
+      tags:
+      - Witness
+      operationId: postApiWitnessRenew
+      x-operation-id-source: derived
+  /api/witness/account/bind-controller:
+    post:
+      summary: Bind an Ed25519 controller key to an EXISTING account (upgrade to durable)
+      description: Authenticated by a CURRENT valid key for the account. First-bind-wins (rebinding needs the admin token). Makes the account durable (drops any test expiry) and self-renewable.
+      security:
+      - witnessApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - controllerPublicKeyJwk
+              properties:
+                controllerPublicKeyJwk:
+                  type: object
+      responses:
+        '200':
+          description: Bound
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: string
+                  controllerBound:
+                    const: true
+                  durable:
+                    const: true
+        '400':
+          description: Invalid JWK
+        '401':
+          description: Missing/invalid key
+        '409':
+          description: Already bound (rebind needs admin)
+      tags:
+      - Witness
+      operationId: postApiWitnessAccountBindController
+      x-operation-id-source: derived
+  /api/witness/seal:
+    post:
+      summary: Seal a governed decision into a signed, hash-chained record
+      security:
+      - witnessApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SealRequest'
+      responses:
+        '200':
+          description: Sealed (carries sealed/anchored state + monthly usage headroom; over-limit warns but never blocks)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  record:
+                    $ref: '#/components/schemas/WitnessRecord'
+                  bodyHash:
+                    type: string
+                  stored:
+                    type: boolean
+                  chainKey:
+                    type: string
+                  deduped:
+                    type: boolean
+                  sealed:
+                    type: boolean
+                  anchored:
+                    type: boolean
+                  sealedState:
+                    type: string
+                  usage:
+                    type: object
+                    properties:
+                      seals_this_period:
+                        type: integer
+                      included:
+                        type: integer
+                      remaining:
+                        type: integer
+                      period:
+                        type: string
+                      period_end:
+                        type: string
+                      tier:
+                        type: string
+                      over_limit:
+                        type: boolean
+                      enforcement:
+                        const: measured_not_billed
+                  warning:
+                    type: string
+                    description: Present only when over the included allowance — sealing still succeeded
+        '400':
+          description: Bad request (e.g. sent an `account` field — the account is derived from your credential)
+        '401':
+          description: Missing/invalid/revoked API key
+        '409':
+          description: seq conflict for the chain
+        '413':
+          description: Payload too large
+        '429':
+          description: Rate limited
+      tags:
+      - Witness
+      operationId: postApiWitnessSeal
+      x-operation-id-source: derived
+  /api/witness/seal/hitl-decision:
+    post:
+      summary: Seal a human-in-the-loop decision (shaped — evidentiary basis required)
+      description: Captures the deciding human, disposition + rationale, cited policies, and content-addressed references to the system-of-record artifacts the decider SAW at decision time (not the action produced) — making the record auditor-reconstructable. Witness seals the ASSERTED actor identity, it does not authenticate them. Provide `evidence` (≥1) or `evidence_omitted_reason`.
+      security:
+      - witnessApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - actor
+              - decision
+              - governing_clauses
+              - basis_captured_at
+              properties:
+                actor:
+                  allOf:
+                  - $ref: '#/components/schemas/Actor'
+                  description: type must be 'human'
+                decision:
+                  type: object
+                  required:
+                  - statement
+                  properties:
+                    statement:
+                      type: string
+                    disposition:
+                      type: string
+                      description: 'Recommended: approved / rejected / escalated / modified'
+                governing_clauses:
+                  type: array
+                  minItems: 1
+                  items:
+                    $ref: '#/components/schemas/Clause'
+                evidence:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EvidenceItem'
+                evidence_omitted_reason:
+                  type: string
+                  description: Required only if evidence is empty
+                basis_captured_at:
+                  type: string
+                  format: date-time
+                  description: Decision time, NOT seal time
+                decision_context:
+                  type: string
+                chainKey:
+                  type: string
+                decisionId:
+                  type: string
+      responses:
+        '200':
+          description: 'Sealed (record_type: hitl_decision in the signed decision.inputs)'
+        '400':
+          description: Shaped-input validation failed — the error message states the missing/invalid field
+        '401':
+          description: Missing/invalid/revoked API key
+        '413':
+          description: Payload too large
+        '429':
+          description: Rate limited
+      tags:
+      - Witness
+      operationId: postApiWitnessSealHitlDecision
+      x-operation-id-source: derived
+  /api/witness/seal/agent-action:
+    post:
+      summary: Seal an autonomous agent action (shaped — evidence and/or parameters)
+      description: 'Records what the agent consumed, split by provenance: `evidence` = external material it saw (content-addressed + hashed); `parameters` = computed arguments it was passed (self-contained, no hash). At least one is required (or `evidence_omitted_reason`). Optional `agent_context` carries free-form execution-substrate hints (asserted, not verified).'
+      security:
+      - witnessApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - actor
+              - action
+              - governing_rule
+              properties:
+                actor:
+                  allOf:
+                  - $ref: '#/components/schemas/Actor'
+                  description: type must be 'agent' or 'system'
+                action:
+                  type: object
+                  required:
+                  - statement
+                  properties:
+                    statement:
+                      type: string
+                    outcome:
+                      type: string
+                    rationale:
+                      type: string
+                governing_rule:
+                  $ref: '#/components/schemas/Clause'
+                evidence:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EvidenceItem'
+                parameters:
+                  type: object
+                  description: Computed arguments (not hashed)
+                evidence_omitted_reason:
+                  type: string
+                  description: Required only if BOTH evidence and parameters are empty
+                agent_context:
+                  type: object
+                  description: Free-form execution context (cloud_run_revision, model_name, region, …) — asserted, not verified
+                basis_captured_at:
+                  type: string
+                  format: date-time
+                chainKey:
+                  type: string
+                decisionId:
+                  type: string
+      responses:
+        '200':
+          description: 'Sealed (record_type: agent_action)'
+        '400':
+          description: Shaped-input validation failed
+        '401':
+          description: Missing/invalid/revoked API key
+        '413':
+          description: Payload too large
+        '429':
+          description: Rate limited
+      tags:
+      - Witness
+      operationId: postApiWitnessSealAgentAction
+      x-operation-id-source: derived
+  /api/witness/seal/attestation:
+    post:
+      summary: Seal an attestation (shaped — a fact/state as of a time)
+      description: Asserts a fact or state as of `as_of`. Not for decisions. `evidence` and `governing_basis` are optional; without a governing_basis it is sealed as attested-by-the-signing-party, not independently verified.
+      security:
+      - witnessApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - actor
+              - claim
+              - as_of
+              properties:
+                actor:
+                  $ref: '#/components/schemas/Actor'
+                claim:
+                  type: string
+                as_of:
+                  type: string
+                  format: date-time
+                evidence:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EvidenceItem'
+                governing_basis:
+                  $ref: '#/components/schemas/Clause'
+                context:
+                  type: string
+                chainKey:
+                  type: string
+                decisionId:
+                  type: string
+      responses:
+        '200':
+          description: 'Sealed (record_type: attestation)'
+        '400':
+          description: Shaped-input validation failed
+        '401':
+          description: Missing/invalid/revoked API key
+        '413':
+          description: Payload too large
+        '429':
+          description: Rate limited
+      tags:
+      - Witness
+      operationId: postApiWitnessSealAttestation
+      x-operation-id-source: derived
+  /api/witness/prepare:
+    post:
+      summary: 'Customer-managed custody: prepare a shaped body for local signing (STATELESS)'
+      description: Witness assembles the shaped body (sole assembler → no client-side drift), fills seq/prevHash from the chain head, sets custody customer-managed with your signing public key, and returns the exact canonical bytes to Ed25519-sign. Persists nothing. Sign the bytes with your record-signing key, attach the proof, and POST { record } to the skill's normal endpoint — the record is then signed by YOUR key (issuer-authenticity, provable even against Witness).
+      security:
+      - witnessApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - skill
+              - signingPublicKeyJwk
+              properties:
+                skill:
+                  type: string
+                  enum:
+                  - issue_admission_credential
+                  - revoke_admission_credential
+                  - seal_agent_action
+                  - seal_attestation
+                  - seal_hitl_decision
+                params:
+                  type: object
+                  description: The shaped params for the skill
+                signingPublicKeyJwk:
+                  type: object
+                  description: Your Ed25519 record-signing PUBLIC JWK {kty:'OKP',crv:'Ed25519',x} — distinct from the account controller key
+                signingKeyId:
+                  type: string
+                chainKey:
+                  type: string
+      responses:
+        '200':
+          description: Unsigned body + canonical bytes to sign + STRUCTURED submit routing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  record:
+                    $ref: '#/components/schemas/WitnessRecord'
+                  canonicalBytes:
+                    type: string
+                  seq:
+                    type: integer
+                  prevHash:
+                    type:
+                    - string
+                    - 'null'
+                  submit:
+                    type: object
+                    description: Where to POST the signed record — do NOT parse submitInstructions as a path
+                    properties:
+                      method:
+                        type: string
+                        const: POST
+                      endpoint:
+                        type: string
+                        description: absolute path, e.g. /api/witness/seal/hitl-decision
+                  submitInstructions:
+                    type: string
+                    description: human-readable prose only
+        '400':
+          description: Unknown skill / bad signing key / shaped-param validation failed
+        '401':
+          description: Missing/invalid key
+      tags:
+      - Witness
+      operationId: postApiWitnessPrepare
+      x-operation-id-source: derived
+  /api/witness/credentials/issue:
+    post:
+      summary: Issue an agent admission credential (a sealed attestation)
+      description: The Witness record IS the credential. Sealed by the issuer's account (only that account can revoke). record_type stays 'attestation'; attestation_type is 'admission_credential'. subject_did / environment_id / scope / compliance_mappings are asserted, not authenticated.
+      security:
+      - witnessApiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - subject_did
+              - issuer_did
+              - environment_id
+              - scope
+              - governance_files_hash
+              - sandbox_result
+              - impact_delta_ref
+              - expires_at
+              properties:
+                subject_did:
+                  type: string
+                issuer_did:
+                  type: string
+                environment_id:
+                  type: string
+                scope:
+                  type: array
+                  items:
+                    type: string
+                governance_files_hash:
+                  type: string
+                sandbox_result:
+                  type: object
+                  required:
+                  - pass
+                  - evidence_seal_ref
+                  properties:
+                    pass:
+                      type: boolean
+                      description: false is valid (honest non-passing / provisional admission)
+                    score:
+                      type:
+                      - number
+                      - 'null'
+                      description: null = not run
+                    evidence_seal_ref:
+                      type: string
+                impact_delta_ref:
+                  type: string
+                expires_at:
+                  type: string
+                  format: date-time
+                reattestation_cadence:
+                  type: string
+                compliance_mappings:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - framework
+                    - claim
+                    properties:
+                      framework:
+                        type: string
+                      article_ref:
+                        type: string
+                      claim:
+                        type: string
+                chainKey:
+                  type: string
+                decisionId:
+                  type: string
+      responses:
+        '200':
+          description: Issued — carries credential_id (the seal ref)
+        '400':
+          description: Validation failed
+        '401':
+          description: Missing/invalid key
+        '413':
+          description: Payload too large
+        '429':
+          description: Rate limited
+      tags:
+      - Witness
+      operationId: postApiWitnessCredentialsIssue
+      x-operation-id-source: derived
+  /api/witness/credentials/{credential_id}:
+    get:
+      summary: check_valid — is this admission credential currently valid? (PUBLIC)
+      description: 'The single canonical validity answer, computed by Witness (issued ∧ signature verifies ∧ not revoked-by-issuer ∧ not expired), so every enforcer is identically correct. No auth (a credential id is not a secret). Always responds 200 with a coded body — enforcers branch on `valid` + `code`, not HTTP status. Cache-Control: private, max-age=60 for credential-found states; no-store for not_found / not_credential. TWO enforcer disciplines: a credential id is a BEARER handle (you MUST separately bind the presenter to `subject` via a DID challenge — validity is not proof of holder identity), and you should record each response in YOUR OWN audit log to prove what you acted on and when.'
+      parameters:
+      - name: credential_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Coded validity verdict (always 200)
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - valid
+                - code
+                - revoked
+                properties:
+                  credential_id:
+                    type: string
+                  valid:
+                    type: boolean
+                  code:
+                    type: string
+                    enum:
+                    - valid
+                    - revoked
+                    - expired
+                    - not_found
+                    - not_credential
+                  subject:
+                    type: string
+                    description: Present when a credential was found
+                  issuer:
+                    type: string
+                  environment:
+                    type: string
+                  scope:
+                    type: array
+                    items:
+                      type: string
+                  expires_at:
+                    type: string
+                  revoked:
+                    type: boolean
+                  revoked_at:
+                    type: string
+                  reason_code:
+                    type: string
+                  issuer_verified:
+                    type:
+                    - boolean
+                    - 'null'
+                    description: 'Issuer-authenticity, distinct from lifecycle: true = customer-managed + signing key published in issuer_did''s DID doc; false = key NOT in DID doc (suspicious); null = custodial or unresolvable'
+                  issuer_verification:
+                    type: string
+                    enum:
+                    - verified
+                    - key_not_in_did_doc
+                    - custodial
+                    - did_unresolvable
+                  issuer_warning:
+                    type: string
+                    description: Present (loud) for key_not_in_did_doc / did_unresolvable
+      tags:
+      - Witness
+      operationId: getApiWitnessCredentialsByCredentialId
+      x-operation-id-source: derived
+  /api/witness/credentials/{credential_id}/revoke:
+    post:
+      summary: Revoke an admission credential (issuer account only)
+      description: Only the account that issued the credential may revoke. Terminal (re-admission = a new credential). Produces a new immutable revocation attestation superseding the credential; verify reflects it within ~60s.
+      security:
+      - witnessApiKey: []
+      parameters:
+      - name: credential_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason_code
+              - revoked_by
+              properties:
+                reason_code:
+                  type: string
+                  enum:
+                  - policy_violation
+                  - superseded
+                  - compromised
+                  - environment_offboarded
+                  - other
+                reason_text:
+                  type: string
+                revoked_by:
+                  type: string
+                chainKey:
+                  type: string
+      responses:
+        '200':
+          description: Revoked — carries revocation_id
+        '400':
+          description: Validation failed
+        '401':
+          description: Missing/invalid key
+        '403':
+          description: Not the issuing account
+        '404':
+          description: Credential not found
+      tags:
+      - Witness
+      operationId: postApiWitnessCredentialsByCredentialIdRevoke
+      x-operation-id-source: derived
+  /api/witness/keys/revoke:
+    post:
+      operationId: revoke_api_key
+      summary: Revoke an account API key — sealed as a key_revocation event
+      description: 'TWO authorities. CONTROLLER-AUTHORIZED (owner self-service): submit a `{record}` — a key_revocation prepared via /prepare {skill:''revoke_api_key''} and signed by the account''s BOUND controller key; customer-managed, provable against Witness, revoked_by.type=''controller''. ADMIN break-glass: `{key_id}` with x-witness-admin; sealed custodially, revoked_by.type=''operator''. The key 401s at once; revocation is TOTAL (its account''s records also become unfetchable with it — no operator backdoor). Idempotent.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              oneOf:
+              - required:
+                - record
+                properties:
+                  record:
+                    $ref: '#/components/schemas/WitnessRecord'
+                description: 'Controller-authorized: a signed key_revocation record'
+              - required:
+                - key_id
+                properties:
+                  key_id:
+                    type: string
+                  reason_code:
+                    type: string
+                    enum:
+                    - compromised
+                    - exposed
+                    - rotated
+                    - superseded
+                    - operator_action
+                    - other
+                  reason_text:
+                    type: string
+                description: Admin break-glass (x-witness-admin)
+      responses:
+        '200':
+          description: Revoked (or already_revoked) — carries key_id + revoked_by
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  revoked:
+                    type: boolean
+                  already_revoked:
+                    type: boolean
+                  key_id:
+                    type: string
+                  revoked_by:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                        - controller
+                        - operator
+        '400':
+          description: Bad record / not signed by the bound controller
+        '401':
+          description: Missing/invalid key
+        '403':
+          description: No record and no admin token
+        '404':
+          description: Unknown key_id
+      tags:
+      - Witness
+  /api/witness/records/{recordId}/issuer:
+    get:
+      operationId: verify_record_issuer
+      summary: verify_record_issuer — is a record's signature by the issuer it claims?
+      description: 'Issuer-authenticity for ANY record by id, WITHOUT exposing the record: returns a verdict + the issuer DID + the public key it resolved against, never decision.inputs / evidence / body. How an enforcer of a privilege-widening event (e.g. a genesis authority registration) confirms the issuer signed it, not merely that Witness recorded it — without the account''s key. Four states as check_valid''s issuer_verified. ids are unguessable UUIDs; unknown → 404 not_found. Cache-Control: public, max-age=60 (no-store while did_unresolvable).'
+      parameters:
+      - name: recordId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Issuer verdict (no record body)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  record_id:
+                    type: string
+                  signature_valid:
+                    type: boolean
+                  issuer_verified:
+                    type:
+                    - boolean
+                    - 'null'
+                  issuer_verification:
+                    type: string
+                    enum:
+                    - verified
+                    - key_not_in_did_doc
+                    - custodial
+                    - did_unresolvable
+                  issuer_did:
+                    type:
+                    - string
+                    - 'null'
+                  signer_key:
+                    type:
+                    - object
+                    - 'null'
+                    description: The public key the verdict resolved against (null for custodial)
+                  issuer_warning:
+                    type: string
+        '404':
+          description: No such record id
+      tags:
+      - Witness
+  /api/witness/verify:
+    post:
+      summary: Independently verify a record or chain (PUBLIC — no key)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                record:
+                  $ref: '#/components/schemas/WitnessRecord'
+                records:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/WitnessRecord'
+      responses:
+        '200':
+          description: Verdict
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  bodyHash:
+                    type: string
+                  signatureValid:
+                    type: boolean
+                  errors:
+                    type: array
+                    items:
+                      type: string
+      tags:
+      - Witness
+      operationId: postApiWitnessVerify
+      x-operation-id-source: derived
+  /api/witness/records:
+    get:
+      summary: list_records — read your own records (account-scoped operational query; account…
+      description: Paginated summaries + the set of chainKeys in your account. `?view=full` returns full bodies (bounded). For one record's full reasoning use GET /records/{recordId}. Structural account filter + crypto backstop; cross-account reads return empty (no existence leak).
+      security:
+      - witnessApiKey: []
+      parameters:
+      - name: chainKey
+        in: query
+        schema:
+          type: string
+        description: Optional chain filter
+      - name: since
+        in: query
+        schema:
+          type: string
+        description: Optional ISO-8601 lower bound (sealedAt)
+      - name: until
+        in: query
+        schema:
+          type: string
+        description: Optional ISO-8601 upper bound
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 50
+        description: 1–500
+      - name: cursor
+        in: query
+        schema:
+          type: string
+        description: Opaque, from a prior nextCursor
+      - name: view
+        in: query
+        schema:
+          type: string
+          enum:
+          - summary
+          - full
+          default: summary
+      responses:
+        '200':
+          description: Record summaries + chainKeys + nextCursor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  chainKeys:
+                    type: array
+                    items:
+                      type: string
+                  count:
+                    type: integer
+                  nextCursor:
+                    type: string
+                    nullable: true
+                  records:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        recordId:
+                          type: string
+                        chainKey:
+                          type: string
+                        seq:
+                          type: integer
+                        verdict:
+                          type: string
+                        agent:
+                          type: string
+                        ruleId:
+                          type: string
+                        bodyHash:
+                          type: string
+                        sealedAt:
+                          type: string
+                        sealed:
+                          type: boolean
+                        anchored:
+                          type: boolean
+                        sealedState:
+                          type: string
+                          enum:
+                          - anchored
+                          - anchoring_pending
+                          - not_anchored
+                          - broken
+                        sealedStateReason:
+                          type: string
+                          nullable: true
+                        anchorState:
+                          type: string
+                          enum:
+                          - ANCHORED_VALID
+                          - SIGNED_PENDING
+                          - BROKEN
+                          deprecated: true
+                        compliance:
+                          type: boolean
+                          deprecated: true
+        '401':
+          description: Missing/invalid key
+      tags:
+      - Witness
+      operationId: getApiWitnessRecords
+      x-operation-id-source: derived
+  /api/witness/records/{recordId}:
+    get:
+      summary: get_record — the FULL signed body of one of your records (reasoning, inputs…
+      description: Account-scoped. A foreign or unknown recordId returns 404 not-found, indistinguishable from nonexistent (no existence leak). Everything needed to read back your reasoning AND verify the record offline.
+      security:
+      - witnessApiKey: []
+      parameters:
+      - name: recordId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: proof
+        in: query
+        schema:
+          type: string
+          enum:
+          - chain
+        description: proof=chain → self-contained OFFLINE bundle {record, chain[genesis..head], anchor(Rekor SET + TSA), didDocument} for zero-Witness-call continuity verification
+      responses:
+        '200':
+          description: Full record (or, with ?proof=chain, an offline chain-proof bundle)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  record:
+                    $ref: '#/components/schemas/WitnessRecord'
+                  chainKey:
+                    type: string
+                  bodyHash:
+                    type: string
+                  signatureValid:
+                    type: boolean
+                  anchorState:
+                    type: string
+                  anchor:
+                    type: object
+                    nullable: true
+                  chain:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WitnessRecord'
+                  didDocument:
+                    type: object
+                  proofType:
+                    type: string
+        '401':
+          description: Missing/invalid key
+        '404':
+          description: Not found (foreign or nonexistent — indistinguishable)
+      tags:
+      - Witness
+      operationId: getApiWitnessRecordsByRecordId
+      x-operation-id-source: derived
+  /api/witness/chains/{chainKey}/proof:
+    get:
+      summary: Whole-chain OFFLINE proof bundle — verify an entire trail with zero Witness…
+      description: Returns all records (genesis..head) + linkage + the anchor attestation (Rekor SET + RFC-3161 TSA tokens) + a did.json snapshot. Feed to offlineVerify for a full-trail verdict. Account-scoped; foreign/unknown chainKey → 404 (no leak). Predecessor path (O(n)), not a Merkle inclusion proof.
+      security:
+      - witnessApiKey: []
+      parameters:
+      - name: chainKey
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Chain proof bundle
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chainKey:
+                    type: string
+                  records:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WitnessRecord'
+                  anchor:
+                    type: object
+                    nullable: true
+                  didDocument:
+                    type: object
+                  proofType:
+                    type: string
+                  bound:
+                    type: object
+        '401':
+          description: Missing/invalid key
+        '404':
+          description: Not found (foreign or nonexistent — no leak)
+      tags:
+      - Witness
+      operationId: getApiWitnessChainsByChainKeyProof
+      x-operation-id-source: derived
+  /api/witness/report:
+    post:
+      summary: Article 12 EVIDENCE report from your trail (a compliance artefact, not a query…
+      description: Scopable by chainKey + date range. Evidence semantics (lifecycle, integrity, scope, disclaimer) are verbatim.
+      security:
+      - witnessApiKey: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chainKey:
+                  type: string
+                since:
+                  type: string
+                until:
+                  type: string
+      responses:
+        '200':
+          description: Report
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Missing/invalid key
+      tags:
+      - Witness
+      operationId: postApiWitnessReport
+      x-operation-id-source: derived
+  /api/witness/usage:
+    get:
+      summary: This account's seal usage + monthly headroom (Sealed tier includes 5,000…
+      description: 'Soft/observable: measured, NEVER enforced — over the allowance sealing continues (billing is not yet live). The same block rides on every seal response.'
+      security:
+      - witnessApiKey: []
+      responses:
+        '200':
+          description: Usage
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account:
+                    type: string
+                  usage:
+                    type: object
+                  warning:
+                    type: string
+        '401':
+          description: Missing/invalid key
+      tags:
+      - Witness
+      operationId: getApiWitnessUsage
+      x-operation-id-source: derived
+  /api/witness/whoami:
+    get:
+      summary: Resolve the presented API key to its account + tier (suite-service credential…
+      description: 'For sibling getvda.ai services (e.g. C2MD) that accept `Authorization: Bearer wtn..` from their own callers and need to validate it: Witness is the source of truth for its own keys, so the sibling calls whoami instead of replicating the key store. Any valid Witness key may call whoami about ITSELF (no elevated scope) — a key can only ever ask about the key it presents, so no other account is enumerable. `tier` is resolved from ACCOUNT state (ANCHORED when the account is on the anchored/compliance tier, else SEALED), not from the key. On success: `Cache-Control: private, max-age=60` (stable enough to cache ~1 min; revocations may lag by that). 401s are `no-store` and carry a generic message (no keyId-exists vs wrong-secret leak). Permissively rate-limited per calling IP AND per account.'
+      security:
+      - witnessApiKey: []
+      responses:
+        '200':
+          description: 'Resolved identity (Cache-Control: private, max-age=60)'
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - account_id
+                - tier
+                - scopes
+                - compliance
+                - key_id
+                - revoked
+                properties:
+                  account_id:
+                    type: string
+                    description: acct_<ULID>
+                  tier:
+                    type: string
+                    enum:
+                    - SEALED
+                    - ANCHORED
+                    description: From account state, not the key
+                  scopes:
+                    type: array
+                    items:
+                      type: string
+                    description: e.g. ["seal","read"]
+                  compliance:
+                    type: boolean
+                    description: true iff ANCHORED tier
+                  key_id:
+                    type: string
+                    description: The presented key's id (for caller-side logging/debug)
+                  revoked:
+                    type: boolean
+                    const: false
+                    description: Always false on a 200 — a revoked key 401s
+                  expires_at:
+                    type:
+                    - string
+                    - 'null'
+                    format: date-time
+                    description: Key validity window (ISO-8601), or null if non-expiring — a sibling authorizing on this response should treat a past value as invalid
+        '401':
+          description: Missing / malformed / unknown / wrong-secret / revoked key — one generic message, no-store (no existence leak)
+        '429':
+          description: whoami rate limit exceeded (per IP and per account)
+      tags:
+      - Witness
+      operationId: getApiWitnessWhoami
+      x-operation-id-source: derived
+  /api/witness/anchor-status:
+    get:
+      summary: Anchor coverage for your account/chain
+      security:
+      - witnessApiKey: []
+      parameters:
+      - name: chainKey
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  headAnchored:
+                    type: boolean
+                  externalValid:
+                    type: boolean
+                  pendingRecords:
+                    type: integer
+      tags:
+      - Witness
+      operationId: getApiWitnessAnchorStatus
+      x-operation-id-source: derived
+  /api/witness/mcp:
+    post:
+      summary: Model Context Protocol endpoint (initialize / tools/list / tools/call…
+      responses:
+        '200':
+          description: JSON-RPC 2.0 response
+      tags:
+      - Witness
+      operationId: postApiWitnessMcp
+      x-operation-id-source: derived
+components:
+  schemas:
+    EvidenceItem:
+      type: object
+      required:
+      - ref
+      - hash
+      description: A content-addressed reference to EXTERNAL system-of-record material. The hash makes it tamper-evident even if `ref` rots or is swapped.
+      properties:
+        ref:
+          type: string
+          description: URI / id / a Witness recordId
+        hash:
+          type: string
+          description: sha256:<hex> of the artifact
+        media_type:
+          type: string
+        description:
+          type: string
+        captured_at:
+          type: string
+          format: date-time
+        inline:
+          type: object
+          required:
+          - encoding
+          - bytes
+          properties:
+            encoding:
+              type: string
+              enum:
+              - base64
+              - utf8
+            bytes:
+              type: string
+          description: Embed the artifact (≤100KB decoded); Witness verifies bytes against `hash` at seal time.
+    WitnessRecord:
+      type: object
+      description: The signed body + proof. Everything except `proof` is covered by the Ed25519 signature.
+      properties:
+        schema:
+          type: string
+          const: vda.witness.record/1
+        recordId:
+          type: string
+        account:
+          type: string
+          description: Server-minted opaque account ULID, bound to your credential, signed.
+        seq:
+          type: integer
+        issuedAt:
+          type: string
+          format: date-time
+        signer:
+          type: object
+        decision:
+          $ref: '#/components/schemas/Decision'
+        governingRule:
+          $ref: '#/components/schemas/GoverningRule'
+        prevHash:
+          type:
+          - string
+          - 'null'
+        proof:
+          type: object
+          properties:
+            algorithm:
+              const: Ed25519
+            signature:
+              type: string
+            created:
+              type: string
+    GoverningRule:
+      type: object
+      required:
+      - ruleId
+      - ruleText
+      properties:
+        ruleId:
+          type: string
+        ruleText:
+          type: string
+          description: The governing rule verbatim (or a stable reference)
+        governanceRef:
+          type: string
+          description: 'Optional: e.g. AGENTS.md#refunds'
+        governanceHash:
+          type: string
+          description: 'Optional: sha256:… of the governance source'
+    Clause:
+      type: object
+      required:
+      - ref
+      description: A cited policy/rule. Capture `text`/`hash` where possible — policies drift, and an auditor needs the version in force.
+      properties:
+        ref:
+          type: string
+        text:
+          type: string
+        hash:
+          type: string
+          description: sha256:<hex> of the policy source version
+    Actor:
+      type: object
+      required:
+      - id
+      - type
+      properties:
+        id:
+          type: string
+          description: Actor identity — ASSERTED by your credential; Witness seals the claim, it does not authenticate the actor.
+        type:
+          type: string
+          enum:
+          - human
+          - agent
+          - system
+        role:
+          type: string
+          description: Optional — the authority under which they acted
+    SealRequest:
+      type: object
+      required:
+      - decision
+      - governingRule
+      properties:
+        decision:
+          $ref: '#/components/schemas/Decision'
+        governingRule:
+          $ref: '#/components/schemas/GoverningRule'
+        chainKey:
+          type: string
+          description: Per-(account,chain) ordering namespace; default 'default'. Max 128 chars [A-Za-z0-9._:-]. This is ALSO the grouping primitive — records sharing a chainKey are hash-linked into one set that is retrievable and provable as a set (GET /api/witness/chains/{chainKey}/proof, GET /api/witness/records?chainKey=, POST /api/witness/report {chainKey}). Give the seals of one workflow/bundle/case a stable shared key (e.g. 'c2md:bundle:<id>') rather than grouping by convention inside your own payloads. There is no separate bundle_id/group_id field.
+          default: default
+        decisionId:
+          type: string
+          description: 'Idempotency key. Dedupe is on (account_id, decisionId): the same value returns the existing record with `deduped: true`.'
+    Decision:
+      type: object
+      required:
+      - agent
+      - verdict
+      - reasoning
+      properties:
+        agent:
+          type: string
+          description: Which agent made the decision
+          maxLength: 65536
+        inputs:
+          description: The decision inputs (any JSON; size-capped ~256KB canonical)
+        verdict:
+          type: string
+          description: The verdict/decision reached
+          maxLength: 65536
+        reasoning:
+          type: string
+          description: Why
+          maxLength: 65536
+        actionProposed:
+          type: string
+          description: 'Optional: what was/should be done'
+  securitySchemes:
+    witnessApiKey:
+      type: http
+      scheme: bearer
+      description: 'API key as a Bearer token. The `x-witness-key: <key>` header also works.'

@@ -1,0 +1,125 @@
+openapi: 3.2.0
+info:
+  title: VDA ACP Bundles API
+  version: 0.1.0
+  description: Agent Control Plane — governance-aware wrapper on git.
+servers:
+- url: https://acp.getvda.ai
+tags:
+- name: Bundles
+paths:
+  /bundles/{env}/active.json:
+    get:
+      summary: The active signed governance bundle (public; evaluator SDK)
+      responses:
+        '200':
+          description: The active SignedBundle
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedBundle'
+        '404':
+          description: no active bundle for this environment
+      tags:
+      - Bundles
+      operationId: getBundlesByEnvActiveJson
+      x-operation-id-source: derived
+  /bundles/{env}/versions/{version}:
+    get:
+      summary: A specific signed bundle version (public)
+      responses:
+        '200':
+          description: The requested SignedBundle version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedBundle'
+        '404':
+          description: no such version
+      tags:
+      - Bundles
+      operationId: getBundlesByEnvVersionsByVersion
+      x-operation-id-source: derived
+components:
+  schemas:
+    BundleManifest:
+      type: object
+      required:
+      - schema
+      - version
+      - environment
+      - commitSha
+      - contentHash
+      - did
+      - keyId
+      - files
+      additionalProperties: false
+      properties:
+        schema:
+          type: string
+          enum:
+          - acp.bundle/1
+        version:
+          type: string
+          description: Monotonic per-environment version, assigned by the pipeline (not a timestamp).
+        environment:
+          type: string
+        commitSha:
+          type: string
+          description: The git commit this bundle was built from — the tie to authoring provenance.
+        contentHash:
+          type: string
+          pattern: ^sha256:[0-9a-f]{64}$
+          description: Binds the file set to the manifest.
+        did:
+          type: string
+          description: ACP's DID; resolve it for the bundle-signing key.
+        keyId:
+          type: string
+          description: The verification method that signs bundles, e.g. did:web:acp.getvda.ai#key-3.
+        files:
+          type: array
+          items:
+            type: string
+          description: Governance file names included, sorted.
+    SignedBundle:
+      type: object
+      required:
+      - manifest
+      - files
+      - signature
+      additionalProperties: false
+      description: 'Deterministic by design: the same commit + version always produces the same bytes and the same signature. Verify by canonicalising `manifest`, checking `signature.value` against the key `manifest.keyId` resolves to, then confirming sha256 of the canonical `files` equals `manifest.contentHash`. Fail-static: a bundle that does not verify is not used.'
+      properties:
+        manifest:
+          $ref: '#/components/schemas/BundleManifest'
+        files:
+          type: object
+          description: Governance file name → raw VDA-MD source. Capability/condition/authority/scope are parsed from these bodies.
+          additionalProperties:
+            type: string
+        signature:
+          $ref: '#/components/schemas/BundleSignature'
+    BundleSignature:
+      type: object
+      required:
+      - algorithm
+      - value
+      - keyId
+      additionalProperties: false
+      properties:
+        algorithm:
+          type: string
+          enum:
+          - Ed25519
+        value:
+          type: string
+          description: base64url signature over the canonical manifest bytes.
+        keyId:
+          type: string
+          description: Must equal manifest.keyId.
+  securitySchemes:
+    witness_bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: wtn.<keyId>.<secret>

@@ -1,0 +1,25 @@
+openapi: 3.2.0
+info:
+  title: Getvda Ai Llms.txt API
+  version: 0.1.0
+  description: 'Operations tagged Llms.txt across 2 of this provider''s published API definitions: getvda-ai-gosce-portfolio-openapi.json, getvda-ai-gosce-router-openapi.json. Each path carries the servers of the definition it was published in.'
+tags:
+- name: Llms.txt
+paths:
+  /llms.txt:
+    get:
+      summary: Llms Txt
+      description: Machine-readable summary of the portfolio for LLM crawlers.
+      operationId: llms_txt_llms_txt_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            text/plain:
+              schema:
+                type: string
+      tags:
+      - Llms.txt
+x-refined-from:
+- getvda-ai-gosce-portfolio-openapi.json
+- getvda-ai-gosce-router-openapi.json

@@ -1,0 +1,540 @@
+openapi: 3.2.0
+info:
+  title: HITL — human decisions on agent actions Tools API
+  version: 0.1.0
+  description: The getvda.ai substrate that owns human decisions on agent actions. External callers (ACP, onboard-agent) register an authority config, then raise → resolve → sealed hitl_decision. Discovery is public; tool calls require Contract A (a Witness Bearer). A NEW caller is created only by controller-signed genesis; register_authority_config updates an existing caller. See docs/EXTERNAL-CALLERS.md.
+  x-git-sha: d347a708f292368e6656381ca9e2ed983260657b
+servers:
+- url: https://hitl.getvda.ai
+security:
+- bearerAuth: []
+tags:
+- name: Tools
+paths:
+  /v1/tools:
+    get:
+      operationId: list_tools
+      summary: List the tool surface (names + schemas)
+      responses:
+        '200':
+          description: tools
+      tags:
+      - Tools
+  /v1/tools/raise_hitl_item:
+    post:
+      operationId: raise_hitl_item
+      summary: Raise a decision for human review
+      description: Raise an item for a human to decide. HITL routes it to an authorised band using YOUR registered authority config — it never infers a band and never defaults one. Returns remaining quota so you can self-limit rather than discovering a ceiling by hitting it.
+      x-mutating: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - caller_id
+              - decision_ref
+              - decision_class
+              - escalation_label
+              - statement
+              - basis_captured_at
+              - governing_clauses
+              properties:
+                caller_id:
+                  type: string
+                  description: Your registered caller id.
+                decision_ref:
+                  type: string
+                  description: Your idempotency key. Re-raising the same decision_ref is rejected, so a retry cannot create a duplicate item.
+                decision_class:
+                  type: string
+                  description: The kind of decision. Must be in your registered permitted_decision_classes.
+                escalation_label:
+                  type: string
+                  description: A label from your registered authority config. HITL maps it to a band. An unknown label is an ERROR, not a default — a defaulted band is a silent decision about who may decide.
+                statement:
+                  type: string
+                  description: What is being asked, in plain language.
+                proposed_action:
+                  type: string
+                  description: What the agent recommends.
+                basis_captured_at:
+                  type: string
+                  description: 'ISO-8601. When the DECIDING SYSTEM SAW ITS EVIDENCE — not when you called HITL. This is load-bearing: it is what the decider saw at recommendation time.'
+                governing_clauses:
+                  type: array
+                  minItems: 1
+                  description: 'Governing clauses in force at decision time. At least one is required. Capture `text` as well as `ref`: policies drift, and the record must show what the clause SAID when it was applied.'
+                  items:
+                    type: object
+                    required:
+                    - ref
+                    properties:
+                      ref:
+                        type: string
+                        description: Policy / SOP / rule identifier.
+                      text:
+                        type: string
+                        description: The clause text as it read at decision time.
+                      hash:
+                        type: string
+                        description: sha256:<64 hex> of the policy source version.
+                evidence:
+                  type: array
+                  description: Content addresses ONLY — a reference and a digest. HITL has no field anywhere that can hold content, so the PII-bearing original never leaves your deployment. Supply this OR evidence_omitted_reason, never both.
+                  items:
+                    type: object
+                    required:
+                    - ref
+                    - hash
+                    properties:
+                      ref:
+                        type: string
+                        description: URI, id, or a Witness recordId.
+                      hash:
+                        type: string
+                        pattern: ^sha256:[0-9a-f]{64}$
+                        description: sha256:<64 hex>.
+                      media_type:
+                        type: string
+                        description: Optional media type.
+                      descriptor:
+                        type: string
+                        description: Short NON-PII label, max 200 chars. A label, not a payload.
+                      captured_at:
+                        type: string
+                        description: ISO-8601 capture time.
+                evidence_omitted_reason:
+                  type: string
+                  description: REQUIRED if evidence is empty. State plainly why there is none. Never synthesise a placeholder that looks like evidence — an unavailable source must be representable as unavailable, not as a plausible object.
+                domain_ref:
+                  type: string
+                  description: A correlation handle into YOUR store, so you can re-render the rich card. Not a payload — HITL never interprets it and it must not carry PII.
+                descriptors:
+                  type: object
+                  description: Small non-PII key/value labels for list views. Capped at 4KB.
+              additionalProperties: false
+      responses:
+        '200':
+          description: raise_hitl_item result
+          content:
+            application/json: {}
+        '400':
+          $ref: '#/components/responses/DomainError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/AuthorityError'
+        '409':
+          $ref: '#/components/responses/QuotaOrConstraint'
+      tags:
+      - Tools
+  /v1/tools/list_hitl_items:
+    post:
+      operationId: list_hitl_items
+      summary: List decision items
+      description: List item summaries. Summaries deliberately carry NO evidence, statement, or domain_ref — use get_hitl_item for a single item when you need detail.
+      x-mutating: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                caller_id:
+                  type: string
+                  description: Filter to one caller.
+                status:
+                  type: string
+                  enum:
+                  - open
+                  - resolved
+                  - cancelled
+                band:
+                  type: string
+                  description: Filter to an authority band.
+                since:
+                  type: string
+                  description: ISO-8601 lower bound on created_at.
+              additionalProperties: false
+      responses:
+        '200':
+          description: list_hitl_items result
+          content:
+            application/json: {}
+        '400':
+          $ref: '#/components/responses/DomainError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/AuthorityError'
+        '409':
+          $ref: '#/components/responses/QuotaOrConstraint'
+      tags:
+      - Tools
+  /v1/tools/get_hitl_item:
+    post:
+      operationId: get_hitl_item
+      summary: Get one decision item
+      description: Full item including evidence content-addresses and, once resolved, the outcome, the asserted actor, and the seal record id. Note the resolution reports the asserted actor and the authenticated calling account separately — they are different facts.
+      x-mutating: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - item_id
+              properties:
+                item_id:
+                  type: string
+                  description: The item id.
+              additionalProperties: false
+      responses:
+        '200':
+          description: get_hitl_item result
+          content:
+            application/json: {}
+        '400':
+          $ref: '#/components/responses/DomainError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/AuthorityError'
+        '409':
+          $ref: '#/components/responses/QuotaOrConstraint'
+      tags:
+      - Tools
+  /v1/tools/resolve_hitl_item:
+    post:
+      operationId: resolve_hitl_item
+      summary: Record a human decision
+      description: Record the outcome of a human decision and seal it. The seal is durably queued before this returns and never blocks you — if Witness is unavailable the result reports seal.status "pending" and the outbox completes it. `escalate` creates the next-band item by walking your registered ladder. `baseline` requires authority to WIDEN a ceiling, which is a different thing from authority to decide the instance.
+      x-mutating: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - item_id
+              - outcome
+              - actor
+              - statement
+              - resolved_by_account
+              properties:
+                item_id:
+                  type: string
+                  description: The item id.
+                outcome:
+                  type: string
+                  enum:
+                  - approve
+                  - deny
+                  - escalate
+                  - baseline
+                  description: One vocabulary. There are exactly four outcomes.
+                actor:
+                  type: object
+                  required:
+                  - id
+                  description: The deciding human, AS ASSERTED BY YOUR SURFACE. HITL records this; it does not authenticate it.
+                  properties:
+                    id:
+                      type: string
+                      description: Identifier.
+                    role:
+                      type: string
+                      description: The authority under which they decided.
+                statement:
+                  type: string
+                  description: The decision and its rationale.
+                resolved_by_account:
+                  type: string
+                  description: The authenticated account submitting this resolution. Recorded separately from the asserted actor on purpose.
+                baseline:
+                  type: object
+                  required:
+                  - bounds
+                  - scope
+                  description: Required when outcome is "baseline". Both bounds and scope must NAME their kind — an unbounded grant must say {"kind":"unbounded"} explicitly. A missing field never grants permission.
+                  properties:
+                    bounds:
+                      type: object
+                      description: One of {"kind":"unbounded"} | {"kind":"numeric","unit":...,"max":...} | {"kind":"enum","values":[...]}. Units are compared exactly and never coerced.
+                    scope:
+                      type: object
+                      description: One of {"kind":"any"} | {"kind":"qualified","qualifiers":{...}}.
+              additionalProperties: false
+      responses:
+        '200':
+          description: resolve_hitl_item result
+          content:
+            application/json: {}
+        '400':
+          $ref: '#/components/responses/DomainError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/AuthorityError'
+        '409':
+          $ref: '#/components/responses/QuotaOrConstraint'
+      tags:
+      - Tools
+  /v1/tools/list_baselines:
+    post:
+      operationId: list_baselines
+      summary: List baselines
+      description: Active baselines for a caller, with unbounded_count surfaced separately. An unbounded baseline is the widest grant a customer can make, so it is flagged explicitly rather than left to be inferred from the shape of bounds.
+      x-mutating: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - caller_id
+              properties:
+                caller_id:
+                  type: string
+                  description: The caller id.
+                include_revoked:
+                  type: boolean
+                  description: Include revoked baselines.
+              additionalProperties: false
+      responses:
+        '200':
+          description: list_baselines result
+          content:
+            application/json: {}
+        '400':
+          $ref: '#/components/responses/DomainError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/AuthorityError'
+        '409':
+          $ref: '#/components/responses/QuotaOrConstraint'
+      tags:
+      - Tools
+  /v1/tools/revoke_baseline:
+    post:
+      operationId: revoke_baseline
+      summary: Revoke a baseline
+      description: Revoke a baseline and seal the revocation. Never a delete — the row and its trail remain, because accumulated baselines are exactly what an auditor needs to review.
+      x-mutating: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - baseline_id
+              - revoked_by
+              - reason
+              - caller_id
+              properties:
+                baseline_id:
+                  type: string
+                  description: The baseline id.
+                revoked_by:
+                  type: string
+                  description: Who revoked it.
+                reason:
+                  type: string
+                  description: Why. Required — a revocation with no reason is not evidence.
+                caller_id:
+                  type: string
+                  description: The caller id.
+              additionalProperties: false
+      responses:
+        '200':
+          description: revoke_baseline result
+          content:
+            application/json: {}
+        '400':
+          $ref: '#/components/responses/DomainError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/AuthorityError'
+        '409':
+          $ref: '#/components/responses/QuotaOrConstraint'
+      tags:
+      - Tools
+  /v1/tools/match_baseline:
+    post:
+      operationId: match_baseline
+      summary: Check baseline containment
+      description: 'Parity check for your local read-model. This is NOT the hot path: match locally in your own decision loop so you take no HITL latency or availability dependency. Use this to verify your projection agrees with the system of record.'
+      x-mutating: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - caller_id
+              - request
+              properties:
+                caller_id:
+                  type: string
+                  description: The caller id.
+                request:
+                  type: object
+                  required:
+                  - decisionClass
+                  properties:
+                    decisionClass:
+                      type: string
+                      description: Decision class.
+                    value:
+                      description: Number or string, per the bounds kind.
+                    unit:
+                      type: string
+                      description: Required for numeric bounds. A missing unit is a mismatch, never a wildcard.
+                    qualifiers:
+                      type: object
+                      description: Scope qualifiers.
+              additionalProperties: false
+      responses:
+        '200':
+          description: match_baseline result
+          content:
+            application/json: {}
+        '400':
+          $ref: '#/components/responses/DomainError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/AuthorityError'
+        '409':
+          $ref: '#/components/responses/QuotaOrConstraint'
+      tags:
+      - Tools
+  /v1/tools/register_authority_config:
+    post:
+      operationId: register_authority_config
+      summary: Register an activated authority config
+      description: Register the authority config that governance has ACTIVATED. HITL never authors governance — git is the system of record and this is a projection of it. Every non-genesis registration must carry git_commit and the activation seal, so registration can never become a route around the governance pipeline.
+      x-mutating: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - caller_id
+              - bands
+              - label_to_band
+              - roster
+              - permitted_decision_classes
+              - max_raises_per_hour
+              - max_open_items
+              - git_commit
+              - activation_seal_record_id
+              properties:
+                caller_id:
+                  type: string
+                  description: The caller id.
+                bands:
+                  type: array
+                  items:
+                    type: string
+                  description: The authority ladder, ordered narrowest first, widest last. Order IS the escalation path.
+                label_to_band:
+                  type: object
+                  description: escalation_label -> band. Every band named must exist in the ladder.
+                roster:
+                  type: object
+                  description: 'band -> [actor ids]. Bands NEST: an actor on a wider band may decide narrower items.'
+                permitted_decision_classes:
+                  type: array
+                  items:
+                    type: string
+                  description: The classes this caller may raise.
+                max_raises_per_hour:
+                  type: integer
+                  minimum: 1
+                max_open_items:
+                  type: integer
+                  minimum: 1
+                git_commit:
+                  type: string
+                  description: The commit this config was activated from.
+                activation_seal_record_id:
+                  type: string
+                  description: The Witness attestation that activated it.
+              additionalProperties: false
+      responses:
+        '200':
+          description: register_authority_config result
+          content:
+            application/json: {}
+        '400':
+          $ref: '#/components/responses/DomainError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/AuthorityError'
+        '409':
+          $ref: '#/components/responses/QuotaOrConstraint'
+      tags:
+      - Tools
+  /v1/tools/get_raise_quota:
+    post:
+      operationId: get_raise_quota
+      summary: Check remaining raise quota
+      description: Remaining raises this hour, remaining open-item headroom, and your permitted decision classes. Read-only — checking does not consume quota.
+      x-mutating: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - caller_id
+              properties:
+                caller_id:
+                  type: string
+                  description: The caller id.
+              additionalProperties: false
+      responses:
+        '200':
+          description: get_raise_quota result
+          content:
+            application/json: {}
+        '400':
+          $ref: '#/components/responses/DomainError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/AuthorityError'
+        '409':
+          $ref: '#/components/responses/QuotaOrConstraint'
+      tags:
+      - Tools
+components:
+  responses:
+    QuotaOrConstraint:
+      description: quota_exceeded (typed, not a bare 429) | a store constraint (e.g. caller_not_found, items_decision_ref_uq)
+    DomainError:
+      description: a typed lifecycle/validation error (e.g. evidence_or_reason_required)
+    AuthorityError:
+      description: unknown_escalation_label | actor_not_on_roster | actor_cannot_widen_ceiling | decision_class_not_permitted
+    Unauthorized:
+      description: missing/invalid Witness Bearer (Contract A)
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Contract A: a Witness Bearer (wtn.<keyId>.<secret>) validated by HITL via Witness GET /whoami. Authorization header only. This authenticates the CALLING account; the human decider on a resolution is asserted separately and never authenticated by HITL.'

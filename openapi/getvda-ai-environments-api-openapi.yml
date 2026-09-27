@@ -1,0 +1,105 @@
+openapi: 3.2.0
+info:
+  title: VDA ACP Environments API
+  version: 0.1.0
+  description: Agent Control Plane — governance-aware wrapper on git.
+servers:
+- url: https://acp.getvda.ai
+tags:
+- name: Environments
+paths:
+  /v1/environments/{env}/governance:
+    get:
+      summary: Load a governance set at a ref
+      security:
+      - witness_bearer: []
+      parameters:
+      - name: env
+        in: path
+        required: true
+      - name: ref
+        in: query
+      responses:
+        '200':
+          description: governance set
+        '503':
+          description: git staged
+      tags:
+      - Environments
+      operationId: getV1EnvironmentsByEnvGovernance
+      x-operation-id-source: derived
+  /v1/environments/{env}/changes/prepare:
+    post:
+      summary: Prepare + evaluate a governance change (diff + Compliance Guard)
+      security:
+      - witness_bearer: []
+      responses:
+        '200':
+          description: prepared
+      tags:
+      - Environments
+      operationId: postV1EnvironmentsByEnvChangesPrepare
+      x-operation-id-source: derived
+  /v1/environments/{env}/changes/test:
+    post:
+      summary: Run the governance CI test suite on a change
+      security:
+      - witness_bearer: []
+      responses:
+        '200':
+          description: suite result
+      tags:
+      - Environments
+      operationId: postV1EnvironmentsByEnvChangesTest
+      x-operation-id-source: derived
+  /v1/environments/{env}/pulls/{num}/surface:
+    get:
+      summary: Non-engineer approval surface
+      security:
+      - witness_bearer: []
+      responses:
+        '200':
+          description: surface
+      tags:
+      - Environments
+      operationId: getV1EnvironmentsByEnvPullsByNumSurface
+      x-operation-id-source: derived
+  /v1/environments/{env}/pulls/{num}/decision:
+    post:
+      summary: Approve or reject a change (seals hitl_decision, merges on approve)
+      security:
+      - witness_bearer: []
+      description: Requires an approver OIDC token in X-Approver-Credential.
+      responses:
+        '200':
+          description: outcome
+        '401':
+          description: identity
+        '403':
+          description: authority
+        '409':
+          description: separation of duties
+      tags:
+      - Environments
+      operationId: postV1EnvironmentsByEnvPullsByNumDecision
+      x-operation-id-source: derived
+  /v1/environments/{env}/versions/activate:
+    post:
+      summary: Build + sign + activate a governance version (sealed to Witness)
+      security:
+      - witness_bearer: []
+      responses:
+        '200':
+          description: activated
+        '503':
+          description: bundle/witness staged
+      tags:
+      - Environments
+      operationId: postV1EnvironmentsByEnvVersionsActivate
+      x-operation-id-source: derived
+components:
+  securitySchemes:
+    witness_bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: wtn.<keyId>.<secret>

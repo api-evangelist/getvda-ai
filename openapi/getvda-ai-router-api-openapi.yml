@@ -1,0 +1,19 @@
+openapi: 3.2.0
+info:
+  title: Router API
+  version: 0.1.0
+tags:
+- name: Router
+paths:
+  /:
+    get:
+      summary: Index
+      operationId: index__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - Router

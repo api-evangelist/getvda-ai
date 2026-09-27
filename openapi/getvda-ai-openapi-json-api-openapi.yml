@@ -1,0 +1,30 @@
+openapi: 3.2.0
+info:
+  title: HITL — human decisions on agent actions Openapi.json API
+  version: 0.1.0
+  description: The getvda.ai substrate that owns human decisions on agent actions. External callers (ACP, onboard-agent) register an authority config, then raise → resolve → sealed hitl_decision. Discovery is public; tool calls require Contract A (a Witness Bearer). A NEW caller is created only by controller-signed genesis; register_authority_config updates an existing caller. See docs/EXTERNAL-CALLERS.md.
+  x-git-sha: d347a708f292368e6656381ca9e2ed983260657b
+servers:
+- url: https://hitl.getvda.ai
+security:
+- bearerAuth: []
+tags:
+- name: Openapi.json
+paths:
+  /openapi.json:
+    get:
+      summary: This document
+      security: []
+      responses:
+        '200':
+          description: OpenAPI 3.1 spec
+      tags:
+      - Openapi.json
+      operationId: getOpenapiJson
+      x-operation-id-source: derived
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Contract A: a Witness Bearer (wtn.<keyId>.<secret>) validated by HITL via Witness GET /whoami. Authorization header only. This authenticates the CALLING account; the human decider on a resolution is asserted separately and never authenticated by HITL.'

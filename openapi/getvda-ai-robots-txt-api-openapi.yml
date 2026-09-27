@@ -1,0 +1,24 @@
+openapi: 3.2.0
+info:
+  title: Getvda Ai Robots.txt API
+  version: '1.0'
+  description: 'Operations tagged Robots.txt across 3 of this provider''s published API definitions: getvda-ai-c2md-edge-openapi.json, getvda-ai-gosce-portfolio-openapi.json, getvda-ai-gosce-router-openapi.json. Each path carries the servers of the definition it was published in.'
+tags:
+- name: Robots.txt
+paths:
+  /robots.txt:
+    get:
+      summary: Robots
+      operationId: robots_robots_txt_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - Robots.txt
+x-refined-from:
+- getvda-ai-c2md-edge-openapi.json
+- getvda-ai-gosce-portfolio-openapi.json
+- getvda-ai-gosce-router-openapi.json
