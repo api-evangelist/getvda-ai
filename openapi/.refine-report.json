@@ -1,12 +1,12 @@
 {
   "provider": "getvda-ai",
   "sources": [
-    "getvda-ai-acp-openapi.json",
-    "getvda-ai-c2md-edge-openapi.json",
-    "getvda-ai-gosce-portfolio-openapi.json",
-    "getvda-ai-gosce-router-openapi.json",
-    "getvda-ai-hitl-openapi.json",
-    "getvda-ai-witness-openapi.json"
+    "_original/getvda-ai-acp-openapi.json",
+    "_original/getvda-ai-c2md-edge-openapi.json",
+    "_original/getvda-ai-gosce-portfolio-openapi.json",
+    "_original/getvda-ai-gosce-router-openapi.json",
+    "_original/getvda-ai-hitl-openapi.json",
+    "_original/getvda-ai-witness-openapi.json"
   ],
   "outputs": [
     "getvda-ai-well-known-api-openapi.yml",
@@ -36,17 +36,11 @@
     "getvda-ai-tools-api-openapi.yml",
     "getvda-ai-witness-api-openapi.yml"
   ],
-  "archived": [
-    "archived openapi/getvda-ai-acp-openapi.json",
-    "archived openapi/getvda-ai-c2md-edge-openapi.json",
-    "archived openapi/getvda-ai-gosce-portfolio-openapi.json",
-    "archived openapi/getvda-ai-gosce-router-openapi.json",
-    "archived openapi/getvda-ai-hitl-openapi.json",
-    "archived openapi/getvda-ai-witness-openapi.json"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
+    "sourced from openapi/_original/ (6 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "getvda-ai-acp-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "getvda-ai-acp-openapi.json: tagged paths GET /healthz -> Healthz",
     "getvda-ai-acp-openapi.json: tagged paths GET /readyz -> Readyz",
@@ -187,7 +181,34 @@
     "tag 'Health' spans 2 source specs (getvda-ai-gosce-portfolio-openapi.json, getvda-ai-gosce-router-openapi.json): per-path servers applied",
     "tag 'Llms.txt' spans 2 source specs (getvda-ai-gosce-portfolio-openapi.json, getvda-ai-gosce-router-openapi.json): per-path servers applied",
     "tag 'Mcp' spans 2 source specs (getvda-ai-gosce-router-openapi.json, getvda-ai-hitl-openapi.json): per-path servers applied",
-    "apis.yml register: written (+26 apis, 27 total)"
+    "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "getvda-ai-agents-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-bundles-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-c2md-edge-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-copilot-studio-yaml-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-environments-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-genesis-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-gosce-portfolio-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-governance-md-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-health-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-healthz-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-livez-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-llms-txt-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-mcp-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-mcp-free-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-mcp-metered-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-openapi-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-readyz-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-robots-txt-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-router-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-selftest-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-sitemap-xml-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-solutions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-tools-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-verify-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-well-known-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "getvda-ai-witness-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

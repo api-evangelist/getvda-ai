@@ -525,12 +525,12 @@ paths:
       - Tools
 components:
   responses:
+    AuthorityError:
+      description: unknown_escalation_label | actor_not_on_roster | actor_cannot_widen_ceiling | decision_class_not_permitted
     QuotaOrConstraint:
       description: quota_exceeded (typed, not a bare 429) | a store constraint (e.g. caller_not_found, items_decision_ref_uq)
     DomainError:
       description: a typed lifecycle/validation error (e.g. evidence_or_reason_required)
-    AuthorityError:
-      description: unknown_escalation_label | actor_not_on_roster | actor_cannot_widen_ceiling | decision_class_not_permitted
     Unauthorized:
       description: missing/invalid Witness Bearer (Contract A)
   securitySchemes:
