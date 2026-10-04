@@ -42,24 +42,24 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    SignedBundle:
+    BundleSignature:
       type: object
       required:
-      - manifest
-      - files
-      - signature
+      - algorithm
+      - value
+      - keyId
       additionalProperties: false
-      description: 'Deterministic by design: the same commit + version always produces the same bytes and the same signature. Verify by canonicalising `manifest`, checking `signature.value` against the key `manifest.keyId` resolves to, then confirming sha256 of the canonical `files` equals `manifest.contentHash`. Fail-static: a bundle that does not verify is not used.'
       properties:
-        manifest:
-          $ref: '#/components/schemas/BundleManifest'
-        files:
-          type: object
-          description: Governance file name → raw VDA-MD source. Capability/condition/authority/scope are parsed from these bodies.
-          additionalProperties:
-            type: string
-        signature:
-          $ref: '#/components/schemas/BundleSignature'
+        algorithm:
+          type: string
+          enum:
+          - Ed25519
+        value:
+          type: string
+          description: base64url signature over the canonical manifest bytes.
+        keyId:
+          type: string
+          description: Must equal manifest.keyId.
     BundleManifest:
       type: object
       required:
@@ -100,24 +100,24 @@ components:
           items:
             type: string
           description: Governance file names included, sorted.
-    BundleSignature:
+    SignedBundle:
       type: object
       required:
-      - algorithm
-      - value
-      - keyId
+      - manifest
+      - files
+      - signature
       additionalProperties: false
+      description: 'Deterministic by design: the same commit + version always produces the same bytes and the same signature. Verify by canonicalising `manifest`, checking `signature.value` against the key `manifest.keyId` resolves to, then confirming sha256 of the canonical `files` equals `manifest.contentHash`. Fail-static: a bundle that does not verify is not used.'
       properties:
-        algorithm:
-          type: string
-          enum:
-          - Ed25519
-        value:
-          type: string
-          description: base64url signature over the canonical manifest bytes.
-        keyId:
-          type: string
-          description: Must equal manifest.keyId.
+        manifest:
+          $ref: '#/components/schemas/BundleManifest'
+        files:
+          type: object
+          description: Governance file name → raw VDA-MD source. Capability/condition/authority/scope are parsed from these bodies.
+          additionalProperties:
+            type: string
+        signature:
+          $ref: '#/components/schemas/BundleSignature'
   securitySchemes:
     witness_bearer:
       type: http

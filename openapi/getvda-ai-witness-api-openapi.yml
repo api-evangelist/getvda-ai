@@ -1276,19 +1276,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    Clause:
-      type: object
-      required:
-      - ref
-      description: A cited policy/rule. Capture `text`/`hash` where possible — policies drift, and an auditor needs the version in force.
-      properties:
-        ref:
-          type: string
-        text:
-          type: string
-        hash:
-          type: string
-          description: sha256:<hex> of the policy source version
     EvidenceItem:
       type: object
       required:
@@ -1323,6 +1310,19 @@ components:
             bytes:
               type: string
           description: Embed the artifact (≤100KB decoded); Witness verifies bytes against `hash` at seal time.
+    Clause:
+      type: object
+      required:
+      - ref
+      description: A cited policy/rule. Capture `text`/`hash` where possible — policies drift, and an auditor needs the version in force.
+      properties:
+        ref:
+          type: string
+        text:
+          type: string
+        hash:
+          type: string
+          description: sha256:<hex> of the policy source version
     WitnessRecord:
       type: object
       description: The signed body + proof. Everything except `proof` is covered by the Ed25519 signature.
@@ -1383,23 +1383,6 @@ components:
         actionProposed:
           type: string
           description: 'Optional: what was/should be done'
-    SealRequest:
-      type: object
-      required:
-      - decision
-      - governingRule
-      properties:
-        decision:
-          $ref: '#/components/schemas/Decision'
-        governingRule:
-          $ref: '#/components/schemas/GoverningRule'
-        chainKey:
-          type: string
-          description: Per-(account,chain) ordering namespace; default 'default'. Max 128 chars [A-Za-z0-9._:-]. This is ALSO the grouping primitive — records sharing a chainKey are hash-linked into one set that is retrievable and provable as a set (GET /api/witness/chains/{chainKey}/proof, GET /api/witness/records?chainKey=, POST /api/witness/report {chainKey}). Give the seals of one workflow/bundle/case a stable shared key (e.g. 'c2md:bundle:<id>') rather than grouping by convention inside your own payloads. There is no separate bundle_id/group_id field.
-          default: default
-        decisionId:
-          type: string
-          description: 'Idempotency key. Dedupe is on (account_id, decisionId): the same value returns the existing record with `deduped: true`.'
     GoverningRule:
       type: object
       required:
@@ -1417,6 +1400,23 @@ components:
         governanceHash:
           type: string
           description: 'Optional: sha256:… of the governance source'
+    SealRequest:
+      type: object
+      required:
+      - decision
+      - governingRule
+      properties:
+        decision:
+          $ref: '#/components/schemas/Decision'
+        governingRule:
+          $ref: '#/components/schemas/GoverningRule'
+        chainKey:
+          type: string
+          description: Per-(account,chain) ordering namespace; default 'default'. Max 128 chars [A-Za-z0-9._:-]. This is ALSO the grouping primitive — records sharing a chainKey are hash-linked into one set that is retrievable and provable as a set (GET /api/witness/chains/{chainKey}/proof, GET /api/witness/records?chainKey=, POST /api/witness/report {chainKey}). Give the seals of one workflow/bundle/case a stable shared key (e.g. 'c2md:bundle:<id>') rather than grouping by convention inside your own payloads. There is no separate bundle_id/group_id field.
+          default: default
+        decisionId:
+          type: string
+          description: 'Idempotency key. Dedupe is on (account_id, decisionId): the same value returns the existing record with `deduped: true`.'
     Actor:
       type: object
       required:
