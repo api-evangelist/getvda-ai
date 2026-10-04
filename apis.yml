@@ -325,6 +325,8 @@ apis:
   humanURL: https://witness.getvda.ai/docs
   baseURL: https://witness.getvda.ai
   tags:
+  - Environment
+  tags_raw:
   - Environments
   properties:
   - type: OpenAPI
@@ -733,6 +735,8 @@ apis:
   humanURL: https://witness.getvda.ai/docs
   baseURL: https://witness.getvda.ai
   tags:
+  - llms-txt
+  tags_raw:
   - Llms.txt
   properties:
   - type: OpenAPI
@@ -791,6 +795,8 @@ apis:
   humanURL: https://witness.getvda.ai/docs
   baseURL: https://witness.getvda.ai
   tags:
+  - MCP
+  tags_raw:
   - Mcp
   properties:
   - type: OpenAPI
@@ -1198,6 +1204,8 @@ apis:
   humanURL: https://witness.getvda.ai/docs
   baseURL: https://witness.getvda.ai
   tags:
+  - Self Test
+  tags_raw:
   - Selftest
   properties:
   - type: OpenAPI
@@ -1604,6 +1612,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/getvda-ai-capability-edges.yml
+  name: Verified Digital Agents (VDA) Business Capability Map
 - type: MCPServer
   url: https://witness.getvda.ai/api/witness/mcp
 - type: AgentSkill
