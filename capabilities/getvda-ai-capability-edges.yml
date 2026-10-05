@@ -1,0 +1,38 @@
+slug: getvda-ai
+provider: Verified Digital Agents (VDA)
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 2
+edges:
+- tag: Tools
+  spec_file: getvda-ai-tools-api-openapi.yml
+  capability_id: BC-610.60
+  capability_id_l1: BC-610
+  capability_name: Artificial Intelligence Management
+  confidence: 0.7
+  evidence: '"owns human decisions on agent actions"; "raise_hitl_item  Raise a decision for human review";
+    "resolve_hitl_item  Record a human decision"'
+  reason: Operations implement human-in-the-loop review and authority configuration over AI agent actions,
+    i.e. governance controls in the AI/agent lifecycle (responsible AI). Mapped to Artificial Intelligence
+    Management; some ambiguity against generic compliance management, hence moderate confidence.
+- tag: Witness
+  spec_file: getvda-ai-witness-api-openapi.yml
+  capability_id: BC-610.60
+  capability_id_l1: BC-610
+  capability_name: Artificial Intelligence Management
+  confidence: 0.7
+  evidence: '"Seal governed AI-agent decisions into tamper-evident, Ed25519-signed, independently-verifiable
+    records"; "postApiWitnessSealAgentAction  Seal an autonomous agent action"'
+  reason: Core operations create and verify evidentiary records of governed AI-agent decisions and issue
+    agent admission credentials — governance/assurance over AI agent behaviour, best fitting Artificial
+    Intelligence Management (responsible AI). Competing readings (regulatory compliance evidence under
+    EU AI Act, or credential/IAM) keep confidence moderate.
