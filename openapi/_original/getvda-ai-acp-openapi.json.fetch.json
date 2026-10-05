@@ -1,0 +1,12 @@
+{
+ "url": "https://acp.getvda.ai/openapi.json",
+ "requested_url": "https://acp.getvda.ai/openapi.json",
+ "status": 200,
+ "content_type": "application/json; charset=utf-8",
+ "bytes": 5008,
+ "sha256": "04b35b8bb2440c1944da6e5249f6ff6d7d5c4b978eae71496620964966b4f29a",
+ "fetched_at": "2026-10-04",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "Re-fetched from the provider by verify-openapi-sources.py; the archived file is byte-identical to what the provider serves."
+}
