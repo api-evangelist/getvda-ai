@@ -98,3 +98,48 @@ plans:
   - Prices are per tool and stated in the 402 PAYMENT-REQUIRED header at request time; "if this catalog and that header disagree, the header wins"
   - Never charged for a failed call — settlement runs only after a successful result
   - Facilitator submits the transaction and pays the gas
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - free
+  - hybrid
+  - subscription
+  units: []
+  plans:
+  - name: Witness — Sealed
+    access: other
+    model: free
+    model_how: derived
+    units: []
+    periods: []
+  - name: Witness — Anchored
+    access: other
+    model: subscription
+    model_how: derived
+    units: []
+    periods: []
+  - name: Witness — Enterprise
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
+  - name: C2MD — free tier (c2md:assess)
+    access: other
+    model: free
+    model_how: derived
+    units: []
+    periods: []
+  - name: C2MD — Starter / Pro / Journey
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods: []
+  - name: GOSCE fleet — x402 pay-per-call
+    access: other
+    model: hybrid
+    model_how: derived
+    units: []
+    periods: []
