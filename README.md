@@ -1,4 +1,4 @@
-# VDA / GOSCE
+# Verified Digital Agents (VDA)
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,19 +64,154 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Verified Digital Agents (VDA, getvda.ai) sells governance for AI agents that can be proved after the fact — a composable suite of governance blocks: **Witness** seals every governed decision into an Ed25519-signed, hash-chained record (anchored to Sigstore Rekor and RFC 3161 timestamp authorities on the paid tier) and produces EU AI Act Article 12 evidence; **C2MD** turns EU AI Act, GDPR, NIST SP 800-53 and ISO 42001 controls into governance Markdown agents can follow; **ACP** versions, tests, approves and signs that governance in git; **Onboarding** admits agents and issues Witness-sealed admission credentials against did:web identities; **HITL** routes what exceeds an agent's authority to a human and seals the decision. The same operator runs **GOSCE**, a 98-server fleet of templated, x402-metered MCP/A2A agents under `*.getvda.ai` (the "VDA / GOSCE" author on a2aregistry.org).
+Verified Digital Agents (VDA, getvda.ai) sells governance for AI agents that can be proved after the fact: Witness seals every governed decision into an Ed25519-signed, hash-chained record (anchored to Sigstore Rekor and RFC 3161 TSAs on the paid tier) and produces EU AI Act Article 12 evidence; C2MD turns EU AI Act, GDPR, NIST SP 800-53 and ISO 42001 controls into governance Markdown agents can follow; ACP versions, tests, approves and signs that governance in git and serves it as signed bundles; Onboarding admits agents and issues Witness-sealed admission credentials against did:web identities; HITL routes what exceeds an agent's authority to a human and seals the decision. Every block publishes a signed A2A agent card, Witness/C2MD/HITL run remote MCP servers, and Witness/HITL/ACP publish OpenAPI 3.1. The same operator runs GOSCE, a 98-server fleet of templated, x402-metered MCP/A2A agents under *.getvda.ai — the "VDA / GOSCE" author that a2aregistry.org counted as 98 agents.
 
-What this profile holds (all fetched from the provider's own hosts on 2026-09-19):
+**Areas:** Company · AI Agents · AI Governance · Compliance · Audit Trail · Agent Identity · A2A · MCP · x402 · EU AI Act · Human-in-the-Loop
 
-- `openapi/` — six verbatim OpenAPI 3.1 documents (Witness 23 ops, HITL 17, ACP 12, C2MD edge 9, GOSCE portfolio 14, GOSCE router 14)
-- `a2a/` — eight served A2A agent cards, graded against A2A 1.0.0 (five conformant, three flavored)
-- `mcp/` — four probed remote MCP servers (Witness 16 tools, C2MD 11, HITL gated, GOSCE router 2) with verbatim `tools/list` results and a tool-to-REST crosswalk
-- `well-known/` — did:web documents on five hosts, the fleet JWKS and its 99-entry agent catalog; no security.txt / api-catalog / OAuth metadata anywhere
-- `packages/` — ten first-party npm/PyPI packages with live versions and dates
-- `llms/` — five provider-published llms.txt files
-- plus authentication, scopes, conformance, errors, lifecycle, conventions (idempotency + reversibility), plans, rate limits, sandbox, regulatory posture, data model, an OpenAPI overlay and four agent skills
+## Verified Digital Agents (VDA) on APIs.io
 
-- Website: https://getvda.ai/
-- Witness docs: https://witness.getvda.ai/docs
-- GOSCE agent index: https://agents.getvda.ai/agents
-- GitHub: https://github.com/getvda-ai
+Everything profiled for Verified Digital Agents (VDA) is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/getvda-ai/](https://apis.io/providers/getvda-ai/)** — or go straight to one of the APIs or properties below.
+
+### APIs (27)
+
+- [VDA Onboarding Agent](https://apis.io/apis/getvda-ai/vda-onboarding-agent/) — Admission authority for the suite — an A2A agent (6 skills) that runs holder-binding (DID-auth), intake and gap analysis for a candidate agent and issues a…
+- [Verified Digital Agents (VDA) Agents API](https://apis.io/apis/getvda-ai/getvda-ai-agents-api/) — The Agents API from Verified Digital Agents (VDA) — 2 operation(s) for agents.
+- [Verified Digital Agents (VDA) Bundles API](https://apis.io/apis/getvda-ai/getvda-ai-bundles-api/) — The Bundles API from Verified Digital Agents (VDA) — 2 operation(s) for bundles.
+- [Verified Digital Agents (VDA) C2MD Edge API](https://apis.io/apis/getvda-ai/getvda-ai-c2md-edge-api/) — The C2MD Edge API from Verified Digital Agents (VDA) — 1 operation(s) for c2md edge.
+- [Verified Digital Agents (VDA) Copilot Studio.yaml API](https://apis.io/apis/getvda-ai/getvda-ai-copilot-studio-yaml-api/) — The Copilot Studio.yaml API from Verified Digital Agents (VDA) — 1 operation(s) for copilot studio.yaml.
+- [Verified Digital Agents (VDA) Environments API](https://apis.io/apis/getvda-ai/getvda-ai-environments-api/) — The Environments API from Verified Digital Agents (VDA) — 6 operation(s) for environments.
+- [Verified Digital Agents (VDA) Genesis API](https://apis.io/apis/getvda-ai/getvda-ai-genesis-api/) — The Genesis API from Verified Digital Agents (VDA) — 1 operation(s) for genesis.
+- [Verified Digital Agents (VDA) GOSCE Portfolio API](https://apis.io/apis/getvda-ai/getvda-ai-gosce-portfolio-api/) — The GOSCE Portfolio API from Verified Digital Agents (VDA) — 2 operation(s) for gosce portfolio.
+- [Verified Digital Agents (VDA) Governance.md API](https://apis.io/apis/getvda-ai/getvda-ai-governance-md-api/) — The Governance.md API from Verified Digital Agents (VDA) — 1 operation(s) for governance.md.
+- [Verified Digital Agents (VDA) Health API](https://apis.io/apis/getvda-ai/getvda-ai-health-api/) — The Health API from Verified Digital Agents (VDA) — 1 operation(s) for health.
+- [Verified Digital Agents (VDA) Healthz API](https://apis.io/apis/getvda-ai/getvda-ai-healthz-api/) — The Healthz API from Verified Digital Agents (VDA) — 1 operation(s) for healthz.
+- [Verified Digital Agents (VDA) Livez API](https://apis.io/apis/getvda-ai/getvda-ai-livez-api/) — The Livez API from Verified Digital Agents (VDA) — 1 operation(s) for livez.
+- [Verified Digital Agents (VDA) Llms.txt API](https://apis.io/apis/getvda-ai/getvda-ai-llms-txt-api/) — The Llms.txt API from Verified Digital Agents (VDA) — 1 operation(s) for llms.txt.
+- [Verified Digital Agents (VDA) MCP API](https://apis.io/apis/getvda-ai/getvda-ai-mcp-api/) — The Mcp API from Verified Digital Agents (VDA) — 1 operation(s) for mcp.
+- [Verified Digital Agents (VDA) Mcp Free API](https://apis.io/apis/getvda-ai/getvda-ai-mcp-free-api/) — The Mcp Free API from Verified Digital Agents (VDA) — 1 operation(s) for mcp free.
+- [Verified Digital Agents (VDA) Mcp Metered API](https://apis.io/apis/getvda-ai/getvda-ai-mcp-metered-api/) — The Mcp Metered API from Verified Digital Agents (VDA) — 1 operation(s) for mcp metered.
+- [Verified Digital Agents (VDA) Openapi.json API](https://apis.io/apis/getvda-ai/getvda-ai-openapi-json-api/) — The Openapi.json API from Verified Digital Agents (VDA) — 1 operation(s) for openapi.json.
+- [Verified Digital Agents (VDA) Readyz API](https://apis.io/apis/getvda-ai/getvda-ai-readyz-api/) — The Readyz API from Verified Digital Agents (VDA) — 1 operation(s) for readyz.
+- [Verified Digital Agents (VDA) Robots.txt API](https://apis.io/apis/getvda-ai/getvda-ai-robots-txt-api/) — The Robots.txt API from Verified Digital Agents (VDA) — 1 operation(s) for robots.txt.
+- [Verified Digital Agents (VDA) Router API](https://apis.io/apis/getvda-ai/getvda-ai-router-api/) — The Router API from Verified Digital Agents (VDA) — 1 operation(s) for router.
+- [Verified Digital Agents (VDA) Selftest API](https://apis.io/apis/getvda-ai/getvda-ai-selftest-api/) — The Selftest API from Verified Digital Agents (VDA) — 1 operation(s) for selftest.
+- [Verified Digital Agents (VDA) Sitemap.xml API](https://apis.io/apis/getvda-ai/getvda-ai-sitemap-xml-api/) — The Sitemap.xml API from Verified Digital Agents (VDA) — 1 operation(s) for sitemap.xml.
+- [Verified Digital Agents (VDA) Solutions API](https://apis.io/apis/getvda-ai/getvda-ai-solutions-api/) — The Solutions API from Verified Digital Agents (VDA) — 3 operation(s) for solutions.
+- [Verified Digital Agents (VDA) Tools API](https://apis.io/apis/getvda-ai/getvda-ai-tools-api/) — The Tools API from Verified Digital Agents (VDA) — 10 operation(s) for tools.
+- [Verified Digital Agents (VDA) Verify API](https://apis.io/apis/getvda-ai/getvda-ai-verify-api/) — The Verify API from Verified Digital Agents (VDA) — 1 operation(s) for verify.
+- [Verified Digital Agents (VDA) .well Known API](https://apis.io/apis/getvda-ai/getvda-ai-well-known-api/) — The .well Known API from Verified Digital Agents (VDA) — 6 operation(s) for .well known.
+- [Verified Digital Agents (VDA) Witness API](https://apis.io/apis/getvda-ai/getvda-ai-witness-api/) — The Witness API from Verified Digital Agents (VDA) — 23 operation(s) for witness.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (8)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [Moved to /providers/getvda-ai/](https://apis.io/servers/getvda-ai/c2md-mcp-endpoint-streamable-http/)
+- [Moved to /providers/getvda-ai/](https://apis.io/servers/getvda-ai/getvda-ai-mcp-yml/)
+- [Moved to /providers/getvda-ai/](https://apis.io/servers/getvda-ai/gosce-router-mcp-endpoint-streamable-http/)
+- [Moved to /providers/getvda-ai/](https://apis.io/servers/getvda-ai/hitl-mcp-endpoint-streamable-http-bearer-required/)
+- [mcp](https://apis.io/servers/getvda-ai/mcp/)
+- [mcp](https://apis.io/servers/getvda-ai/mcp-2/)
+- [mcp](https://apis.io/servers/getvda-ai/mcp-3/)
+- [mcp](https://apis.io/servers/getvda-ai/mcp-4/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Getvda Ai Witness Overlay](https://apis.io/overlays/getvda-ai/getvda-ai-witness-overlay/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Getvda Ai Authentication](https://apis.io/security/getvda-ai/getvda-ai-authentication/)
+- [Getvda Ai Domain Security](https://apis.io/security/getvda-ai/getvda-ai-domain-security/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Getvda Ai Scopes](https://apis.io/scopes/getvda-ai/getvda-ai-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Getvda Ai Plans Pricing](https://apis.io/plans/getvda-ai/getvda-ai-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Getvda Ai Rate Limits](https://apis.io/rate-limits/getvda-ai/getvda-ai-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://getvda.ai/)
+- [Documentation](https://getvda.ai/governance-cycle.html)
+- [Getting started](https://witness.getvda.ai/docs)
+- [Pricing](https://witness.getvda.ai/.well-known/agent-card.json)
+- [Blog](https://getvda.ai/blog/)
+- [GitHub](https://github.com/getvda-ai)
+
+## API Evangelist rating
+
+**Kin Score 46.2** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 80.0 |
+| Contract quality | 39.1 |
+| Contract governance | 18.2 |
+| Operational transparency | 34.2 |
+| Developer ergonomics | 58.9 |
+| Access clarity | 42.1 |
+
+**Agent readiness 36.8** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | documented (partial credit) |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | documented (partial credit) |
+| Error Semantics | verified |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | conformant |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | partial |
+| Operation Distinctiveness | — |
+
+**Regulatory alignment 30.4** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/getvda-ai/](https://apis.io/providers/getvda-ai/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Verified Digital Agents (VDA): the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/getvda-ai/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
